@@ -1,0 +1,64 @@
+import type { Session, Track } from '../models/types';
+
+/** Planned focus time for a number of whole laps. */
+export function lapsToSeconds(track: Track, laps: number): number {
+  return laps * track.lapTimeSeconds;
+}
+
+/** Whole laps finished after `focusedSeconds`, never more than `plannedLaps`. */
+export function completedLaps(track: Track, focusedSeconds: number, plannedLaps: number): number {
+  const laps = Math.floor(focusedSeconds / track.lapTimeSeconds);
+  return Math.max(0, Math.min(laps, plannedLaps));
+}
+
+export function distanceKm(track: Track, laps: number): number {
+  return Math.round(laps * track.lapLengthKm * 1000) / 1000;
+}
+
+/** 1 XP and 1 credit per full minute focused, so ending early still pays for the time spent. */
+export function xpForSeconds(focusedSeconds: number): number {
+  return Math.floor(Math.max(0, focusedSeconds) / 60);
+}
+
+export function creditsForSeconds(focusedSeconds: number): number {
+  return xpForSeconds(focusedSeconds);
+}
+
+/** Level n needs 50 * (n - 1)^2 total XP: 0, 50, 200, 450, 800, ... */
+export function levelForXp(totalXp: number): number {
+  return Math.floor(Math.sqrt(Math.max(0, totalXp) / 50)) + 1;
+}
+
+export function xpForLevel(level: number): number {
+  return 50 * (level - 1) * (level - 1);
+}
+
+export interface SessionInput {
+  id: string;
+  track: Track;
+  plannedLaps: number;
+  focusedSeconds: number;
+  startedAt: Date;
+  endedAt: Date;
+}
+
+export function buildSession(input: SessionInput): Session {
+  const { track, plannedLaps } = input;
+  const plannedSeconds = lapsToSeconds(track, plannedLaps);
+  // Never credit more focus time than the session planned.
+  const focusedSeconds = Math.max(0, Math.min(Math.floor(input.focusedSeconds), plannedSeconds));
+  const laps = completedLaps(track, focusedSeconds, plannedLaps);
+  return {
+    id: input.id,
+    trackId: track.id,
+    plannedLaps,
+    focusedSeconds,
+    completedLaps: laps,
+    finished: focusedSeconds >= plannedSeconds,
+    startedAt: input.startedAt.toISOString(),
+    endedAt: input.endedAt.toISOString(),
+    distanceKm: distanceKm(track, laps),
+    xpEarned: xpForSeconds(focusedSeconds),
+    creditsEarned: creditsForSeconds(focusedSeconds),
+  };
+}
