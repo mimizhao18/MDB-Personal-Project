@@ -7,6 +7,7 @@ import {
   distanceKm,
   lapsToSeconds,
   levelForXp,
+  levelProgress,
   xpForLevel,
   xpForSeconds,
 } from '../src/logic/rewards.ts';
@@ -124,5 +125,11 @@ assert.equal(formatDurationWords(4680), '1 h 18 min');
 assert.equal(formatDurationWords(3600), '1 h');
 assert.equal(formatDurationWords(45), '45 s');
 assert.ok(LAP_OPTIONS.every((n) => Number.isInteger(n) && n > 0));
+
+// level progress
+assert.deepEqual(levelProgress(0), { level: 1, xpIntoLevel: 0, xpForNextLevel: 50, fraction: 0 });
+assert.deepEqual(levelProgress(25), { level: 1, xpIntoLevel: 25, xpForNextLevel: 50, fraction: 0.5 });
+assert.deepEqual(levelProgress(50), { level: 2, xpIntoLevel: 0, xpForNextLevel: 150, fraction: 0 });
+assert.deepEqual(levelProgress(125), { level: 2, xpIntoLevel: 75, xpForNextLevel: 150, fraction: 0.5 });
 
 console.log('all rule checks passed');

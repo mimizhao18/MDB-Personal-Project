@@ -1,5 +1,5 @@
 import { router, useLocalSearchParams } from 'expo-router';
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { Alert, BackHandler, Pressable, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -7,9 +7,9 @@ import { TrackView } from '../components/TrackView';
 import { TRACKS } from '../data/tracks';
 import { useSessionTimer } from '../hooks/useSessionTimer';
 import { formatClock } from '../logic/lapProgress';
-import { distanceKm } from '../logic/rewards';
-import { formatDurationWords } from '../logic/sessionOptions';
+import { buildSession } from '../logic/rewards';
 import type { Track } from '../models/types';
+import { recordSession } from '../storage/sessions';
 import { colors, spacing } from '../theme';
 
 export default function SessionScreen() {
@@ -32,7 +32,8 @@ export default function SessionScreen() {
 
 function Race({ track, laps, speed }: { track: Track; laps: number; speed: number }) {
   const timer = useSessionTimer(track, laps, speed);
-  const { status, progress: p, start, pause, resume, end } = timer;
+  const { status, progress: p, startedAt, endedAt, start, pause, resume, end } = timer;
+  const saved = useRef(false);
 
   useEffect(() => {
     start();
@@ -44,6 +45,32 @@ function Race({ track, laps, speed }: { track: Track; laps: number; speed: numbe
     return () => sub.remove();
   }, [status]);
 
+  // When the race is over, save it once and go to the summary.
+  useEffect(() => {
+    if ((status !== 'finished' && status !== 'ended') || saved.current) return;
+    saved.current = true;
+    const session = buildSession({
+      id: String(Date.now()),
+      track,
+      plannedLaps: laps,
+      focusedSeconds: p.elapsedSeconds,
+      startedAt: startedAt ?? new Date(),
+      endedAt: endedAt ?? new Date(),
+    });
+    if (session.xpEarned === 0) {
+      Alert.alert('Too short to count', 'A race needs at least 1 minute of focus to earn rewards.');
+      router.replace('/');
+      return;
+    }
+    recordSession(session).then(
+      () => router.replace({ pathname: '/summary', params: { id: session.id } }),
+      () => {
+        Alert.alert('Could not save the race', 'Something went wrong saving your race. Please try again.');
+        router.replace('/');
+      },
+    );
+  }, [status, track, laps, p.elapsedSeconds, startedAt, endedAt]);
+
   const confirmEnd = () => {
     Alert.alert('End race early?', 'You keep the laps and focus time you have done so far.', [
       { text: 'Keep racing', style: 'cancel' },
@@ -54,14 +81,8 @@ function Race({ track, laps, speed }: { track: Track; laps: number; speed: numbe
   if (status === 'finished' || status === 'ended') {
     return (
       <View style={styles.center}>
-        <Text style={styles.title}>{status === 'finished' ? 'Chequered flag!' : 'Race ended early'}</Text>
-        <Text style={styles.detail}>
-          {p.completedLaps} of {laps} laps
-        </Text>
-        <Text style={styles.detail}>{formatDurationWords(p.elapsedSeconds)} focused</Text>
-        <Text style={styles.detail}>{distanceKm(track, p.completedLaps).toFixed(1)} km driven</Text>
-        <Text style={styles.muted}>XP, credits and the full summary come in step 7.</Text>
-        <Button label="Back to Home" onPress={() => router.replace('/')} />
+        <Text style={styles.title}>{status === 'finished' ? 'Chequered flag!' : 'Race ended'}</Text>
+        <Text style={styles.muted}>Saving your race…</Text>
       </View>
     );
   }

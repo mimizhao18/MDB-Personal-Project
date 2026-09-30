@@ -33,6 +33,24 @@ export function xpForLevel(level: number): number {
   return 50 * (level - 1) * (level - 1);
 }
 
+export interface LevelProgress {
+  level: number;
+  /** XP earned inside the current level. */
+  xpIntoLevel: number;
+  /** XP the current level spans. */
+  xpForNextLevel: number;
+  /** 0 to 1 toward the next level. */
+  fraction: number;
+}
+
+export function levelProgress(totalXp: number): LevelProgress {
+  const level = levelForXp(totalXp);
+  const floor = xpForLevel(level);
+  const span = xpForLevel(level + 1) - floor;
+  const into = Math.max(0, totalXp) - floor;
+  return { level, xpIntoLevel: into, xpForNextLevel: span, fraction: span === 0 ? 0 : into / span };
+}
+
 export interface SessionInput {
   id: string;
   track: Track;
