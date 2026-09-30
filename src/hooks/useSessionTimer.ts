@@ -14,12 +14,10 @@ export interface SessionTimer {
   start: () => void;
   pause: () => void;
   resume: () => void;
-  /** Stop before the planned laps are done. */
+  /** Stop before the planned laps are done. Only allowed while paused. */
   end: () => void;
   reset: () => void;
 }
-
-const TICK_MS = 100;
 
 /**
  * Drives a focus session. Elapsed time comes from the clock (not from counting ticks), so it stays correct
@@ -70,7 +68,7 @@ export function useSessionTimer(track: Track, plannedLaps: number, timeScale = 1
   }, [status]);
 
   const end = useCallback(() => {
-    if (status !== 'running' && status !== 'paused') return;
+    if (status !== 'paused') return;
     freeze();
     setEndedAt(new Date());
     setStatus('ended');
@@ -87,7 +85,8 @@ export function useSessionTimer(track: Track, plannedLaps: number, timeScale = 1
 
   useEffect(() => {
     if (status !== 'running') return;
-    const id = setInterval(() => {
+    // One update per screen frame so the car moves smoothly.
+    let frame = requestAnimationFrame(function tick() {
       const elapsed = readElapsed();
       setElapsedSeconds(elapsed);
       if (elapsed >= plannedSeconds) {
@@ -95,9 +94,11 @@ export function useSessionTimer(track: Track, plannedLaps: number, timeScale = 1
         resumedAtMs.current = null;
         setEndedAt(new Date());
         setStatus('finished');
+        return;
       }
-    }, TICK_MS);
-    return () => clearInterval(id);
+      frame = requestAnimationFrame(tick);
+    });
+    return () => cancelAnimationFrame(frame);
   }, [status, readElapsed, plannedSeconds]);
 
   return {

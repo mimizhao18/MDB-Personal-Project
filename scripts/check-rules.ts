@@ -11,6 +11,7 @@ import {
   xpForSeconds,
 } from '../src/logic/rewards.ts';
 import { formatClock, lapProgress } from '../src/logic/lapProgress.ts';
+import { positionOnTrack } from '../src/logic/trackPosition.ts';
 import { applySessionToStreak, daysBetween, displayedStreak } from '../src/logic/streak.ts';
 
 const track = { id: 'silverstone', lapLengthKm: 5.891, lapTimeSeconds: 90 };
@@ -96,5 +97,23 @@ assert.equal(formatClock(90), '1:30');
 assert.equal(formatClock(59.2), '1:00'); // rounds up so the clock never shows 0:00 early
 assert.equal(formatClock(0), '0:00');
 assert.equal(formatClock(4680), '78:00');
+
+// car position on the track
+const square = { points: [[0, 0], [10, 0], [10, 10], [0, 10]] };
+let pos = positionOnTrack(square, 0);
+assert.deepEqual([pos.x, pos.y], [0, 0]);
+pos = positionOnTrack(square, 0.125);
+assert.deepEqual([pos.x, pos.y], [5, 0]);
+pos = positionOnTrack(square, 0.25);
+assert.deepEqual([pos.x, pos.y], [10, 0]);
+pos = positionOnTrack(square, 1); // a full lap is back at the line
+assert.deepEqual([pos.x, pos.y], [0, 0]);
+pos = positionOnTrack(square, 1.125); // wraps
+assert.deepEqual([pos.x, pos.y], [5, 0]);
+const circle = { points: Array.from({ length: 360 }, (_, k) => [100 * Math.cos((k * Math.PI) / 180), 100 * Math.sin((k * Math.PI) / 180)]) };
+pos = positionOnTrack(circle, 0); // at (100, 0) heading toward +y, i.e. 90 degrees
+assert.ok(Math.abs(pos.angleDeg - 90) < 1.5, `angle ${pos.angleDeg}`);
+pos = positionOnTrack(circle, 0.25); // at (0, 100) heading toward -x, i.e. 180 degrees
+assert.ok(Math.abs(Math.abs(pos.angleDeg) - 180) < 1.5, `angle ${pos.angleDeg}`);
 
 console.log('all rule checks passed');
