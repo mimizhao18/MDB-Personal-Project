@@ -2,7 +2,7 @@ import type { PlayerProfile, Session } from '../models/types';
 import { applySessionToStreak, dayKey } from '../logic/streak';
 import { readJson, writeJson } from './storage';
 
-const PROFILE_KEY = 'profile.v1';
+export const PROFILE_KEY = 'profile.v1';
 
 export const DEFAULT_PROFILE: PlayerProfile = {
   totalXp: 0,

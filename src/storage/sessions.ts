@@ -2,7 +2,7 @@ import type { PlayerProfile, Session } from '../models/types';
 import { applySessionToProfile } from './profile';
 import { readJson, writeJson } from './storage';
 
-const SESSIONS_KEY = 'sessions.v1';
+export const SESSIONS_KEY = 'sessions.v1';
 
 function isSession(v: unknown): v is Session {
   if (typeof v !== 'object' || v === null) return false;

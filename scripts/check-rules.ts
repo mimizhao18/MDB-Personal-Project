@@ -14,6 +14,7 @@ import {
 import { formatClock, lapProgress } from '../src/logic/lapProgress.ts';
 import { positionOnTrack } from '../src/logic/trackPosition.ts';
 import { formatDurationWords, LAP_OPTIONS } from '../src/logic/sessionOptions.ts';
+import { lifetimeStats } from '../src/logic/stats.ts';
 import { applySessionToStreak, daysBetween, displayedStreak } from '../src/logic/streak.ts';
 
 const track = { id: 'silverstone', lapLengthKm: 5.891, lapTimeSeconds: 90 };
@@ -131,5 +132,9 @@ assert.deepEqual(levelProgress(0), { level: 1, xpIntoLevel: 0, xpForNextLevel: 5
 assert.deepEqual(levelProgress(25), { level: 1, xpIntoLevel: 25, xpForNextLevel: 50, fraction: 0.5 });
 assert.deepEqual(levelProgress(50), { level: 2, xpIntoLevel: 0, xpForNextLevel: 150, fraction: 0 });
 assert.deepEqual(levelProgress(125), { level: 2, xpIntoLevel: 75, xpForNextLevel: 150, fraction: 0.5 });
+
+// lifetime stats
+assert.deepEqual(lifetimeStats([]), { races: 0, laps: 0, distanceKm: 0, focusedSeconds: 0 });
+assert.deepEqual(lifetimeStats([done, early]), { races: 2, laps: 14, distanceKm: 82.5, focusedSeconds: 1300 });
 
 console.log('all rule checks passed');

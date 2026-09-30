@@ -1,5 +1,5 @@
 import { router, useLocalSearchParams } from 'expo-router';
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Alert, BackHandler, Pressable, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -8,7 +8,8 @@ import { TRACKS } from '../data/tracks';
 import { useSessionTimer } from '../hooks/useSessionTimer';
 import { formatClock } from '../logic/lapProgress';
 import { buildSession } from '../logic/rewards';
-import type { Track } from '../models/types';
+import type { CarSettings, Track } from '../models/types';
+import { getProfile } from '../storage/profile';
 import { recordSession } from '../storage/sessions';
 import { colors, spacing } from '../theme';
 
@@ -34,6 +35,11 @@ function Race({ track, laps, speed }: { track: Track; laps: number; speed: numbe
   const timer = useSessionTimer(track, laps, speed);
   const { status, progress: p, startedAt, endedAt, start, pause, resume, end } = timer;
   const saved = useRef(false);
+  const [car, setCar] = useState<CarSettings | undefined>(undefined);
+
+  useEffect(() => {
+    getProfile().then((profile) => setCar(profile.car));
+  }, []);
 
   useEffect(() => {
     start();
@@ -96,7 +102,7 @@ function Race({ track, laps, speed }: { track: Track; laps: number; speed: numbe
         </Text>
       </View>
 
-      <TrackView track={track} lapFraction={p.lapFraction} />
+      <TrackView track={track} lapFraction={p.lapFraction} car={car} />
 
       <View style={styles.middle}>
         <View style={styles.barTrack}>
