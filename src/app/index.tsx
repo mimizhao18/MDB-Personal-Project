@@ -60,6 +60,9 @@ export default function HomeScreen() {
 
       <View style={styles.carArea}>
         <CarImage car={profile.car} size={300} />
+        <Pressable style={styles.garageButton} onPress={() => router.push('/garage')}>
+          <Text style={styles.garageText}>Customize car</Text>
+        </Pressable>
       </View>
 
       <View style={styles.statRow}>
@@ -98,7 +101,9 @@ const styles = StyleSheet.create({
   topRight: { alignItems: 'flex-end', gap: spacing.sm },
   credits: { color: colors.text, fontSize: 18, fontWeight: '700' },
   settings: { color: colors.textMuted, fontSize: 16 },
-  carArea: { flex: 1, alignItems: 'center', justifyContent: 'center' },
+  carArea: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: spacing.md },
+  garageButton: { backgroundColor: colors.surface, borderRadius: 10, paddingVertical: spacing.sm, paddingHorizontal: spacing.lg },
+  garageText: { color: colors.text, fontSize: 16, fontWeight: '600' },
   statRow: { flexDirection: 'row', gap: spacing.sm },
   stat: { flex: 1, backgroundColor: colors.surface, borderRadius: 12, paddingVertical: spacing.md, alignItems: 'center', gap: spacing.xs },
   statValue: { color: colors.text, fontSize: 22, fontWeight: '700' },

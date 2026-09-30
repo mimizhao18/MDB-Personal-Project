@@ -1,5 +1,6 @@
 import type { PlayerProfile, Session } from '../models/types';
 import { applySessionToStreak, dayKey } from '../logic/streak';
+import { FREE_COLOR_IDS } from '../data/cosmetics';
 import { readJson, writeJson } from './storage';
 
 export const PROFILE_KEY = 'profile.v1';
@@ -10,6 +11,7 @@ export const DEFAULT_PROFILE: PlayerProfile = {
   currentStreak: 0,
   longestStreak: 0,
   lastSessionDay: null,
+  unlockedColors: FREE_COLOR_IDS,
   car: { primaryColor: '#E10600', secondaryColor: '#FFFFFF', number: 1 },
 };
 
@@ -31,8 +33,12 @@ function isProfile(v: unknown): v is PlayerProfile {
   );
 }
 
-export function getProfile(): Promise<PlayerProfile> {
-  return readJson(PROFILE_KEY, DEFAULT_PROFILE, isProfile);
+/** Older saved profiles may lack newer fields; fill those from the defaults so progress is never lost. */
+export async function getProfile(): Promise<PlayerProfile> {
+  const stored = await readJson<PlayerProfile | null>(PROFILE_KEY, null, (v): v is PlayerProfile => isProfile(v));
+  if (stored === null) return DEFAULT_PROFILE;
+  const unlocked = Array.isArray(stored.unlockedColors) ? stored.unlockedColors.filter((c) => typeof c === 'string') : [];
+  return { ...stored, unlockedColors: Array.from(new Set([...FREE_COLOR_IDS, ...unlocked])) };
 }
 
 export async function saveProfile(profile: PlayerProfile): Promise<void> {

@@ -52,5 +52,7 @@ export interface PlayerProfile {
   longestStreak: number;
   /** Local calendar day (YYYY-MM-DD) of the last session that counted toward the streak. */
   lastSessionDay: string | null;
+  /** Ids of the paint colors bought so far (see src/data/cosmetics.ts). */
+  unlockedColors: string[];
   car: CarSettings;
 }

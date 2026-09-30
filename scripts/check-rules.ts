@@ -15,6 +15,7 @@ import { formatClock, lapProgress } from '../src/logic/lapProgress.ts';
 import { positionOnTrack } from '../src/logic/trackPosition.ts';
 import { formatDurationWords, LAP_OPTIONS } from '../src/logic/sessionOptions.ts';
 import { lifetimeStats } from '../src/logic/stats.ts';
+import { buyColor, equipColor, ownsColor, setCarNumber } from '../src/logic/garage.ts';
 import { applySessionToStreak, daysBetween, displayedStreak } from '../src/logic/streak.ts';
 
 const track = { id: 'silverstone', lapLengthKm: 5.891, lapTimeSeconds: 90 };
@@ -105,19 +106,30 @@ assert.equal(formatClock(4680), '78:00');
 const square = { points: [[0, 0], [10, 0], [10, 10], [0, 10]] };
 let pos = positionOnTrack(square, 0);
 assert.deepEqual([pos.x, pos.y], [0, 0]);
-pos = positionOnTrack(square, 0.125);
-assert.deepEqual([pos.x, pos.y], [5, 0]);
-pos = positionOnTrack(square, 0.25);
+pos = positionOnTrack(square, 0.25); // passes exactly through the traced points
 assert.deepEqual([pos.x, pos.y], [10, 0]);
 pos = positionOnTrack(square, 1); // a full lap is back at the line
 assert.deepEqual([pos.x, pos.y], [0, 0]);
-pos = positionOnTrack(square, 1.125); // wraps
-assert.deepEqual([pos.x, pos.y], [5, 0]);
-const circle = { points: Array.from({ length: 360 }, (_, k) => [100 * Math.cos((k * Math.PI) / 180), 100 * Math.sin((k * Math.PI) / 180)]) };
+const wrapped = positionOnTrack(square, 1.25);
+assert.ok(Math.abs(wrapped.x - 10) < 1e-9 && Math.abs(wrapped.y) < 1e-9);
+const angleDiff = (a, b) => Math.abs(((a - b + 540) % 360) - 180);
+const circle = { points: Array.from({ length: 36 }, (_, k) => [100 * Math.cos((k * 10 * Math.PI) / 180), 100 * Math.sin((k * 10 * Math.PI) / 180)]) };
 pos = positionOnTrack(circle, 0); // at (100, 0) heading toward +y, i.e. 90 degrees
-assert.ok(Math.abs(pos.angleDeg - 90) < 1.5, `angle ${pos.angleDeg}`);
+assert.ok(angleDiff(pos.angleDeg, 90) < 1, `angle ${pos.angleDeg}`);
 pos = positionOnTrack(circle, 0.25); // at (0, 100) heading toward -x, i.e. 180 degrees
-assert.ok(Math.abs(Math.abs(pos.angleDeg) - 180) < 1.5, `angle ${pos.angleDeg}`);
+assert.ok(angleDiff(pos.angleDeg, 180) < 1, `angle ${pos.angleDeg}`);
+// between points the car stays on the circle (straight-line steps would cut inside it by ~0.4%)
+pos = positionOnTrack(circle, 0.5 / 36);
+assert.ok(Math.abs(Math.hypot(pos.x, pos.y) - 100) < 0.05, `radius ${Math.hypot(pos.x, pos.y)}`);
+// the heading turns smoothly: no sudden jumps anywhere around the lap, even on a coarse 36-point circle
+let maxJump = 0;
+let prev = positionOnTrack(circle, 0).angleDeg;
+for (let k = 1; k <= 4000; k++) {
+  const a = positionOnTrack(circle, k / 4000).angleDeg;
+  maxJump = Math.max(maxJump, angleDiff(a, prev));
+  prev = a;
+}
+assert.ok(maxJump < 0.3, `max heading jump ${maxJump}`);
 
 // duration wording and lap options
 assert.equal(formatDurationWords(900), '15 min');
@@ -136,5 +148,27 @@ assert.deepEqual(levelProgress(125), { level: 2, xpIntoLevel: 75, xpForNextLevel
 // lifetime stats
 assert.deepEqual(lifetimeStats([]), { races: 0, laps: 0, distanceKm: 0, focusedSeconds: 0 });
 assert.deepEqual(lifetimeStats([done, early]), { races: 2, laps: 14, distanceKm: 82.5, focusedSeconds: 1300 });
+
+// garage
+const red = { id: 'red', name: 'Red', hex: '#E10600', price: 0 };
+const blue = { id: 'blue', name: 'Blue', hex: '#1E41FF', price: 50 };
+const gp = { totalXp: 0, credits: 80, currentStreak: 0, longestStreak: 0, lastSessionDay: null, unlockedColors: ['red'], car: { primaryColor: '#E10600', secondaryColor: '#FFFFFF', number: 1 } };
+assert.equal(ownsColor(gp, red), true);
+assert.equal(ownsColor(gp, blue), false);
+let g = buyColor(gp, blue);
+assert.equal(g.ok, true);
+assert.equal(g.profile.credits, 30);
+assert.deepEqual(g.profile.unlockedColors, ['red', 'blue']);
+assert.equal(gp.credits, 80); // original profile untouched
+assert.deepEqual(buyColor(g.profile, blue), { ok: false, reason: 'already-owned' });
+assert.deepEqual(buyColor({ ...gp, credits: 49 }, blue), { ok: false, reason: 'not-enough-credits' });
+assert.deepEqual(equipColor(gp, blue, 'primary'), { ok: false, reason: 'not-owned' });
+g = equipColor(buyColor(gp, blue).profile, blue, 'secondary');
+assert.equal(g.profile.car.secondaryColor, '#1E41FF');
+assert.equal(g.profile.car.primaryColor, '#E10600');
+assert.equal(setCarNumber(gp, 44, 1, 99).profile.car.number, 44);
+assert.equal(setCarNumber(gp, 0, 1, 99).ok, false);
+assert.equal(setCarNumber(gp, 100, 1, 99).ok, false);
+assert.equal(setCarNumber(gp, 4.5, 1, 99).ok, false);
 
 console.log('all rule checks passed');
