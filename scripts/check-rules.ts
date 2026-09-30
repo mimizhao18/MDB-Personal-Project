@@ -10,6 +10,7 @@ import {
   xpForLevel,
   xpForSeconds,
 } from '../src/logic/rewards.ts';
+import { formatClock, lapProgress } from '../src/logic/lapProgress.ts';
 import { applySessionToStreak, daysBetween, displayedStreak } from '../src/logic/streak.ts';
 
 const track = { id: 'silverstone', lapLengthKm: 5.891, lapTimeSeconds: 90 };
@@ -74,5 +75,26 @@ assert.equal(displayedStreak(s, '2026-10-02'), 0); // missed a day
 s = applySessionToStreak(s, '2026-10-05'); // gap restarts, longest kept
 assert.equal(s.currentStreak, 1);
 assert.equal(s.longestStreak, 3);
+
+// lap progress
+let p = lapProgress(track, 10, 0);
+assert.deepEqual([p.completedLaps, p.currentLap, p.lapFraction, p.totalFraction, p.finished], [0, 1, 0, 0, false]);
+p = lapProgress(track, 10, 45);
+assert.deepEqual([p.completedLaps, p.currentLap, p.lapFraction, p.remainingSeconds], [0, 1, 0.5, 855]);
+p = lapProgress(track, 10, 90);
+assert.deepEqual([p.completedLaps, p.currentLap, p.lapFraction], [1, 2, 0]);
+p = lapProgress(track, 10, 135);
+assert.deepEqual([p.completedLaps, p.currentLap, p.lapFraction], [1, 2, 0.5]);
+p = lapProgress(track, 10, 899);
+assert.deepEqual([p.completedLaps, p.currentLap, p.finished], [9, 10, false]);
+p = lapProgress(track, 10, 900);
+assert.deepEqual([p.completedLaps, p.currentLap, p.lapFraction, p.totalFraction, p.finished], [10, 10, 1, 1, true]);
+p = lapProgress(track, 10, 5000); // past the end and negative are clamped
+assert.equal(p.elapsedSeconds, 900);
+assert.equal(lapProgress(track, 10, -5).elapsedSeconds, 0);
+assert.equal(formatClock(90), '1:30');
+assert.equal(formatClock(59.2), '1:00'); // rounds up so the clock never shows 0:00 early
+assert.equal(formatClock(0), '0:00');
+assert.equal(formatClock(4680), '78:00');
 
 console.log('all rule checks passed');
