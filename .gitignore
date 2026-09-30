@@ -39,3 +39,6 @@ yarn-error.*
 # generated native folders
 /ios
 /android
+
+# F1 reference graphics (copyrighted, tracing reference only)
+reference/
