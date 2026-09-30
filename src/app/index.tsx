@@ -52,9 +52,14 @@ export default function HomeScreen() {
         </View>
         <View style={styles.topRight}>
           <Text style={styles.credits}>{profile.credits} credits</Text>
-          <Pressable onPress={() => router.push('/settings')} hitSlop={12}>
-            <Text style={styles.settings}>Settings</Text>
-          </Pressable>
+          <View style={styles.links}>
+            <Pressable onPress={() => router.push('/history')} hitSlop={12}>
+              <Text style={styles.settings}>History</Text>
+            </Pressable>
+            <Pressable onPress={() => router.push('/settings')} hitSlop={12}>
+              <Text style={styles.settings}>Settings</Text>
+            </Pressable>
+          </View>
         </View>
       </View>
 
@@ -100,6 +105,7 @@ const styles = StyleSheet.create({
   barFill: { height: '100%', backgroundColor: colors.accent },
   topRight: { alignItems: 'flex-end', gap: spacing.sm },
   credits: { color: colors.text, fontSize: 18, fontWeight: '700' },
+  links: { flexDirection: 'row', gap: spacing.md },
   settings: { color: colors.textMuted, fontSize: 16 },
   carArea: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: spacing.md },
   garageButton: { backgroundColor: colors.surface, borderRadius: 10, paddingVertical: spacing.sm, paddingHorizontal: spacing.lg },

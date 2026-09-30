@@ -16,6 +16,7 @@ export default function RootLayout() {
         }}
       >
         <Stack.Screen name="index" options={{ headerShown: false }} />
+        <Stack.Screen name="history" options={{ title: 'History' }} />
         <Stack.Screen name="garage" options={{ title: 'Garage' }} />
         <Stack.Screen name="settings" options={{ title: 'Settings' }} />
         <Stack.Screen name="create-session" options={{ title: 'New Race' }} />

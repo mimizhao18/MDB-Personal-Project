@@ -1,4 +1,4 @@
-// Run with: node --experimental-strip-types scripts/check-rules.ts
+// Run with: npm run check
 // @ts-nocheck (plain Node script; the app's tsconfig does not know about Node or .ts import suffixes)
 import assert from 'node:assert/strict';
 import {
@@ -16,6 +16,7 @@ import { positionOnTrack } from '../src/logic/trackPosition.ts';
 import { formatDurationWords, LAP_OPTIONS } from '../src/logic/sessionOptions.ts';
 import { lifetimeStats } from '../src/logic/stats.ts';
 import { buyColor, equipColor, ownsColor, setCarNumber } from '../src/logic/garage.ts';
+import { recentDays } from '../src/logic/history.ts';
 import { applySessionToStreak, daysBetween, displayedStreak } from '../src/logic/streak.ts';
 
 const track = { id: 'silverstone', lapLengthKm: 5.891, lapTimeSeconds: 90 };
@@ -170,5 +171,17 @@ assert.equal(setCarNumber(gp, 44, 1, 99).profile.car.number, 44);
 assert.equal(setCarNumber(gp, 0, 1, 99).ok, false);
 assert.equal(setCarNumber(gp, 100, 1, 99).ok, false);
 assert.equal(setCarNumber(gp, 4.5, 1, 99).ok, false);
+
+// recent days (history strip)
+const mk = (endedAt, focusedSeconds) => ({ ...done, endedAt: new Date(endedAt).toISOString(), focusedSeconds });
+const week = recentDays([mk('2026-09-30T10:15:00', 900), mk('2026-09-30T18:00:00', 600), mk('2026-09-28T09:00:00', 300), mk('2026-09-01T09:00:00', 999)], new Date('2026-09-30T12:00:00'), 7);
+assert.equal(week.length, 7);
+assert.equal(week[0].day, '2026-09-24');
+assert.equal(week[6].day, '2026-09-30');
+assert.equal(week[6].weekday, 3); // Wednesday
+assert.deepEqual([week[6].races, week[6].focusedSeconds], [2, 1500]);
+assert.deepEqual([week[4].races, week[4].focusedSeconds], [1, 300]); // Sep 28
+assert.equal(week[5].races, 0);
+assert.equal(week.reduce((n, d) => n + d.races, 0), 3); // the Sep 1 race is outside the window
 
 console.log('all rule checks passed');
