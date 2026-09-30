@@ -17,7 +17,7 @@ export default function RootLayout() {
       >
         <Stack.Screen name="index" options={{ title: 'Home' }} />
         <Stack.Screen name="create-session" options={{ title: 'New Race' }} />
-        <Stack.Screen name="session" options={{ title: 'Race', headerBackVisible: false }} />
+        <Stack.Screen name="session" options={{ title: 'Race', headerBackVisible: false, gestureEnabled: false }} />
       </Stack>
     </>
   );

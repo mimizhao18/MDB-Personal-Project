@@ -13,12 +13,16 @@ import { colors, spacing } from '../theme';
 export default function CreateSessionScreen() {
   const [trackId, setTrackId] = useState<TrackId>(TRACK_LIST[0].id);
   const [laps, setLaps] = useState<number>(DEFAULT_LAPS);
+  const [speed, setSpeed] = useState(1); // development only: speeds the race up for testing
 
   const track = TRACK_LIST.find((t) => t.id === trackId) ?? TRACK_LIST[0];
   const seconds = lapsToSeconds(track, laps);
 
   const start = () => {
-    router.push({ pathname: '/session', params: { track: track.id, laps: String(laps) } });
+    router.push({
+      pathname: '/session',
+      params: { track: track.id, laps: String(laps), ...(__DEV__ && speed > 1 ? { speed: String(speed) } : {}) },
+    });
   };
 
   return (
@@ -58,6 +62,19 @@ export default function CreateSessionScreen() {
             );
           })}
         </View>
+
+        {__DEV__ && (
+          <>
+            <Text style={styles.heading}>Test speed (development only)</Text>
+            <View style={styles.chips}>
+              {[1, 10, 30, 60].map((x) => (
+                <Pressable key={x} style={[styles.chip, x === speed && styles.selected]} onPress={() => setSpeed(x)}>
+                  <Text style={styles.chipLaps}>{x}x</Text>
+                </Pressable>
+              ))}
+            </View>
+          </>
+        )}
       </ScrollView>
 
       <View style={styles.footer}>
