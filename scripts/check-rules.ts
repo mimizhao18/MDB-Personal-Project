@@ -12,6 +12,7 @@ import {
 } from '../src/logic/rewards.ts';
 import { formatClock, lapProgress } from '../src/logic/lapProgress.ts';
 import { positionOnTrack } from '../src/logic/trackPosition.ts';
+import { formatDurationWords, LAP_OPTIONS } from '../src/logic/sessionOptions.ts';
 import { applySessionToStreak, daysBetween, displayedStreak } from '../src/logic/streak.ts';
 
 const track = { id: 'silverstone', lapLengthKm: 5.891, lapTimeSeconds: 90 };
@@ -115,5 +116,13 @@ pos = positionOnTrack(circle, 0); // at (100, 0) heading toward +y, i.e. 90 degr
 assert.ok(Math.abs(pos.angleDeg - 90) < 1.5, `angle ${pos.angleDeg}`);
 pos = positionOnTrack(circle, 0.25); // at (0, 100) heading toward -x, i.e. 180 degrees
 assert.ok(Math.abs(Math.abs(pos.angleDeg) - 180) < 1.5, `angle ${pos.angleDeg}`);
+
+// duration wording and lap options
+assert.equal(formatDurationWords(900), '15 min');
+assert.equal(formatDurationWords(450), '7 min 30 s');
+assert.equal(formatDurationWords(4680), '1 h 18 min');
+assert.equal(formatDurationWords(3600), '1 h');
+assert.equal(formatDurationWords(45), '45 s');
+assert.ok(LAP_OPTIONS.every((n) => Number.isInteger(n) && n > 0));
 
 console.log('all rule checks passed');
