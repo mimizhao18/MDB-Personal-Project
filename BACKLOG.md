@@ -8,6 +8,7 @@
 
 ## Known gaps and loose ends
 - **More tracks.** Monaco and Spa are planned. Silverstone's shape was traced from the official F1 graphic (see `reference/`, not in git). Lap time rule: lap record rounded to the nearest 10 s.
+- **Track tracing tools.** The Python scripts that traced Silverstone were temporary and are not in the repo. Before adding Monaco and Spa, recreate them as a reusable tool (`tools/`) so all tracks are traced the same way.
 - **Track shape.** Lightly smoothed trace; tight corners may still look slightly rough. Could be hand-tuned.
 - **Keep the screen awake during a race.** `expo-keep-awake` would not install (peer dependency conflict in Expo's optional packages). The timer stays correct without it, but the phone may dim or sleep.
 - **Test speed in development.** Races run at 10x/30x/60x add real XP and credits to the profile. Use Settings > Reset all data to clear them.
