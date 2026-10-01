@@ -13,7 +13,8 @@ import {
 } from '../src/logic/rewards.ts';
 import { formatClock, lapProgress } from '../src/logic/lapProgress.ts';
 import { positionOnTrack } from '../src/logic/trackPosition.ts';
-import { formatDurationWords, LAP_OPTIONS } from '../src/logic/sessionOptions.ts';
+import { formatDurationWords } from '../src/logic/sessionOptions.ts';
+import { clampLaps, lapsFromMinutes, maxMinutes, minutesForLaps } from '../src/logic/raceLength.ts';
 import { lifetimeStats } from '../src/logic/stats.ts';
 import { buyColor, equipColor, ownsColor, setCarNumber } from '../src/logic/garage.ts';
 import { recentDays } from '../src/logic/history.ts';
@@ -138,7 +139,32 @@ assert.equal(formatDurationWords(450), '7 min 30 s');
 assert.equal(formatDurationWords(4680), '1 h 18 min');
 assert.equal(formatDurationWords(3600), '1 h');
 assert.equal(formatDurationWords(45), '45 s');
-assert.ok(LAP_OPTIONS.every((n) => Number.isInteger(n) && n > 0));
+
+// race length slider: minutes snap to whole laps, and the slider never jumps back
+const raceTracks = [
+  { lapTimeSeconds: 90, raceLaps: 52 }, // Silverstone
+  { lapTimeSeconds: 70, raceLaps: 78 }, // Monaco
+  { lapTimeSeconds: 100, raceLaps: 44 }, // Spa
+];
+for (const t of raceTracks) {
+  assert.equal(lapsFromMinutes(t, 0), 1); // never fewer than 1 lap
+  assert.equal(lapsFromMinutes(t, 100000), t.raceLaps); // never more than a full race
+  assert.equal(clampLaps(t, 0), 1);
+  assert.equal(clampLaps(t, t.raceLaps + 10), t.raceLaps);
+  assert.equal(maxMinutes(t), Math.round((t.raceLaps * t.lapTimeSeconds) / 60));
+  for (let m = 1; m <= maxMinutes(t); m++) {
+    const laps = lapsFromMinutes(t, m);
+    assert.ok(Number.isInteger(laps) && laps >= 1 && laps <= t.raceLaps, `${m} min -> ${laps} laps`);
+    // the race is within half a lap of the minutes asked for, unless clamped at the ends
+    if (laps > 1 && laps < t.raceLaps) assert.ok(Math.abs(laps * t.lapTimeSeconds - m * 60) <= t.lapTimeSeconds / 2 + 1e-9, `${m} min`);
+  }
+  for (let laps = 1; laps <= t.raceLaps; laps++) {
+    // placing the minutes slider for a lap count and reading it back gives the same laps (no jumping)
+    assert.equal(lapsFromMinutes(t, minutesForLaps(t, laps)), laps, `laps ${laps} at ${t.lapTimeSeconds}s`);
+  }
+}
+assert.equal(lapsFromMinutes(raceTracks[0], 15), 10); // 15 min at 90 s per lap = 10 laps
+assert.equal(minutesForLaps(raceTracks[0], 10), 15);
 
 // level progress
 assert.deepEqual(levelProgress(0), { level: 1, xpIntoLevel: 0, xpForNextLevel: 50, fraction: 0 });

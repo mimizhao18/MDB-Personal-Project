@@ -4,7 +4,7 @@ import { Alert, BackHandler, Pressable, StyleSheet, Text, View } from 'react-nat
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { TrackView } from '../components/TrackView';
-import { TRACKS } from '../data/tracks';
+import { TRACKS, isTrackId } from '../data/tracks';
 import { useSessionTimer } from '../hooks/useSessionTimer';
 import { formatClock } from '../logic/lapProgress';
 import { buildSession } from '../logic/rewards';
@@ -15,7 +15,7 @@ import { colors, spacing } from '../theme';
 
 export default function SessionScreen() {
   const params = useLocalSearchParams<{ track?: string; laps?: string; speed?: string }>();
-  const track = params.track === 'silverstone' ? TRACKS.silverstone : undefined;
+  const track = isTrackId(params.track) ? TRACKS[params.track] : undefined;
   const laps = Number(params.laps);
   // Test speed-up, only honoured in development builds.
   const speed = __DEV__ && Number(params.speed) > 1 ? Number(params.speed) : 1;

@@ -19,7 +19,8 @@ export default function RootLayout() {
         <Stack.Screen name="history" options={{ title: 'History' }} />
         <Stack.Screen name="garage" options={{ title: 'Garage' }} />
         <Stack.Screen name="settings" options={{ title: 'Settings' }} />
-        <Stack.Screen name="create-session" options={{ title: 'New Race' }} />
+        {/* Swipe-back is off here because dragging the race-length slider to the right looks like a back swipe. */}
+        <Stack.Screen name="create-session" options={{ title: 'New Race', gestureEnabled: false }} />
         <Stack.Screen name="summary" options={{ title: 'Race Summary', headerBackVisible: false, gestureEnabled: false }} />
         <Stack.Screen name="session" options={{ title: 'Race', headerBackVisible: false, gestureEnabled: false }} />
       </Stack>

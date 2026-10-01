@@ -1,4 +1,4 @@
-export type TrackId = 'silverstone';
+export type TrackId = 'silverstone' | 'monaco' | 'spa';
 
 export interface Track {
   id: TrackId;
@@ -10,6 +10,8 @@ export interface Track {
   /** Seconds one lap takes in the app: the lap record rounded to the nearest 10 s. */
   lapTimeSeconds: number;
   viewBox: { width: number; height: number };
+  /** Drawn road width in viewBox units (narrower on tracks whose strands run close together). */
+  roadWidth: number;
   startFinish: { from: Point; to: Point };
   /** SVG path of the centerline. */
   path: string;

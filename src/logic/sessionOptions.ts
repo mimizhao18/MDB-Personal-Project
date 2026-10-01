@@ -1,6 +1,4 @@
-/** Session lengths offered on the Create Session screen, in whole laps. The last one is a full Silverstone race. */
-export const LAP_OPTIONS = [5, 10, 20, 30, 40, 52] as const;
-
+/** The race length the New Race screen starts on, in whole laps. */
 export const DEFAULT_LAPS = 10;
 
 /** "15 min", "7 min 30 s", "1 h 18 min". */

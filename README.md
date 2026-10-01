@@ -4,7 +4,7 @@ A mobile focus-timer app with a Formula 1 theme. You pick a race length in laps,
 
 Built with Expo (React Native) and TypeScript. Runs on a phone through Expo Go.
 
-**Status:** version 1 is complete (all 10 build steps). See [BACKLOG.md](BACKLOG.md) for what comes next.
+**Status:** version 1 is complete (all 10 build steps), plus the race-length slider and the Monaco and Spa tracks. See [BACKLOG.md](BACKLOG.md) for what comes next.
 
 ## Running the app
 
@@ -60,7 +60,7 @@ Older saved profiles are upgraded automatically when new fields are added. **Set
 | Screen | File | Purpose |
 |---|---|---|
 | Home | `src/app/index.tsx` | Level and XP bar, credits, your car, stats, Start Race, links to History, Settings and the garage |
-| New Race | `src/app/create-session.tsx` | Pick the track and race length. In development builds it also has a **Test speed** row (10x/30x/60x) so races finish quickly |
+| New Race | `src/app/create-session.tsx` | Pick one of the three tracks and set the race length with a slider that toggles between **laps** and **minutes** (minutes snap to whole laps). In development builds it also has a **Test speed** row (10x/30x/60x) so races finish quickly |
 | Race | `src/app/session.tsx` | Live race: track with the moving car, lap counter, time remaining, pause/resume/end. Saves the race when it ends |
 | Summary | `src/app/summary.tsx` | Laps, time, distance, XP and credits earned, level progress, streak |
 | History | `src/app/history.tsx` | Current and longest streak, last-7-days chart, list of past races |
@@ -74,7 +74,7 @@ Navigation uses **Expo Router** (file-based): every file in `src/app/` is a scre
 ```
 src/
   app/          Screens (Expo Router)
-  components/   CarIcon.tsx (the car drawing), TrackView.tsx (track + moving car)
+  components/   CarIcon.tsx (the car drawing), TrackView.tsx (track + moving car), Slider.tsx (race-length slider)
   data/         tracks/ (track definitions and shapes), cosmetics.ts (paint colors)
   hooks/        useSessionTimer.ts (the race clock)
   logic/        Pure functions: no screens, no storage, easy to test
@@ -82,6 +82,7 @@ src/
   storage/      Reading and writing saved data
   theme.ts      Colors and spacing
 scripts/        check-rules.ts (automated tests) and helpers
+tools/          trace_track.py (turns an F1 track graphic into a track shape file)
 ```
 
 Design rule: **rules live in `src/logic/`** as plain functions, and screens only display them. That is why the rules can be tested without a phone.
@@ -90,16 +91,26 @@ Design rule: **rules live in `src/logic/`** as plain functions, and screens only
 - `logic/rewards.ts`: laps/time/distance conversions, XP and credits, levels, building a saved session record.
 - `logic/lapProgress.ts`: turns "planned laps + elapsed seconds" into current lap, completed laps and how far through the lap (0 to 1).
 - `logic/trackPosition.ts`: turns a lap fraction into the car's position and heading on the track, using a smooth curve through the traced points so turning is not jerky.
-- `logic/streak.ts`, `logic/history.ts`, `logic/stats.ts`, `logic/garage.ts`, `logic/sessionOptions.ts`: streaks, the weekly chart, lifetime totals, buying and equipping, race length options.
+- `logic/raceLength.ts`: converts between laps and minutes for the race-length slider (always whole laps).
+- `logic/streak.ts`, `logic/history.ts`, `logic/stats.ts`, `logic/garage.ts`, `logic/sessionOptions.ts`: streaks, the weekly chart, lifetime totals, buying and equipping, formatting.
 - `hooks/useSessionTimer.ts`: the race clock (idle, running, paused, finished, ended). Elapsed time comes from the real clock, not counted ticks, so it stays correct if the app is throttled. Updates once per screen frame for smooth motion.
 - `storage/`: `storage.ts` wraps AsyncStorage and falls back to defaults if data is missing or corrupt; `profile.ts` and `sessions.ts` hold the profile and race list; `sessions.ts > recordSession` saves a race and adds its rewards to the profile.
 
 ## Tracks
 
-Only **Silverstone** exists so far. Each track (`src/data/tracks/`) has its real lap count and length, the app lap time, and a **traced shape**:
-- `silverstoneShape.ts` holds an SVG path, 360 points spaced evenly by distance along one lap (point `i` is `i/360` of a lap, starting at the start/finish line and running in race direction), the start/finish line, and the drawing box (1000 wide).
-- The shape was traced from the circuit graphic on the official Formula 1 website (centerline only), lightly smoothed. The downloaded image is kept in `reference/`, which is **not in git** because it is F1's copyrighted artwork.
-- Adding a track means: get its facts and graphic, trace the centerline the same way, create a shape file and a track file, and add it to `src/data/tracks/index.ts`. The trace scripts were temporary and are not in the repo yet; see the backlog.
+Three circuits: **Silverstone**, **Monaco** and **Spa-Francorchamps**. Each track (`src/data/tracks/`) has its real lap count and length, the app lap time, and a **traced shape**.
+
+| Track | Race laps | Lap length | Lap record used | App lap time | Full race |
+|---|---|---|---|---|---|
+| Silverstone | 52 | 5.891 km | 1:27.097 | 90 s | 78 min |
+| Monaco | 78 | 3.337 km | 1:12.909 | 70 s | 91 min |
+| Spa-Francorchamps | 44 | 7.004 km | 1:44.701 | 100 s | 73 min |
+
+- Facts and the circuit graphic come from each race's page on formula1.com. The app lap time is the lap record rounded to the nearest 10 s.
+- Each `<track>Shape.ts` holds an SVG path, 360 points spaced evenly by distance along one lap (point `i` is `i/360` of a lap, starting at the start/finish line and running in race direction), the start/finish line, the drawing box (1000 wide) and the road width.
+- Shapes are generated by **`tools/trace_track.py`** from the track image in `reference/` (the downloaded F1 graphics, **not in git** because they are F1's copyrighted artwork). The same pipeline is used for every track: extract a mask, skeletonize to a centerline, chain the pieces into a loop, fit a smooth curve, resample to 360 points. Silverstone traces the road outline; Monaco and Spa trace the thin colored center line, because on Monaco the road outlines fuse together. See the docstring at the top of the script. Needs `pip install -r tools/requirements.txt`.
+- Road width is per track (26 units, 14 on Monaco where two strands run only about 25 units apart). The car and start line are scaled to match.
+- Adding a track: download its detailed graphic to `reference/<id>.webp`, add an entry to `CONFIGS` in the tracing tool (start/finish pixel, a point just after the line to set the direction, road width), run `python tools/trace_track.py <id>`, check the overlay with `--debug-dir`, then add a track file and register it in `src/data/tracks/index.ts` and the `TrackId` type.
 
 ## Testing
 
@@ -115,6 +126,6 @@ Only **Silverstone** exists so far. Each track (`src/data/tracks/`) has its real
 
 ## Known issues and next steps
 
-See [BACKLOG.md](BACKLOG.md): UI design pass, XP and credit balance, car design, a laps/minutes slider for race length, more tracks (Monaco, Spa), keeping the screen awake during a race, and the longer-term multiplayer and distraction-blocking ideas.
+See [BACKLOG.md](BACKLOG.md): UI design pass, XP and credit balance, car design, keeping the screen awake during a race, and the longer-term multiplayer and distraction-blocking ideas.
 
 Expo projects change quickly between releases, so `AGENTS.md` tells coding assistants to check the current Expo docs for the installed SDK before using any Expo API.
