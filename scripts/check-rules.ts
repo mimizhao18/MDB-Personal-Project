@@ -18,6 +18,7 @@ import { clampLaps, lapsFromMinutes, maxMinutes, minutesForLaps } from '../src/l
 import { lifetimeStats } from '../src/logic/stats.ts';
 import { buyColor, equipColor, ownsColor, setCarNumber } from '../src/logic/garage.ts';
 import { recentDays } from '../src/logic/history.ts';
+import { buildDemoData } from '../src/logic/demo.ts';
 import { applySessionToStreak, daysBetween, displayedStreak } from '../src/logic/streak.ts';
 
 const track = { id: 'silverstone', lapLengthKm: 5.891, lapTimeSeconds: 90 };
@@ -209,5 +210,27 @@ assert.deepEqual([week[6].races, week[6].focusedSeconds], [2, 1500]);
 assert.deepEqual([week[4].races, week[4].focusedSeconds], [1, 300]); // Sep 28
 assert.equal(week[5].races, 0);
 assert.equal(week.reduce((n, d) => n + d.races, 0), 3); // the Sep 1 race is outside the window
+
+// demo data
+const demoTracks = {
+  silverstone: { id: 'silverstone', lapLengthKm: 5.891, lapTimeSeconds: 90 },
+  monaco: { id: 'monaco', lapLengthKm: 3.337, lapTimeSeconds: 70 },
+  spa: { id: 'spa', lapLengthKm: 7.004, lapTimeSeconds: 100 },
+};
+const demoNow = new Date('2026-10-05T12:00:00');
+const demo = buildDemoData(demoNow, demoTracks);
+assert.equal(demo.sessions.length, 7);
+assert.equal(demo.profile.totalXp, 191); // 9 short of level 3 (200 XP), so one 15 min race levels up
+assert.equal(levelProgress(demo.profile.totalXp).level, 2);
+assert.equal(levelProgress(demo.profile.totalXp + 15).level, 3);
+assert.equal(demo.profile.credits, 141); // 191 earned minus the 50 spent on blue
+assert.equal(demo.profile.lastSessionDay, '2026-10-04'); // yesterday, so the 5-day streak is still alive and a race today extends it
+assert.equal(displayedStreak(demo.profile, '2026-10-05'), 5);
+assert.deepEqual(demo.sessions.map((s) => s.finished), [true, true, true, false, true, true, true]);
+assert.equal(new Set(demo.sessions.map((s) => s.id)).size, 7);
+assert.ok(demo.sessions.every((s) => s.endedAt < demoNow.toISOString())); // all in the past
+assert.ok(demo.sessions.every((s) => s.focusedSeconds <= s.plannedLaps * demoTracks[s.trackId].lapTimeSeconds));
+assert.equal(applySessionToStreak(demo.profile, '2026-10-05').currentStreak, 6);
+assert.equal(lifetimeStats(demo.sessions).races, 7);
 
 console.log('all rule checks passed');

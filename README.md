@@ -17,6 +17,16 @@ npx expo start
 
 Scan the QR code with your phone. Leave the server running while you work: saving a file updates the phone within a second or two. Restart with `npx expo start --clear` after installing packages or changing `app.json`.
 
+### Running in a web browser (for presenting on a screen)
+
+The same app runs in a desktop browser, shown as a phone-sized column in the middle of the page:
+
+```bash
+npx expo start --web
+```
+
+It opens at http://localhost:8081. Data is saved in the browser's own storage, so open **Settings > Load demo data** once to fill it with example races. Browser dialogs replace the phone's pop-up alerts (`src/ui/alert.ts`). This is meant for demos; the phone app is the real target.
+
 Useful commands:
 
 | Command | What it does |
@@ -65,7 +75,7 @@ Older saved profiles are upgraded automatically when new fields are added. **Set
 | Summary | `src/app/summary.tsx` | Laps, time, distance, XP and credits earned, level progress, streak |
 | History | `src/app/history.tsx` | Current and longest streak, last-7-days chart, list of past races |
 | Garage | `src/app/garage.tsx` | Buy and equip colors, change race number |
-| Settings | `src/app/settings.tsx` | Reset all data |
+| Settings | `src/app/settings.tsx` | Reset all data. In development builds also **Load demo data**: replaces everything with a week of example races (191 XP, 141 credits, a 5-day streak) so the app looks lived-in for demos; one 15-minute race then triggers a level-up |
 
 Navigation uses **Expo Router** (file-based): every file in `src/app/` is a screen, and `_layout.tsx` defines the navigation stack.
 

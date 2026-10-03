@@ -57,7 +57,7 @@ export default function CreateSessionScreen() {
             <Text style={styles.trackName}>{track.name}</Text>
             <Text style={styles.muted}>{track.country}</Text>
           </View>
-          <TrackView track={track} lapFraction={0} />
+          <TrackView track={track} lapFraction={0} showCar={false} />
           <Text style={styles.muted}>
             {track.lapLengthKm} km per lap · {track.lapTimeSeconds} s per lap · {track.raceLaps} lap race
           </Text>

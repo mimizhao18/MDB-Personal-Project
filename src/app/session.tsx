@@ -1,6 +1,6 @@
 import { router, useLocalSearchParams } from 'expo-router';
 import { useEffect, useRef, useState } from 'react';
-import { Alert, BackHandler, Pressable, StyleSheet, Text, View } from 'react-native';
+import { BackHandler, Pressable, StyleSheet, Text, useWindowDimensions, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { TrackView } from '../components/TrackView';
@@ -11,6 +11,7 @@ import { buildSession } from '../logic/rewards';
 import type { CarSettings, Track } from '../models/types';
 import { getProfile } from '../storage/profile';
 import { recordSession } from '../storage/sessions';
+import { showAlert } from '../ui/alert';
 import { colors, spacing } from '../theme';
 
 export default function SessionScreen() {
@@ -35,6 +36,11 @@ function Race({ track, laps, speed }: { track: Track; laps: number; speed: numbe
   const timer = useSessionTimer(track, laps, speed);
   const { status, progress: p, startedAt, endedAt, start, pause, resume, end } = timer;
   const saved = useRef(false);
+  // On short windows (a laptop browser, a small phone) everything is sized down so the buttons stay on screen.
+  const windowHeight = useWindowDimensions().height;
+  const compact = windowHeight < 720;
+  // The track takes whatever height is left after the text and buttons (never less than 100), so nothing is pushed off screen.
+  const trackHeight = Math.max(100, windowHeight - (compact ? 385 : 445));
   const [car, setCar] = useState<CarSettings | undefined>(undefined);
 
   useEffect(() => {
@@ -64,21 +70,21 @@ function Race({ track, laps, speed }: { track: Track; laps: number; speed: numbe
       endedAt: endedAt ?? new Date(),
     });
     if (session.xpEarned === 0) {
-      Alert.alert('Too short to count', 'A race needs at least 1 minute of focus to earn rewards.');
+      showAlert('Too short to count', 'A race needs at least 1 minute of focus to earn rewards.');
       router.replace('/');
       return;
     }
     recordSession(session).then(
       () => router.replace({ pathname: '/summary', params: { id: session.id } }),
       () => {
-        Alert.alert('Could not save the race', 'Something went wrong saving your race. Please try again.');
+        showAlert('Could not save the race', 'Something went wrong saving your race. Please try again.');
         router.replace('/');
       },
     );
   }, [status, track, laps, p.elapsedSeconds, startedAt, endedAt]);
 
   const confirmEnd = () => {
-    Alert.alert('End race early?', 'You keep the laps and focus time you have done so far.', [
+    showAlert('End race early?', 'You keep the laps and focus time you have done so far.', [
       { text: 'Keep racing', style: 'cancel' },
       { text: 'End race', style: 'destructive', onPress: end },
     ]);
@@ -94,21 +100,23 @@ function Race({ track, laps, speed }: { track: Track; laps: number; speed: numbe
   }
 
   return (
-    <SafeAreaView style={styles.safe} edges={['bottom']}>
+    <SafeAreaView style={[styles.safe, compact && styles.safeCompact]} edges={['bottom']}>
       <View style={styles.top}>
         <Text style={styles.trackName}>{track.name}</Text>
-        <Text style={styles.lap}>
+        <Text style={[styles.lap, compact && styles.lapCompact]}>
           Lap {p.currentLap} / {laps}
         </Text>
       </View>
 
-      <TrackView track={track} lapFraction={p.lapFraction} car={car} />
+      <View style={{ height: trackHeight }}>
+        <TrackView track={track} lapFraction={p.lapFraction} car={car} fill />
+      </View>
 
       <View style={styles.middle}>
         <View style={styles.barTrack}>
           <View style={[styles.barFill, { width: `${p.totalFraction * 100}%` }]} />
         </View>
-        <Text style={styles.clock}>{formatClock(p.remainingSeconds)}</Text>
+        <Text style={[styles.clock, compact && styles.clockCompact]}>{formatClock(p.remainingSeconds)}</Text>
         <Text style={styles.muted}>{status === 'paused' ? 'Paused' : 'remaining'}</Text>
       </View>
 
@@ -131,15 +139,18 @@ function Button({ label, onPress, secondary }: { label: string; onPress: () => v
 
 const styles = StyleSheet.create({
   safe: { flex: 1, padding: spacing.md, justifyContent: 'space-between' },
+  safeCompact: { paddingVertical: spacing.sm },
   center: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: spacing.sm, padding: spacing.md },
   top: { alignItems: 'center', gap: spacing.xs },
   trackName: { color: colors.textMuted, fontSize: 16 },
   lap: { color: colors.text, fontSize: 36, fontWeight: '800' },
   middle: { alignItems: 'center', gap: spacing.xs },
-  barTrack: { width: '100%', height: 8, borderRadius: 4, backgroundColor: colors.surface, overflow: 'hidden', marginBottom: spacing.md },
+  barTrack: { width: '100%', height: 8, borderRadius: 4, backgroundColor: colors.surface, overflow: 'hidden', marginBottom: spacing.sm },
   barFill: { height: '100%', backgroundColor: colors.accent },
   clock: { color: colors.text, fontSize: 64, fontWeight: '800', fontVariant: ['tabular-nums'] },
-  buttons: { gap: spacing.sm, minHeight: 112 },
+  clockCompact: { fontSize: 44 },
+  lapCompact: { fontSize: 28 },
+  buttons: { gap: spacing.sm, minHeight: 112 }, // same height with one button or two, so nothing jumps when pausing
   title: { color: colors.text, fontSize: 24, fontWeight: '700', marginBottom: spacing.sm, textAlign: 'center' },
   detail: { color: colors.text, fontSize: 18 },
   muted: { color: colors.textMuted, fontSize: 14 },

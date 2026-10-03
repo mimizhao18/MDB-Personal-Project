@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Alert, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { CarImage } from '../components/CarIcon';
@@ -9,6 +9,7 @@ import { buyColor, equipColor, ownsColor, setCarNumber } from '../logic/garage';
 import type { GarageResult } from '../logic/garage';
 import type { PlayerProfile } from '../models/types';
 import { getProfile, saveProfile } from '../storage/profile';
+import { showAlert } from '../ui/alert';
 import { colors, spacing } from '../theme';
 
 type Part = 'primary' | 'secondary';
@@ -26,14 +27,14 @@ export default function GarageScreen() {
     if (!result.ok) {
       const message =
         result.reason === 'not-enough-credits' ? 'You do not have enough credits yet. Keep racing to earn more!' : 'That change is not possible.';
-      Alert.alert('Cannot do that', message);
+      showAlert('Cannot do that', message);
       return;
     }
     setProfile(result.profile);
     try {
       await saveProfile(result.profile);
     } catch {
-      Alert.alert('Could not save', 'Your change was not saved. Please try again.');
+      showAlert('Could not save', 'Your change was not saved. Please try again.');
     }
   };
 
@@ -42,7 +43,7 @@ export default function GarageScreen() {
       void apply(equipColor(profile, color, part));
       return;
     }
-    Alert.alert(`Buy ${color.name}?`, `${color.price} credits. You have ${profile.credits}.`, [
+    showAlert(`Buy ${color.name}?`, `${color.price} credits. You have ${profile.credits}.`, [
       { text: 'Cancel', style: 'cancel' },
       {
         text: `Buy for ${color.price}`,

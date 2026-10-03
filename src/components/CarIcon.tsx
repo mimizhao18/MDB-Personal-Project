@@ -24,7 +24,7 @@ export function CarShape({ car, showNumber = false }: { car: CarSettings; showNu
       />
       <Rect x={-6} y={-3.5} width={8} height={7} rx={3} fill={car.secondaryColor} />
       {showNumber && (
-        <SvgText x={-14} y={3} fontSize={7} fontWeight="bold" fill={car.secondaryColor} textAnchor="middle">
+        <SvgText x={-14} y={3} fontSize={7} fontWeight="bold" fontFamily="Arial" fill={car.secondaryColor} textAnchor="middle">
           {car.number}
         </SvgText>
       )}

@@ -11,6 +11,10 @@ interface Props {
   /** 0 to 1 through the current lap. */
   lapFraction: number;
   car?: CarSettings;
+  /** Set to false for a plain track preview with no car. */
+  showCar?: boolean;
+  /** Fill whatever space the parent gives (keeping the track's proportions) instead of sizing to the width. */
+  fill?: boolean;
 }
 
 const DEFAULT_CAR: CarSettings = { primaryColor: '#E10600', secondaryColor: '#FFFFFF', number: 1 };
@@ -20,17 +24,19 @@ const STANDARD_ROAD_WIDTH = 26; // the car is drawn for this road width and scal
 const KERB_COLOR = '#2B2B2B';
 
 /** The circuit with the car on it. Drawn in track coordinates and scaled to fit the width. */
-export function TrackView({ track, lapFraction, car = DEFAULT_CAR }: Props) {
+export function TrackView({ track, lapFraction, car = DEFAULT_CAR, showCar = true, fill = false }: Props) {
   const { width, height } = track.viewBox;
   const pos = positionOnTrack(track, lapFraction);
 
   return (
-    <View style={[styles.wrap, { aspectRatio: width / height }]}>
+    <View style={fill ? styles.fill : [styles.wrap, { aspectRatio: width / height }]}>
       <Svg width="100%" height="100%" viewBox={`0 0 ${width} ${height}`}>
         <TrackLayer track={track} />
-        <G transform={`translate(${pos.x} ${pos.y}) rotate(${pos.angleDeg}) scale(${track.roadWidth / STANDARD_ROAD_WIDTH})`}>
-          <CarShape car={car} />
-        </G>
+        {showCar && (
+          <G transform={`translate(${pos.x} ${pos.y}) rotate(${pos.angleDeg}) scale(${track.roadWidth / STANDARD_ROAD_WIDTH})`}>
+            <CarShape car={car} />
+          </G>
+        )}
       </Svg>
     </View>
   );
@@ -51,4 +57,5 @@ const TrackLayer = memo(function TrackLayer({ track }: { track: Track }) {
 
 const styles = StyleSheet.create({
   wrap: { width: '100%' },
+  fill: { flex: 1, width: '100%', minHeight: 100 },
 });
