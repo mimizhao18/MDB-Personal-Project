@@ -2,6 +2,7 @@ import { memo } from 'react';
 import { StyleSheet, View } from 'react-native';
 import Svg, { G, Line, Path } from 'react-native-svg';
 
+import { DEFAULT_LIVERY_ID } from '../data/liveries';
 import { positionOnTrack } from '../logic/trackPosition';
 import type { CarSettings, Track } from '../models/types';
 import { CarShape } from './CarIcon';
@@ -17,7 +18,7 @@ interface Props {
   fill?: boolean;
 }
 
-const DEFAULT_CAR: CarSettings = { primaryColor: '#E10600', secondaryColor: '#FFFFFF', number: 1 };
+const DEFAULT_CAR: CarSettings = { liveryId: DEFAULT_LIVERY_ID, number: 1 };
 const ROAD_COLOR = '#E6E6E6';
 const KERB_EXTRA = 4; // dark edge, split across both sides of the road
 const STANDARD_ROAD_WIDTH = 26; // the car is drawn for this road width and scaled for others

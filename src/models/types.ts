@@ -42,8 +42,8 @@ export interface Session {
 }
 
 export interface CarSettings {
-  primaryColor: string;
-  secondaryColor: string;
+  /** Which livery (see src/data/liveries.ts) the car wears. */
+  liveryId: string;
   number: number;
 }
 
@@ -54,7 +54,7 @@ export interface PlayerProfile {
   longestStreak: number;
   /** Local calendar day (YYYY-MM-DD) of the last session that counted toward the streak. */
   lastSessionDay: string | null;
-  /** Ids of the paint colors bought so far (see src/data/cosmetics.ts). */
-  unlockedColors: string[];
+  /** Ids of the liveries owned (see src/data/liveries.ts). The free ones are always included. */
+  unlockedLiveries: string[];
   car: CarSettings;
 }

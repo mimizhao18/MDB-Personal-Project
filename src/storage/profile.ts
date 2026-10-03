@@ -1,6 +1,7 @@
-import type { PlayerProfile, Session } from '../models/types';
+import { DEFAULT_LIVERY_ID, FREE_LIVERY_IDS, LIVERIES, MAX_CAR_NUMBER, MIN_CAR_NUMBER } from '../data/liveries';
+import { normalizeProfile } from '../logic/profileMigration';
 import { applySessionToStreak, dayKey } from '../logic/streak';
-import { FREE_COLOR_IDS } from '../data/cosmetics';
+import type { PlayerProfile, Session } from '../models/types';
 import { readJson, writeJson } from './storage';
 
 export const PROFILE_KEY = 'profile.v1';
@@ -11,34 +12,16 @@ export const DEFAULT_PROFILE: PlayerProfile = {
   currentStreak: 0,
   longestStreak: 0,
   lastSessionDay: null,
-  unlockedColors: FREE_COLOR_IDS,
-  car: { primaryColor: '#E10600', secondaryColor: '#FFFFFF', number: 1 },
+  unlockedLiveries: FREE_LIVERY_IDS,
+  car: { liveryId: DEFAULT_LIVERY_ID, number: MIN_CAR_NUMBER },
 };
 
-function isProfile(v: unknown): v is PlayerProfile {
-  if (typeof v !== 'object' || v === null) return false;
-  const p = v as Record<string, unknown>;
-  const car = p.car as Record<string, unknown> | null | undefined;
-  return (
-    typeof p.totalXp === 'number' &&
-    typeof p.credits === 'number' &&
-    typeof p.currentStreak === 'number' &&
-    typeof p.longestStreak === 'number' &&
-    (p.lastSessionDay === null || typeof p.lastSessionDay === 'string') &&
-    typeof car === 'object' &&
-    car !== null &&
-    typeof car.primaryColor === 'string' &&
-    typeof car.secondaryColor === 'string' &&
-    typeof car.number === 'number'
-  );
-}
+const CATALOG = { knownIds: LIVERIES.map((l) => l.id), freeIds: FREE_LIVERY_IDS, defaultId: DEFAULT_LIVERY_ID };
 
-/** Older saved profiles may lack newer fields; fill those from the defaults so progress is never lost. */
+/** Reads the saved profile. Older saves are upgraded on the way in, so XP, credits and streak are never lost. */
 export async function getProfile(): Promise<PlayerProfile> {
-  const stored = await readJson<PlayerProfile | null>(PROFILE_KEY, null, (v): v is PlayerProfile => isProfile(v));
-  if (stored === null) return DEFAULT_PROFILE;
-  const unlocked = Array.isArray(stored.unlockedColors) ? stored.unlockedColors.filter((c) => typeof c === 'string') : [];
-  return { ...stored, unlockedColors: Array.from(new Set([...FREE_COLOR_IDS, ...unlocked])) };
+  const raw = await readJson<unknown>(PROFILE_KEY, null, (v): v is unknown => true);
+  return normalizeProfile(raw, CATALOG, MIN_CAR_NUMBER, MAX_CAR_NUMBER) ?? DEFAULT_PROFILE;
 }
 
 export async function saveProfile(profile: PlayerProfile): Promise<void> {

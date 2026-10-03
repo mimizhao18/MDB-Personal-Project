@@ -54,16 +54,19 @@ Run the typecheck and lint before calling any change done (required by `AGENTS.m
 - These numbers are placeholders (see the backlog).
 
 ### The garage
-- Spend credits on paint colors, used for the car body and accent. Two are free (Racing Red, White); the rest cost 50 to 300 credits.
-- Changing the race number (1 to 99) is free.
-- Colors are defined in `src/data/cosmetics.ts`.
+- Spend credits on **liveries**: ready-made car designs, like skins. There are 5 (Scarlet is free; Cobalt 50, Papaya 100, Emerald 150, Obsidian 250 credits, placeholder prices).
+- A livery is just data in `src/data/liveries.ts`: a stable id, name, price, body color, accent color and a **pattern** (`stripe`, `split` or `chevron`). The car drawing builds the look from it, so redrawing the car updates every livery at once. Add a livery by adding one entry. Never rename or reuse an id, because players' saves refer to it.
+- Tap any livery, owned or not, to **preview it on the big car**. A button under the car then says Equipped, Equip, or Buy for N credits (it shows how many more credits you need if you can't afford it yet).
+- Liveries are original designs, not real teams' colors or logos.
+- The race number (1 to 99) is free and shows on the rear wing.
+- The car has two levels of detail (`src/components/CarIcon.tsx`): `simple` for the small car on the track and `full` for Home and the garage.
 
 ### Saved data
 Everything is stored **on the phone only**, using AsyncStorage (no accounts, no server):
-- `profile.v1`: total XP, credits, streak, unlocked colors, car look.
+- `profile.v1`: total XP, credits, streak, owned liveries, and the car (livery id and race number).
 - `sessions.v1`: the list of finished races.
 
-Older saved profiles are upgraded automatically when new fields are added. **Settings > Reset all data** wipes both.
+Older saved profiles are upgraded automatically when fields change (`src/logic/profileMigration.ts`); for example, saves from the paint-color days keep their XP, credits and streak and get the default livery. **Settings > Reset all data** wipes both.
 
 ## Screens
 
@@ -74,8 +77,8 @@ Older saved profiles are upgraded automatically when new fields are added. **Set
 | Race | `src/app/session.tsx` | Live race: track with the moving car, lap counter, time remaining, pause/resume/end. Saves the race when it ends |
 | Summary | `src/app/summary.tsx` | Laps, time, distance, XP and credits earned, level progress, streak |
 | History | `src/app/history.tsx` | Current and longest streak, last-7-days chart, list of past races |
-| Garage | `src/app/garage.tsx` | Buy and equip colors, change race number |
-| Settings | `src/app/settings.tsx` | Reset all data. In development builds also **Load demo data**: replaces everything with a week of example races (191 XP, 141 credits, a 5-day streak) so the app looks lived-in for demos; one 15-minute race then triggers a level-up |
+| Garage | `src/app/garage.tsx` | Buy and equip liveries, change race number |
+| Settings | `src/app/settings.tsx` | Reset all data. In development builds also **Load demo data**: replaces everything with a week of example races (191 XP, 141 credits, a 5-day streak, the Cobalt livery owned) so the app looks lived-in for demos; one 15-minute race then triggers a level-up |
 
 Navigation uses **Expo Router** (file-based): every file in `src/app/` is a screen, and `_layout.tsx` defines the navigation stack.
 

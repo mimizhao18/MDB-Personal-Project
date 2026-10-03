@@ -1,33 +1,32 @@
-import type { PaintColor } from '../data/cosmetics';
+import type { Livery } from '../data/liveries';
 import type { PlayerProfile } from '../models/types';
 
 export type GarageResult =
   | { ok: true; profile: PlayerProfile }
   | { ok: false; reason: 'not-enough-credits' | 'already-owned' | 'not-owned' | 'invalid-number' };
 
-export function ownsColor(profile: PlayerProfile, color: PaintColor): boolean {
-  return color.price === 0 || profile.unlockedColors.includes(color.id);
+export function ownsLivery(profile: PlayerProfile, livery: Livery): boolean {
+  return livery.price === 0 || profile.unlockedLiveries.includes(livery.id);
 }
 
-/** Spends credits to unlock a color. */
-export function buyColor(profile: PlayerProfile, color: PaintColor): GarageResult {
-  if (ownsColor(profile, color)) return { ok: false, reason: 'already-owned' };
-  if (profile.credits < color.price) return { ok: false, reason: 'not-enough-credits' };
+/** Spends credits to unlock a livery. */
+export function buyLivery(profile: PlayerProfile, livery: Livery): GarageResult {
+  if (ownsLivery(profile, livery)) return { ok: false, reason: 'already-owned' };
+  if (profile.credits < livery.price) return { ok: false, reason: 'not-enough-credits' };
   return {
     ok: true,
     profile: {
       ...profile,
-      credits: profile.credits - color.price,
-      unlockedColors: [...profile.unlockedColors, color.id],
+      credits: profile.credits - livery.price,
+      unlockedLiveries: [...profile.unlockedLiveries, livery.id],
     },
   };
 }
 
-/** Puts an owned color on the car body or accent. */
-export function equipColor(profile: PlayerProfile, color: PaintColor, part: 'primary' | 'secondary'): GarageResult {
-  if (!ownsColor(profile, color)) return { ok: false, reason: 'not-owned' };
-  const car = part === 'primary' ? { ...profile.car, primaryColor: color.hex } : { ...profile.car, secondaryColor: color.hex };
-  return { ok: true, profile: { ...profile, car } };
+/** Puts an owned livery on the car. */
+export function equipLivery(profile: PlayerProfile, livery: Livery): GarageResult {
+  if (!ownsLivery(profile, livery)) return { ok: false, reason: 'not-owned' };
+  return { ok: true, profile: { ...profile, car: { ...profile.car, liveryId: livery.id } } };
 }
 
 export function setCarNumber(profile: PlayerProfile, number: number, min: number, max: number): GarageResult {
