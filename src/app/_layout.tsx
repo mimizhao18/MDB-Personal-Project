@@ -24,7 +24,8 @@ export default function RootLayout() {
               contentStyle: { backgroundColor: colors.background },
             }}
           >
-            <Stack.Screen name="index" options={{ headerShown: false }} />
+            {/* The header is hidden, but the title is still what back buttons on other screens show. */}
+            <Stack.Screen name="index" options={{ title: 'Home', headerShown: false }} />
             <Stack.Screen name="history" options={{ title: 'History' }} />
             <Stack.Screen name="garage" options={{ title: 'Garage' }} />
             <Stack.Screen name="settings" options={{ title: 'Settings' }} />

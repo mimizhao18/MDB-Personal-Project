@@ -4,7 +4,7 @@ import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { Slider } from '../components/Slider';
-import { TrackView } from '../components/TrackView';
+import { TrackCarousel } from '../components/TrackCarousel';
 import { TRACK_LIST } from '../data/tracks';
 import { clampLaps, lapsFromMinutes, maxMinutes, minutesForLaps } from '../logic/raceLength';
 import { distanceKm, lapsToSeconds } from '../logic/rewards';
@@ -44,24 +44,7 @@ export default function CreateSessionScreen() {
     <SafeAreaView style={styles.safe} edges={['bottom']}>
       <ScrollView contentContainerStyle={styles.content}>
         <Text style={styles.heading}>Track</Text>
-        <View style={styles.chips}>
-          {TRACK_LIST.map((t) => (
-            <Pressable key={t.id} style={[styles.chip, t.id === trackId && styles.selected]} onPress={() => setTrackId(t.id)}>
-              <Text style={styles.chipText}>{t.name}</Text>
-            </Pressable>
-          ))}
-        </View>
-
-        <View style={styles.trackCard}>
-          <View style={styles.trackHeader}>
-            <Text style={styles.trackName}>{track.name}</Text>
-            <Text style={styles.muted}>{track.country}</Text>
-          </View>
-          <TrackView track={track} lapFraction={0} showCar={false} />
-          <Text style={styles.muted}>
-            {track.lapLengthKm} km per lap · {track.lapTimeSeconds} s per lap · {track.raceLaps} lap race
-          </Text>
-        </View>
+        <TrackCarousel tracks={TRACK_LIST} selectedId={trackId} onSelect={setTrackId} />
 
         <Text style={styles.heading}>Race length</Text>
         <View style={styles.modeToggle}>
@@ -147,9 +130,6 @@ const styles = StyleSheet.create({
   },
   chipText: { color: colors.text, fontSize: 15, fontWeight: '700' },
   selected: { borderColor: colors.accent },
-  trackCard: { backgroundColor: colors.surface, borderRadius: 12, padding: spacing.md, gap: spacing.sm },
-  trackHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'baseline' },
-  trackName: { color: colors.text, fontSize: 18, fontWeight: '700' },
   modeToggle: { flexDirection: 'row', backgroundColor: colors.surface, borderRadius: 10, padding: 4 },
   modeButton: { flex: 1, paddingVertical: spacing.sm, borderRadius: 8, alignItems: 'center' },
   modeButtonActive: { backgroundColor: colors.accent },

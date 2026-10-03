@@ -1,5 +1,30 @@
 # Backlog: things to change or add later
 
+# Decisions for you (nothing is built until you decide)
+
+Answer these whenever you have time. Short answers are fine; "your call" is a valid answer for any of them.
+
+## Rewards and levels (`src/logic/rewards.ts`, `src/data/cosmetics.ts`)
+1. **Earning rate.** Now: 1 XP and 1 credit per focused minute. A 25-minute race = 25 XP. Is that the right pace, or should credits and XP differ (for example more credits for finishing)?
+2. **Finishing bonus.** Should finishing the full race pay extra over ending early? (Ending early now pays only for time focused.)
+3. **Level curve.** Now: level n needs 50 x (n-1)^2 XP (level 2 at 50, level 5 at 800). How many hours of focus should level 10 take?
+4. **What levels do.** Right now a level is just a number. Should levels unlock things (colors, tracks, car parts)?
+5. **Prices.** Colors cost 50 to 300 credits. How long should the most expensive thing take to earn?
+6. **Streak rewards.** Should a streak give bonus XP or credits?
+
+## Car design (`src/components/CarIcon.tsx`)
+1. **Look.** The car is now a cleaner top-down F1 shape. The end goal is a clean, close-to-real F1 car on Home and in the garage. How far should it go: stay as drawn vector art, or use a detailed illustration or image?
+2. **Customization.** Colors and number only for now. Add liveries (stripes, patterns), helmet color, wheel rims, sponsors?
+
+## Race length (`src/app/create-session.tsx`)
+1. Anything to change about the laps/minutes slider? For example presets like 25/45/60 minutes, remembering your last choice, or a "full race" button.
+
+## UI design (all screens)
+1. **Overall feel.** Dark only (now), or light mode too?
+2. **Brand.** Does the app have a name and logo yet? (Home says nothing right now.)
+3. **Tone and details.** Fonts, animations, sounds, and haptics on race events.
+
+
 ## From the v1 build (your list)
 - **UI design for everything.** Current screens are a functional first pass (colors, spacing, typography, icons, animations).
 - **XP levels and credit system.** Current rules are placeholders: 1 XP and 1 credit per focused minute, level n needs 50 x (n-1)^2 XP. All in `src/logic/rewards.ts`. Prices in the garage need rebalancing against this too.
