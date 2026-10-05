@@ -9,6 +9,7 @@ import type { Livery } from '../../data/liveries';
 import type { CarSettings } from '../../models/types';
 import { buildCar, disposeCar } from './buildCar';
 import { Canvas } from './canvas';
+import { glowHexFor, hexToRgb255 } from './glow';
 import { buildStudioEnvironment, radialTexture } from './studio';
 
 /** Where the camera is looking: yaw is the angle around the car, pitch is how high above it. Changed by dragging. */
@@ -31,7 +32,10 @@ const MAX_PITCH = 0.62;
 function Scene({ livery, orbit }: { livery: Livery; orbit: React.MutableRefObject<Orbit> }) {
   const { camera, gl, scene } = useThree();
   const car = useMemo(() => buildCar(livery), [livery]);
-  const glow = useMemo(() => radialTexture([225, 20, 10], 0.75, 1.6), []);
+  // The floor glow and the rim lights take the car's color (the accent color for very dark paint).
+  const glowHex = glowHexFor(livery.primary, livery.secondary);
+  const glow = useMemo(() => radialTexture(hexToRgb255(glowHex), 0.75, 1.6), [glowHex]);
+  const groundTint = useMemo(() => new THREE.Color(glowHex).multiplyScalar(0.3), [glowHex]);
   const shadow = useMemo(() => radialTexture([0, 0, 0], 0.85, 1.4), []);
 
   useEffect(() => () => disposeCar(car), [car]);
@@ -66,14 +70,14 @@ function Scene({ livery, orbit }: { livery: Livery; orbit: React.MutableRefObjec
     <>
       <color attach="background" args={['#0b0b0e']} />
       <ambientLight intensity={0.35} />
-      <hemisphereLight args={['#aab4d0', '#4a1212', 0.6]} />
+      <hemisphereLight args={['#aab4d0', groundTint, 0.6]} />
       <directionalLight position={[5, 7, 4]} intensity={2.2} />
-      <pointLight position={[-4, 1.6, -3]} intensity={30} color="#ff3020" />
-      <pointLight position={[3, 0.4, 3.5]} intensity={6} color="#ffb09a" />
-      {/* warm bounce from the glowing floor, so the underside is not pitch black */}
-      <pointLight position={[0, 0.12, 0]} intensity={5} distance={5} color="#ff3a22" />
+      <pointLight position={[-4, 1.6, -3]} intensity={30} color={glowHex} />
+      <pointLight position={[3, 0.4, 3.5]} intensity={6} color="#ffe6dc" />
+      {/* bounce from the glowing floor, so the underside is not pitch black */}
+      <pointLight position={[0, 0.12, 0]} intensity={5} distance={5} color={glowHex} />
 
-      {/* soft red glow and a contact shadow on the floor */}
+      {/* a soft glow in the car's color and a contact shadow on the floor */}
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.003, 0]} renderOrder={1}>
         <planeGeometry args={[11, 11]} />
         <meshBasicMaterial map={glow} transparent depthWrite={false} />

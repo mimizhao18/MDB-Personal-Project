@@ -22,6 +22,7 @@ import { DEFAULT_LIVERY_ID, FREE_LIVERY_IDS, LIVERIES, MAX_CAR_NUMBER, MIN_CAR_N
 import { recentDays } from '../src/logic/history.ts';
 import { buildDemoData } from '../src/logic/demo.ts';
 import { colors, theme } from '../src/design/tokens.ts';
+import { glowHexFor, hexToRgb255 } from '../src/components/car3d/glow.ts';
 import { applySessionToStreak, daysBetween, displayedStreak } from '../src/logic/streak.ts';
 
 const track = { id: 'silverstone', lapLengthKm: 5.891, lapTimeSeconds: 90 };
@@ -285,5 +286,17 @@ assert.ok(Object.values(colors).every((c) => /^#[0-9A-Fa-f]{6}$/.test(c)), 'colo
 assert.equal(colors.accent, '#E10600'); // fixed F1 red
 assert.notEqual(colors.gold.toLowerCase(), colors.accent.toLowerCase());
 assert.ok(theme.type.label.textTransform === 'uppercase');
+
+// 3D car glow follows the livery
+for (const livery of LIVERIES) {
+  const glow = glowHexFor(livery.primary, livery.secondary);
+  assert.ok(glow === livery.primary || glow === livery.secondary);
+  const [r, g, b] = hexToRgb255(glow);
+  assert.ok(0.2126 * (r / 255) + 0.7152 * (g / 255) + 0.0722 * (b / 255) >= 0.1, `${livery.id} glow is visible`); // never a near-black glow
+}
+assert.equal(glowHexFor('#E10600', '#FFFFFF'), '#E10600'); // a red car glows red
+assert.equal(glowHexFor('#1E41FF', '#FFD800'), '#1E41FF'); // a blue car glows blue
+assert.equal(glowHexFor('#1A1A1A', '#D4AF37'), '#D4AF37'); // a near-black car glows in its accent (gold)
+assert.deepEqual(hexToRgb255('#FF8000'), [255, 128, 0]);
 
 console.log('all rule checks passed');
