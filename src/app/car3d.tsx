@@ -9,7 +9,16 @@ import { Segmented } from '../ui/kit';
 
 // The 3D code is only loaded when this screen opens (not when the app starts), so a problem in it on some device
 // cannot stop the rest of the app from starting. If it fails, the error is shown below instead of crashing.
-const Car3DView = lazy(() => import('../components/car3d/Car3DView').then((m) => ({ default: m.Car3DView })));
+const Car3DView = lazy(async () => {
+  const loaded = (await import('../components/car3d/Car3DView')) as Record<string, unknown>;
+  // Different bundlers wrap the module slightly differently, so accept any of the usual shapes.
+  const inner = loaded.default as Record<string, unknown> | undefined;
+  const view = (typeof loaded.default === 'function' ? loaded.default : undefined) ?? loaded.Car3DView ?? inner?.default ?? inner?.Car3DView;
+  if (typeof view !== 'function') {
+    throw new Error(`The 3D module loaded but has no car view. What it contains: ${Object.keys(loaded).join(', ') || '(nothing)'}`);
+  }
+  return { default: view as typeof import('../components/car3d/Car3DView').Car3DView };
+});
 
 const IDS = LIVERIES.map((l) => l.id);
 

@@ -148,3 +148,6 @@ export function Car3DView({ car, height = 340 }: { car: CarSettings; height?: nu
 const styles = StyleSheet.create({
   box: { width: '100%', backgroundColor: '#0b0b0e', overflow: 'hidden' },
 });
+
+// Also the default export, which is what React.lazy (on-demand loading) looks for.
+export default Car3DView;
