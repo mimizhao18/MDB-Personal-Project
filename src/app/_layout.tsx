@@ -35,6 +35,7 @@ export default function RootLayout() {
             <Stack.Screen name="history" options={{ title: 'History', ...topLevel }} />
             <Stack.Screen name="garage" options={{ title: 'Garage', ...topLevel }} />
             <Stack.Screen name="settings" options={{ title: 'Settings', ...topLevel }} />
+            <Stack.Screen name="car3d" options={{ title: '3D car (experimental)' }} />
             {/* Swipe-back is off here because dragging the race-length slider to the right looks like a back swipe. */}
             <Stack.Screen name="create-session" options={{ title: 'New Race', gestureEnabled: false }} />
             <Stack.Screen name="summary" options={{ title: 'Race Summary', headerBackVisible: false, headerLeft: () => null, gestureEnabled: false }} />

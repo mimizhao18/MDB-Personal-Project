@@ -116,6 +116,13 @@ Design rule: **rules live in `src/logic/`** as plain functions, and screens only
 - **Credits** are shown with a gold octagonal coin icon (`src/components/CreditIcon.tsx`, used through `src/ui/Credits.tsx`). The icon is a placeholder, easy to swap.
 - The app went through a development-only "design lab" to choose between corner styles, spacings, Home layouts and navigation styles. The choices (sharp, comfortable, hub, tab bar) are now the only look, and the lab and the unused variants were removed. They are in git history (commit a6e6b9d) if you want to look again.
 
+## 3D car (prototype, on the `car-3d` branch)
+
+- A smooth, stylized 3D race car built entirely in code (no model file) with **three.js** and **react-three-fiber** (`src/components/car3d/`). It is not wired into Home yet; open **Settings > 3D car preview** (development builds) to see it.
+- `buildCar.ts` makes the car from simple parts: one lofted body surface, wings with end plates, wheels, halo, helmet, and suspension. The body's texture coordinates run along the length and around the cross-section, so a livery's pattern (stripe, split nose, chevrons) is drawn as a small generated texture and wraps onto the car. Accent colors go on the helmet, wing flaps and tire bands.
+- `studio.ts` builds fake studio surroundings (a dark room with soft boxes) used only for paint reflections, plus the soft floor glow and shadow. `Car3DView.tsx` is the view: drag to spin and tilt, and it turns slowly when left alone. A `canvas.ts` / `canvas.native.ts` pair picks the web or the phone (expo-gl) canvas.
+- Packages added: `three`, `@react-three/fiber`, `expo-gl`, `@types/three`. The 3D folder has its own lint settings because three.js objects are meant to be changed in place.
+
 ## Tracks
 
 Three circuits: **Silverstone**, **Monaco** and **Spa-Francorchamps**. Each track (`src/data/tracks/`) has its real lap count and length, the app lap time, and a **traced shape**.

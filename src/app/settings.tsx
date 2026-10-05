@@ -62,6 +62,8 @@ export default function SettingsScreen() {
           <SectionLabel>Demo (development only)</SectionLabel>
           <Button label="Load demo data" variant="secondary" onPress={confirmDemo} />
           <Text style={styles.muted}>Fills the app with a week of example races, a 5-day streak and credits to spend. Use Reset all data to clear it.</Text>
+          <SectionLabel>Experimental (development only)</SectionLabel>
+          <Button label="3D car preview" variant="secondary" onPress={() => router.push('/car3d')} />
         </>
       )}
     </View>

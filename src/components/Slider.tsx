@@ -71,10 +71,10 @@ export function Slider({ value, min, max, step = 1, onChange, accessibilityLabel
         onChange(Math.max(min, Math.min(max, value + delta)));
       }}
     >
-      <View ref={barRef} style={styles.bar} onLayout={(e) => setWidth(e.nativeEvent.layout.width)} pointerEvents="none">
+      <View ref={barRef} style={[styles.bar, { pointerEvents: 'none' }]} onLayout={(e) => setWidth(e.nativeEvent.layout.width)}>
         <View style={[styles.fill, { width: `${fraction * 100}%` }]} />
       </View>
-      <View style={[styles.thumb, { left: thumbLeft }]} pointerEvents="none" />
+      <View style={[styles.thumb, { left: thumbLeft, pointerEvents: 'none' }]} />
     </View>
   );
 }
