@@ -21,6 +21,7 @@ import { normalizeProfile } from '../src/logic/profileMigration.ts';
 import { DEFAULT_LIVERY_ID, FREE_LIVERY_IDS, LIVERIES, MAX_CAR_NUMBER, MIN_CAR_NUMBER, getLivery } from '../src/data/liveries.ts';
 import { recentDays } from '../src/logic/history.ts';
 import { buildDemoData } from '../src/logic/demo.ts';
+import { DEFAULT_DESIGN, DESIGN_OPTIONS, buildTheme, normalizeDesign } from '../src/design/tokens.ts';
 import { applySessionToStreak, daysBetween, displayedStreak } from '../src/logic/streak.ts';
 
 const track = { id: 'silverstone', lapLengthKm: 5.891, lapTimeSeconds: 90 };
@@ -273,5 +274,31 @@ assert.ok(demo.sessions.every((s) => s.endedAt < demoNow.toISOString())); // all
 assert.ok(demo.sessions.every((s) => s.focusedSeconds <= s.plannedLaps * demoTracks[s.trackId].lapTimeSeconds));
 assert.equal(applySessionToStreak(demo.profile, '2026-10-05').currentStreak, 6);
 assert.equal(lifetimeStats(demo.sessions).races, 7);
+
+// design tokens
+const themeDefault = buildTheme(DEFAULT_DESIGN);
+assert.equal(DEFAULT_DESIGN.corners, 'subtle'); // clean but not harsh
+assert.ok(themeDefault.radius.lg <= 8 && themeDefault.radius.lg > 0, 'default cards are only slightly rounded');
+assert.deepEqual(themeDefault.spacing, { xs: 4, sm: 8, md: 16, lg: 24, xl: 32 });
+const sharp = buildTheme({ ...DEFAULT_DESIGN, corners: 'sharp' }).radius;
+const soft = buildTheme({ ...DEFAULT_DESIGN, corners: 'soft' }).radius;
+assert.ok(sharp.lg <= themeDefault.radius.lg && themeDefault.radius.lg < soft.lg, 'sharp < subtle < soft');
+assert.ok(sharp.md <= themeDefault.radius.md && themeDefault.radius.md < soft.md);
+for (const corners of DESIGN_OPTIONS.corners) {
+  const r = buildTheme({ ...DEFAULT_DESIGN, corners }).radius;
+  assert.ok(r.sm <= r.md && r.md <= r.lg && r.lg < r.pill, `radius scale for ${corners}`);
+}
+const compact = buildTheme({ ...DEFAULT_DESIGN, density: 'compact' }).spacing;
+const roomy = buildTheme({ ...DEFAULT_DESIGN, density: 'roomy' }).spacing;
+assert.ok(compact.md < themeDefault.spacing.md && themeDefault.spacing.md < roomy.md, 'compact < comfortable < roomy');
+for (const density of DESIGN_OPTIONS.density) {
+  const sp = buildTheme({ ...DEFAULT_DESIGN, density }).spacing;
+  assert.ok(Object.values(sp).every((v) => Number.isInteger(v) && v > 0), 'spacing stays whole numbers');
+  assert.ok(sp.xs < sp.sm && sp.sm < sp.md && sp.md < sp.lg && sp.lg < sp.xl, `spacing order for ${density}`);
+}
+assert.deepEqual(normalizeDesign(null), DEFAULT_DESIGN);
+assert.deepEqual(normalizeDesign('junk'), DEFAULT_DESIGN);
+assert.deepEqual(normalizeDesign({ corners: 'sharp', nav: 'tabs' }), { ...DEFAULT_DESIGN, corners: 'sharp', nav: 'tabs' }); // missing fields default
+assert.deepEqual(normalizeDesign({ corners: 'round', density: 7, homeLayout: 'cards', nav: 'drawer' }), { ...DEFAULT_DESIGN, homeLayout: 'cards' }); // invalid values dropped
 
 console.log('all rule checks passed');

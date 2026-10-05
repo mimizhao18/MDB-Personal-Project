@@ -21,10 +21,17 @@ Answer these whenever you have time. Short answers are fine; "your call" is a va
 1. Anything to change about the laps/minutes slider? For example presets like 25/45/60 minutes, remembering your last choice, or a "full race" button.
 
 ## UI design (all screens)
-1. **Overall feel.** Dark only (now), or light mode too?
-2. **Brand.** Does the app have a name and logo yet? (Home says nothing right now.)
-3. **Tone and details.** Fonts, animations, sounds, and haptics on race events.
+**Decided (2026-10-05):**
+- Style: **dark and minimal**, clean, lots of space, data shown like a pit-wall screen.
+- Accent color: **fixed F1 red** (the car shows its livery colors; the UI stays red).
+- Typography: as close to F1's own fonts as possible, **not a priority**. (F1's real fonts, "Formula1 Display" and "Formula1", are licensed and cannot be used; a close free font such as Titillium Web or Barlow Condensed could stand in.)
+- Corners: **less round but not harsh** (default is now 'subtle').
+- Navigation and layout: **undecided; experimenting** with the design lab (Home layouts hub, cards and dashboard; links or bottom tab bar). Pick one, then remove the unused variants and make the design lab optional or delete it.
 
+**Still open:**
+1. Does the app have a name and logo yet? (Home says nothing right now.)
+2. Light mode too, or dark only?
+3. Animations, sounds, and haptics on race events.
 
 ## From the v1 build (your list)
 - **UI design for everything.** Current screens are a functional first pass (colors, spacing, typography, icons, animations).

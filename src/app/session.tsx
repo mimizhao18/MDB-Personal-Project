@@ -1,10 +1,11 @@
 import { router, useLocalSearchParams } from 'expo-router';
 import { useEffect, useRef, useState } from 'react';
-import { BackHandler, Pressable, StyleSheet, Text, useWindowDimensions, View } from 'react-native';
+import { BackHandler, Text, useWindowDimensions, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { TrackView } from '../components/TrackView';
 import { TRACKS, isTrackId } from '../data/tracks';
+import { makeStyles } from '../design/DesignProvider';
 import { useSessionTimer } from '../hooks/useSessionTimer';
 import { formatClock } from '../logic/lapProgress';
 import { buildSession } from '../logic/rewards';
@@ -12,9 +13,10 @@ import type { CarSettings, Track } from '../models/types';
 import { getProfile } from '../storage/profile';
 import { recordSession } from '../storage/sessions';
 import { showAlert } from '../ui/alert';
-import { colors, spacing } from '../theme';
+import { Button, ProgressBar } from '../ui/kit';
 
 export default function SessionScreen() {
+  const styles = useStyles();
   const params = useLocalSearchParams<{ track?: string; laps?: string; speed?: string }>();
   const track = isTrackId(params.track) ? TRACKS[params.track] : undefined;
   const laps = Number(params.laps);
@@ -33,6 +35,7 @@ export default function SessionScreen() {
 }
 
 function Race({ track, laps, speed }: { track: Track; laps: number; speed: number }) {
+  const styles = useStyles();
   const timer = useSessionTimer(track, laps, speed);
   const { status, progress: p, startedAt, endedAt, start, pause, resume, end } = timer;
   const saved = useRef(false);
@@ -113,8 +116,8 @@ function Race({ track, laps, speed }: { track: Track; laps: number; speed: numbe
       </View>
 
       <View style={styles.middle}>
-        <View style={styles.barTrack}>
-          <View style={[styles.barFill, { width: `${p.totalFraction * 100}%` }]} />
+        <View style={styles.progress}>
+          <ProgressBar fraction={p.totalFraction} />
         </View>
         <Text style={[styles.clock, compact && styles.clockCompact]}>{formatClock(p.remainingSeconds)}</Text>
         <Text style={styles.muted}>{status === 'paused' ? 'Paused' : 'remaining'}</Text>
@@ -123,38 +126,25 @@ function Race({ track, laps, speed }: { track: Track; laps: number; speed: numbe
       <View style={styles.buttons}>
         {status === 'running' && <Button label="Pause" onPress={pause} />}
         {status === 'paused' && <Button label="Resume" onPress={resume} />}
-        {status === 'paused' && <Button label="End race" onPress={confirmEnd} secondary />}
+        {status === 'paused' && <Button label="End race" onPress={confirmEnd} variant="secondary" />}
       </View>
     </SafeAreaView>
   );
 }
 
-function Button({ label, onPress, secondary }: { label: string; onPress: () => void; secondary?: boolean }) {
-  return (
-    <Pressable style={[styles.button, secondary && styles.buttonSecondary]} onPress={onPress}>
-      <Text style={styles.buttonText}>{label}</Text>
-    </Pressable>
-  );
-}
-
-const styles = StyleSheet.create({
-  safe: { flex: 1, padding: spacing.md, justifyContent: 'space-between' },
-  safeCompact: { paddingVertical: spacing.sm },
-  center: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: spacing.sm, padding: spacing.md },
-  top: { alignItems: 'center', gap: spacing.xs },
-  trackName: { color: colors.textMuted, fontSize: 16 },
-  lap: { color: colors.text, fontSize: 36, fontWeight: '800' },
-  middle: { alignItems: 'center', gap: spacing.xs },
-  barTrack: { width: '100%', height: 8, borderRadius: 4, backgroundColor: colors.surface, overflow: 'hidden', marginBottom: spacing.sm },
-  barFill: { height: '100%', backgroundColor: colors.accent },
-  clock: { color: colors.text, fontSize: 64, fontWeight: '800', fontVariant: ['tabular-nums'] },
+const useStyles = makeStyles((t) => ({
+  safe: { flex: 1, padding: t.spacing.md, justifyContent: 'space-between' },
+  safeCompact: { paddingVertical: t.spacing.sm },
+  center: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: t.spacing.md, padding: t.spacing.md },
+  top: { alignItems: 'center', gap: t.spacing.xs },
+  trackName: { ...t.type.label, color: t.colors.textMuted },
+  lap: { fontSize: 34, fontWeight: '800', color: t.colors.text, letterSpacing: -0.5 },
+  lapCompact: { fontSize: 26 },
+  middle: { alignItems: 'center', gap: t.spacing.xs },
+  progress: { width: '100%', marginBottom: t.spacing.sm },
+  clock: { fontSize: 64, fontWeight: '800', color: t.colors.text, fontVariant: ['tabular-nums'], letterSpacing: -1 },
   clockCompact: { fontSize: 44 },
-  lapCompact: { fontSize: 28 },
-  buttons: { gap: spacing.sm, minHeight: 112 }, // same height with one button or two, so nothing jumps when pausing
-  title: { color: colors.text, fontSize: 24, fontWeight: '700', marginBottom: spacing.sm, textAlign: 'center' },
-  detail: { color: colors.text, fontSize: 18 },
-  muted: { color: colors.textMuted, fontSize: 14 },
-  button: { backgroundColor: colors.accent, borderRadius: 10, paddingVertical: spacing.md, paddingHorizontal: spacing.xl, alignItems: 'center' },
-  buttonSecondary: { backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.surfaceBorder },
-  buttonText: { color: colors.accentText, fontSize: 18, fontWeight: '700' },
-});
+  buttons: { gap: t.spacing.sm, minHeight: 112 }, // same height with one button or two, so nothing jumps when pausing
+  title: { ...t.type.heading, fontSize: 22, color: t.colors.text, textAlign: 'center' },
+  muted: { ...t.type.caption, color: t.colors.textMuted },
+}));

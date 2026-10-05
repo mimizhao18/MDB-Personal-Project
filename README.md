@@ -109,6 +109,13 @@ Design rule: **rules live in `src/logic/`** as plain functions, and screens only
 - `hooks/useSessionTimer.ts`: the race clock (idle, running, paused, finished, ended). Elapsed time comes from the real clock, not counted ticks, so it stays correct if the app is throttled. Updates once per screen frame for smooth motion.
 - `storage/`: `storage.ts` wraps AsyncStorage and falls back to defaults if data is missing or corrupt; `profile.ts` and `sessions.ts` hold the profile and race list; `sessions.ts > recordSession` saves a race and adds its rewards to the profile.
 
+## Design system and the design lab
+
+- **Design values** live in `src/design/tokens.ts` (colors, spacing, corner radius, text styles) and are read by every screen through `useTheme()`. Styles that depend on them are declared with `makeStyles` (`src/design/DesignProvider.tsx`). Shared building blocks (buttons, cards, section labels, stat tiles, progress bars, segmented controls) are in `src/ui/kit.tsx`, so screens look consistent.
+- **Look:** dark and minimal, fixed F1 red accent, hairline borders, slightly rounded corners (4 to 6 px by default, so it is clean but not harsh), small uppercase section labels.
+- **Design lab (development only):** tap the **Design** tab on the right edge of any screen to open a panel that changes the whole app live and remembers the choice. Options: **corners** (sharp, subtle, soft), **spacing** (compact, comfortable, roomy), **Home layout** (hub, cards, dashboard) and **navigation** (small links or a bottom tab bar). Defaults are subtle, comfortable, hub and links. The design lab and its stored settings are not part of a release build.
+- To add a design option: add it to `DesignSettings` and `DESIGN_OPTIONS` in `tokens.ts`, use it in `buildTheme` or a screen, and add a row in `src/design/DesignLab.tsx`.
+
 ## Tracks
 
 Three circuits: **Silverstone**, **Monaco** and **Spa-Francorchamps**. Each track (`src/data/tracks/`) has its real lap count and length, the app lap time, and a **traced shape**.

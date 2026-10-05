@@ -1,7 +1,7 @@
 import { useRef, useState } from 'react';
-import { GestureResponderEvent, StyleSheet, View } from 'react-native';
+import { GestureResponderEvent, View } from 'react-native';
 
-import { colors } from '../theme';
+import { makeStyles } from '../design/DesignProvider';
 
 interface Props {
   value: number;
@@ -12,11 +12,28 @@ interface Props {
   accessibilityLabel?: string;
 }
 
-const THUMB = 28;
-const TRACK_HEIGHT = 6;
+const THUMB_W = 16;
+const THUMB_H = 30;
+const TRACK_HEIGHT = 4;
+
+const useStyles = makeStyles((t) => ({
+  touchArea: { height: 48, justifyContent: 'center', marginHorizontal: THUMB_W / 2 },
+  bar: { height: TRACK_HEIGHT, borderRadius: t.radius.sm, backgroundColor: t.colors.border, overflow: 'hidden' },
+  fill: { height: '100%', backgroundColor: t.colors.accent },
+  thumb: {
+    position: 'absolute',
+    width: THUMB_W,
+    height: THUMB_H,
+    borderRadius: t.radius.sm + 1,
+    backgroundColor: t.colors.text,
+    borderWidth: t.border.hairline,
+    borderColor: t.colors.accent,
+  },
+}));
 
 /** A simple horizontal slider that snaps to `step`. Touch or drag anywhere along the bar. */
 export function Slider({ value, min, max, step = 1, onChange, accessibilityLabel }: Props) {
+  const styles = useStyles();
   const [width, setWidth] = useState(0);
   const barRef = useRef<View>(null);
 
@@ -34,7 +51,7 @@ export function Slider({ value, min, max, step = 1, onChange, accessibilityLabel
   };
 
   const fraction = max === min ? 0 : (value - min) / (max - min);
-  const thumbLeft = fraction * width - THUMB / 2;
+  const thumbLeft = fraction * width - THUMB_W / 2;
 
   return (
     <View
@@ -61,18 +78,3 @@ export function Slider({ value, min, max, step = 1, onChange, accessibilityLabel
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  touchArea: { height: 48, justifyContent: 'center', marginHorizontal: THUMB / 2 },
-  bar: { height: TRACK_HEIGHT, borderRadius: TRACK_HEIGHT / 2, backgroundColor: colors.surfaceBorder, overflow: 'hidden' },
-  fill: { height: '100%', backgroundColor: colors.accent },
-  thumb: {
-    position: 'absolute',
-    width: THUMB,
-    height: THUMB,
-    borderRadius: THUMB / 2,
-    backgroundColor: colors.text,
-    borderWidth: 3,
-    borderColor: colors.accent,
-  },
-});

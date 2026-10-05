@@ -1,10 +1,11 @@
 import { router } from 'expo-router';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Text, View } from 'react-native';
 
+import { makeStyles } from '../design/DesignProvider';
 import { loadDemoData } from '../storage/demo';
 import { resetAllData } from '../storage/reset';
 import { showAlert } from '../ui/alert';
-import { colors, spacing } from '../theme';
+import { Button, SectionLabel } from '../ui/kit';
 
 /** Back to the previous screen, or Home if the page was opened directly (for example after a browser refresh). */
 function goBack() {
@@ -14,6 +15,7 @@ function goBack() {
 
 // Kept minimal for now; sound, notifications and similar options can live here later.
 export default function SettingsScreen() {
+  const styles = useStyles();
   const confirmReset = () => {
     showAlert(
       'Reset all data?',
@@ -51,31 +53,24 @@ export default function SettingsScreen() {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.heading}>Data</Text>
-      <Pressable style={styles.dangerButton} onPress={confirmReset}>
-        <Text style={styles.dangerText}>Reset all data</Text>
-      </Pressable>
+      <SectionLabel>Data</SectionLabel>
+      <Button label="Reset all data" variant="secondary" onPress={confirmReset} />
       <Text style={styles.muted}>Your races and progress are saved only on this phone.</Text>
 
       {__DEV__ && (
         <>
-          <Text style={styles.heading}>Demo (development only)</Text>
-          <Pressable style={styles.demoButton} onPress={confirmDemo}>
-            <Text style={styles.demoText}>Load demo data</Text>
-          </Pressable>
+          <SectionLabel>Demo (development only)</SectionLabel>
+          <Button label="Load demo data" variant="secondary" onPress={confirmDemo} />
           <Text style={styles.muted}>Fills the app with a week of example races, a 5-day streak and credits to spend. Use Reset all data to clear it.</Text>
+          <SectionLabel>Design (development only)</SectionLabel>
+          <Text style={styles.muted}>Tap the Design tab on the right edge of any screen to try different looks and layouts.</Text>
         </>
       )}
     </View>
   );
 }
 
-const styles = StyleSheet.create({
-  container: { flex: 1, padding: spacing.md, gap: spacing.md },
-  heading: { color: colors.text, fontSize: 20, fontWeight: '700' },
-  muted: { color: colors.textMuted, fontSize: 14 },
-  dangerButton: { backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.accent, borderRadius: 10, paddingVertical: spacing.md, alignItems: 'center' },
-  demoButton: { backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.surfaceBorder, borderRadius: 10, paddingVertical: spacing.md, alignItems: 'center' },
-  demoText: { color: colors.text, fontSize: 16, fontWeight: '700' },
-  dangerText: { color: colors.accent, fontSize: 16, fontWeight: '700' },
-});
+const useStyles = makeStyles((t) => ({
+  container: { flex: 1, padding: t.spacing.md, gap: t.spacing.md },
+  muted: { ...t.type.caption, color: t.colors.textMuted },
+}));
