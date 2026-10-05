@@ -14,7 +14,7 @@ Answer these whenever you have time. Short answers are fine; "your call" is a va
 
 ## Car design (`src/components/CarIcon.tsx`, `src/data/liveries.ts`)
 1. **Look.** The car has a simple version (on the track) and a full version (Home, garage), both top-down vector art, with 5 liveries. The end goal is a clean, close-to-real F1 car on Home and in the garage, shown in a **diagonal 3D view**. How should that be made? Options: (a) hand-drawn illustrations per livery (best look, most work, one image per livery and angle); (b) a 3D model rendered live with three.js through `expo-gl` (the livery recolors one model, so new liveries are cheap; heavier to build, and needs checking in Expo Go and on the web demo); (c) pre-rendered images of one 3D model, rendered once per livery (good look, simple at runtime, needs a 3D tool such as Blender and a way to batch renders). Liveries are data (colors plus a pattern), which suits option (b) best.
-1b. **3D car progress.** A procedural 3D car prototype exists on the `car-3d` branch (see README). Next steps if you like it: wire it into Home and the garage, test on a real iPhone, add the race number as a decal, and keep improving the shape (sidepods, nose, wings) and lighting.
+1b. **3D car progress.** A procedural 3D car is on Home and in the garage (see README). Next: improve the shape (sidepods, nose, thinner wings), add the race number as a decal and real-looking tire markings, and check performance on older phones.
 2. **More liveries.** Only a handful for now, on purpose, while the car art keeps changing. More patterns (not just stripe, split and chevron) multiply the looks.
 3. **Customization beyond liveries.** Helmet color, wheel rims, sponsors, or a free color picker as a late unlock?
 
@@ -38,7 +38,7 @@ Answer these whenever you have time. Short answers are fine; "your call" is a va
 ## From the v1 build (your list)
 - **UI design for everything.** Current screens are a functional first pass (colors, spacing, typography, icons, animations).
 - **XP levels and credit system.** Current rules are placeholders: 1 XP and 1 credit per focused minute, level n needs 50 x (n-1)^2 XP. All in `src/logic/rewards.ts`. Prices in the garage need rebalancing against this too.
-- **Car design.** Liveries exist (5). Still needs a much more realistic car, and the diagonal 3D Home view (see Decisions above).
+- **Car design.** Liveries exist (5) and the car is 3D on Home and in the garage. Still needs a more realistic, more detailed model (see Decisions above).
 
 ## Known gaps and loose ends
 - **More tracks.** Silverstone, Monaco and Spa exist. More can be added with `tools/trace_track.py` (see README). Lap time rule: lap record rounded to the nearest 10 s.

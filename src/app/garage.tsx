@@ -3,6 +3,7 @@ import { Pressable, ScrollView, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { CarImage } from '../components/CarIcon';
+import { HeroCar } from '../components/HeroCar';
 import { LIVERIES, MAX_CAR_NUMBER, MIN_CAR_NUMBER, getLivery } from '../data/liveries';
 import type { Livery } from '../data/liveries';
 import { makeStyles } from '../design/styles';
@@ -13,6 +14,7 @@ import { getProfile, saveProfile } from '../storage/profile';
 import { showAlert } from '../ui/alert';
 import { Credits } from '../ui/Credits';
 import { Button, Card, SectionLabel } from '../ui/kit';
+import { colors } from '../theme';
 
 const useStyles = makeStyles((t) => ({
   container: { flex: 1 },
@@ -20,6 +22,22 @@ const useStyles = makeStyles((t) => ({
   preview: { alignItems: 'center', gap: t.spacing.xs },
   previewAction: { alignSelf: 'stretch', marginTop: t.spacing.sm },
   liveryName: { ...t.type.title, fontSize: 22, color: t.colors.text },
+  raceCard: { gap: t.spacing.sm },
+  raceLabel: { ...t.type.label, color: t.colors.textMuted },
+  // a stretch of the race track: light road between dark edges, like the Race screen
+  road: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-around',
+    backgroundColor: '#E6E6E6',
+    borderTopWidth: 5,
+    borderBottomWidth: 5,
+    borderColor: '#2B2B2B',
+    paddingVertical: t.spacing.sm,
+    minHeight: 76,
+  },
+  raceCar: { alignItems: 'center', gap: 2 },
+  raceCaption: { fontSize: 11, color: '#555555' },
   grid: { flexDirection: 'row', flexWrap: 'wrap', gap: t.spacing.sm },
   cardWrap: { flexGrow: 1, flexBasis: '45%' },
   card: { alignItems: 'center', gap: t.spacing.xs, paddingVertical: t.spacing.md },
@@ -107,7 +125,7 @@ export default function GarageScreen() {
     <SafeAreaView style={styles.container} edges={['bottom']}>
       <ScrollView contentContainerStyle={styles.content}>
         <Card style={styles.preview}>
-          <CarImage car={previewCar} size={300} />
+          <HeroCar car={previewCar} height={260} background={colors.surface} />
           <Text style={styles.liveryName}>{previewed.name}</Text>
           <Credits amount={profile.credits} />
           <View style={styles.previewAction}>
@@ -122,6 +140,20 @@ export default function GarageScreen() {
                 onPress={() => buy(previewed)}
               />
             )}
+          </View>
+        </Card>
+
+        <Card style={styles.raceCard}>
+          <Text style={styles.raceLabel}>In a race</Text>
+          <View style={styles.road}>
+            <View style={styles.raceCar}>
+              <CarImage car={previewCar} size={30} detail="simple" showNumber={false} />
+              <Text style={styles.raceCaption}>Actual size</Text>
+            </View>
+            <View style={styles.raceCar}>
+              <CarImage car={previewCar} size={96} detail="simple" showNumber={false} />
+              <Text style={styles.raceCaption}>Zoomed</Text>
+            </View>
           </View>
         </Card>
 

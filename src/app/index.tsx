@@ -3,7 +3,7 @@ import { useCallback, useState } from 'react';
 import { Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { CarImage } from '../components/CarIcon';
+import { HeroCar } from '../components/HeroCar';
 import { makeStyles } from '../design/styles';
 import { levelProgress } from '../logic/rewards';
 import { formatDurationWords } from '../logic/sessionOptions';
@@ -24,7 +24,7 @@ const useStyles = makeStyles((t) => ({
   levelBlock: { flex: 1, gap: t.spacing.xs },
   level: { ...t.type.title, color: t.colors.text },
   caption: { ...t.type.caption, color: t.colors.textMuted },
-  carArea: { flex: 1, alignItems: 'center', justifyContent: 'center' },
+  carArea: { flex: 1 },
   statRow: { flexDirection: 'row', gap: t.spacing.sm },
   focusTotal: { ...t.type.caption, color: t.colors.textMuted, textAlign: 'center' },
 }));
@@ -67,7 +67,7 @@ export default function HomeScreen() {
       </View>
 
       <View style={styles.carArea}>
-        <CarImage car={profile.car} size={300} />
+        <HeroCar car={profile.car} />
       </View>
 
       <View style={styles.statRow}>

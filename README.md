@@ -72,12 +72,12 @@ Older saved profiles are upgraded automatically when fields change (`src/logic/p
 
 | Screen | File | Purpose |
 |---|---|---|
-| Home | `src/app/index.tsx` | Level and XP bar, credits, your car, stats, Start Race, links to History, Settings and the garage |
+| Home | `src/app/index.tsx` | Level and XP bar, credits, your car in 3D, stats, Start Race |
 | New Race | `src/app/create-session.tsx` | Pick one of the three tracks and set the race length with a slider that toggles between **laps** and **minutes** (minutes snap to whole laps). In development builds it also has a **Test speed** row (10x/30x/60x) so races finish quickly |
 | Race | `src/app/session.tsx` | Live race: track with the moving car, lap counter, time remaining, pause/resume/end. Saves the race when it ends |
 | Summary | `src/app/summary.tsx` | Laps, time, distance, XP and credits earned, level progress, streak |
 | History | `src/app/history.tsx` | Current and longest streak, last-7-days chart, list of past races |
-| Garage | `src/app/garage.tsx` | Buy and equip liveries, change race number |
+| Garage | `src/app/garage.tsx` | A 3D preview of any livery, how the car looks in a race, buy and equip liveries, change race number |
 | Settings | `src/app/settings.tsx` | Reset all data. In development builds also **Load demo data**: replaces everything with a week of example races (191 XP, 141 credits, a 5-day streak, the Cobalt livery owned) so the app looks lived-in for demos; one 15-minute race then triggers a level-up |
 
 Navigation uses **Expo Router** (file-based): every file in `src/app/` is a screen, and `_layout.tsx` defines the navigation stack.
@@ -116,12 +116,14 @@ Design rule: **rules live in `src/logic/`** as plain functions, and screens only
 - **Credits** are shown with a gold octagonal coin icon (`src/components/CreditIcon.tsx`, used through `src/ui/Credits.tsx`). The icon is a placeholder, easy to swap.
 - The app went through a development-only "design lab" to choose between corner styles, spacings, Home layouts and navigation styles. The choices (sharp, comfortable, hub, tab bar) are now the only look, and the lab and the unused variants were removed. They are in git history (commit a6e6b9d) if you want to look again.
 
-## 3D car (prototype, on the `car-3d` branch)
+## 3D car
 
-- A smooth, stylized 3D race car built entirely in code (no model file) with **three.js** and **react-three-fiber** (`src/components/car3d/`). It is not wired into Home yet; open **Settings > 3D car preview** (development builds) to see it.
-- `buildCar.ts` makes the car from simple parts: one lofted body surface, wings with end plates, wheels, halo, helmet, and suspension. The body's texture coordinates run along the length and around the cross-section, so a livery's pattern (stripe, split nose, chevrons) is drawn as a small generated texture and wraps onto the car. Accent colors go on the helmet, wing flaps and tire bands.
-- `studio.ts` builds fake studio surroundings (a dark room with soft boxes) used only for paint reflections, plus the soft floor glow and shadow. `Car3DView.tsx` is the view: drag to spin and tilt, and it turns slowly when left alone. A `canvas.ts` / `canvas.native.ts` pair picks the web or the phone (expo-gl) canvas.
-- Packages added: `three`, `@react-three/fiber`, `expo-gl`, `@types/three`. The 3D folder has its own lint settings because three.js objects are meant to be changed in place.
+- Home and the garage show the player's car as a **smooth, stylized 3D model you can spin and tilt** (drag it; it also turns slowly by itself and stops drawing while its screen is not in front). It is built entirely in code with **three.js** and **react-three-fiber** (`src/components/car3d/`), so there is no model file and a livery recolors it directly.
+- **Fallback:** `src/components/HeroCar.tsx` loads the 3D view the first time it is needed and shows the flat 2D car instead if 3D cannot start on a device, so a 3D problem cannot break the app. The 3D code is never loaded at app start.
+- `buildCar.ts` makes the car from simple parts: one lofted body surface, wings with end plates, wheels, halo, helmet and suspension. The body's texture coordinates run along the length and around the cross-section, so a livery's pattern (stripe, split nose, chevrons) is drawn as a small generated texture that wraps onto the car; accent colors go on the helmet, wing flaps and tire bands. `studio.ts` makes fake studio surroundings for paint reflections plus the floor glow and shadow; the **glow and rim lights take the livery's color** (`glow.ts`; very dark paint uses its accent). `Car3DView.tsx` is the view (drag to orbit; the camera backs off to fit the space it is given). `canvas.ts` / `canvas.native.ts` pick the web or the phone (expo-gl) canvas.
+- **The garage also shows the flat icon as it appears in a race:** an "In a race" strip with the small top-down car on a stretch of road, at actual size and zoomed.
+- **Phones need one build setting.** `three` 0.18x ships a CommonJS file that calls the Node-only `process.emitWarning`, which crashes on a phone ("undefined is not a function"). `metro.config.js` points every `three` import at `build/three.module.js`. If `three` is upgraded and 3D breaks on a phone, check that first. After changing `metro.config.js`, restart Expo with `npx expo start --clear`.
+- Packages: `three`, `@react-three/fiber`, `expo-gl`, `@types/three`. The 3D folder has its own lint settings because three.js objects are meant to be changed in place.
 
 ## Tracks
 

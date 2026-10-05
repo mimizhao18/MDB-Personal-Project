@@ -1,10 +1,12 @@
+import { useFocusEffect } from 'expo-router';
 import { useFrame, useThree } from '@react-three/fiber';
-import { useEffect, useMemo, useRef } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 import type { GestureResponderEvent } from 'react-native';
 import * as THREE from 'three';
 
 import { getLivery } from '../../data/liveries';
+import { colors } from '../../theme';
 import type { Livery } from '../../data/liveries';
 import type { CarSettings } from '../../models/types';
 import { buildCar, disposeCar } from './buildCar';
@@ -22,14 +24,15 @@ interface Orbit {
   lastY: number;
 }
 
-const DISTANCE = 9.6;
+const MIN_DISTANCE = 9;
+const FIT_WIDTH = 11.6; // camera distance times the view's width/height ratio needed to fit the car side-on with some margin
 const TARGET = new THREE.Vector3(0.1, 0.5, 0);
 const AUTO_SPIN_RADIANS_PER_SECOND = 0.32;
 const IDLE_BEFORE_SPIN_MS = 1800;
 const MIN_PITCH = 0.04;
 const MAX_PITCH = 0.62;
 
-function Scene({ livery, orbit }: { livery: Livery; orbit: React.MutableRefObject<Orbit> }) {
+function Scene({ livery, orbit, background }: { livery: Livery; orbit: React.MutableRefObject<Orbit>; background: string }) {
   const { camera, gl, scene } = useThree();
   const car = useMemo(() => buildCar(livery), [livery]);
   // The floor glow and the rim lights take the car's color (the accent color for very dark paint).
@@ -58,17 +61,20 @@ function Scene({ livery, orbit }: { livery: Livery; orbit: React.MutableRefObjec
     };
   }, [gl, scene]);
 
-  useFrame((_, delta) => {
+  useFrame((state, delta) => {
     const o = orbit.current;
+    // Back the camera off in tall or narrow spaces so the car (about 5 long, side-on) always fits.
+    const aspect = state.size.width / Math.max(1, state.size.height);
+    const distance = Math.max(MIN_DISTANCE, FIT_WIDTH / Math.max(0.5, aspect));
     if (!o.dragging && Date.now() - o.lastTouchAt > IDLE_BEFORE_SPIN_MS) o.yaw += delta * AUTO_SPIN_RADIANS_PER_SECOND;
-    const flat = Math.cos(o.pitch) * DISTANCE;
-    camera.position.set(TARGET.x + Math.cos(o.yaw) * flat, TARGET.y + Math.sin(o.pitch) * DISTANCE, TARGET.z + Math.sin(o.yaw) * flat);
+    const flat = Math.cos(o.pitch) * distance;
+    camera.position.set(TARGET.x + Math.cos(o.yaw) * flat, TARGET.y + Math.sin(o.pitch) * distance, TARGET.z + Math.sin(o.yaw) * flat);
     camera.lookAt(TARGET);
   });
 
   return (
     <>
-      <color attach="background" args={['#0b0b0e']} />
+      <color attach="background" args={[background]} />
       <ambientLight intensity={0.35} />
       <hemisphereLight args={['#aab4d0', groundTint, 0.6]} />
       <directionalLight position={[5, 7, 4]} intensity={2.2} />
@@ -95,9 +101,18 @@ function Scene({ livery, orbit }: { livery: Livery; orbit: React.MutableRefObjec
 /**
  * The car in 3D. Drag to spin and tilt it; it turns slowly by itself when left alone.
  * The Canvas is drawn by WebGL in a browser and by expo-gl on a phone (see canvas.ts and canvas.native.ts).
+ * Give it a `height`, or leave that out to fill the space its parent gives it. `background` should match what is behind it.
+ * It stops drawing while its screen is not in front, so a Home screen under another screen does not keep the phone busy.
  */
-export function Car3DView({ car, height = 340 }: { car: CarSettings; height?: number }) {
+export function Car3DView({ car, height, background = colors.background }: { car: CarSettings; height?: number; background?: string }) {
   const livery = getLivery(car.liveryId);
+  const [focused, setFocused] = useState(true);
+  useFocusEffect(
+    useCallback(() => {
+      setFocused(true);
+      return () => setFocused(false);
+    }, []),
+  );
   const orbit = useRef<Orbit>({ yaw: 0.75, pitch: 0.2, dragging: false, lastTouchAt: 0, lastX: 0, lastY: 0 });
   // Development only: lets the camera be set from the browser console when reviewing the model from different angles.
   useEffect(() => {
@@ -125,7 +140,7 @@ export function Car3DView({ car, height = 340 }: { car: CarSettings; height?: nu
 
   return (
     <View
-      style={[styles.box, { height }]}
+      style={[styles.box, height ? { height } : styles.fill, { backgroundColor: background }]}
       onStartShouldSetResponder={() => true}
       onMoveShouldSetResponder={() => true}
       onResponderTerminationRequest={() => false}
@@ -137,8 +152,8 @@ export function Car3DView({ car, height = 340 }: { car: CarSettings; height?: nu
       accessibilityLabel={`3D view of the ${livery.name} car. Drag to rotate.`}
     >
       <View style={[StyleSheet.absoluteFill, { pointerEvents: 'none' }]}>
-        <Canvas camera={{ fov: 30, position: [6, 2, 6], near: 0.1, far: 60 }} gl={{ antialias: true }} dpr={[1, 2]}>
-          <Scene livery={livery} orbit={orbit} />
+        <Canvas camera={{ fov: 30, position: [6, 2, 6], near: 0.1, far: 60 }} gl={{ antialias: true }} dpr={[1, 2]} frameloop={focused ? 'always' : 'never'}>
+          <Scene livery={livery} orbit={orbit} background={background} />
         </Canvas>
       </View>
     </View>
@@ -146,8 +161,13 @@ export function Car3DView({ car, height = 340 }: { car: CarSettings; height?: nu
 }
 
 const styles = StyleSheet.create({
-  box: { width: '100%', backgroundColor: '#0b0b0e', overflow: 'hidden' },
+  box: { width: '100%', overflow: 'hidden' },
+  fill: { flex: 1 },
 });
 
-// Also the default export, which is what React.lazy (on-demand loading) looks for.
+/** For callers that load this module on demand: returns the view as an element, so they need no dynamic component. */
+export function renderCar3D(props: { car: CarSettings; height?: number; background?: string }): React.ReactElement {
+  return <Car3DView {...props} />;
+}
+
 export default Car3DView;
