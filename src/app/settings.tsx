@@ -1,7 +1,7 @@
 import { router } from 'expo-router';
 import { Text, View } from 'react-native';
 
-import { makeStyles } from '../design/DesignProvider';
+import { makeStyles } from '../design/styles';
 import { loadDemoData } from '../storage/demo';
 import { resetAllData } from '../storage/reset';
 import { showAlert } from '../ui/alert';
@@ -62,8 +62,6 @@ export default function SettingsScreen() {
           <SectionLabel>Demo (development only)</SectionLabel>
           <Button label="Load demo data" variant="secondary" onPress={confirmDemo} />
           <Text style={styles.muted}>Fills the app with a week of example races, a 5-day streak and credits to spend. Use Reset all data to clear it.</Text>
-          <SectionLabel>Design (development only)</SectionLabel>
-          <Text style={styles.muted}>Tap the Design tab on the right edge of any screen to try different looks and layouts.</Text>
         </>
       )}
     </View>

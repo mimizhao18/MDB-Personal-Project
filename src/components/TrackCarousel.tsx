@@ -2,7 +2,7 @@ import { useRef, useState } from 'react';
 import { FlatList, Pressable, Text, useWindowDimensions, View } from 'react-native';
 import type { NativeScrollEvent, NativeSyntheticEvent } from 'react-native';
 
-import { makeStyles, useTheme } from '../design/DesignProvider';
+import { makeStyles, useTheme } from '../design/styles';
 import type { Track, TrackId } from '../models/types';
 import { Card } from '../ui/kit';
 import { TrackView } from './TrackView';

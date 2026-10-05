@@ -4,13 +4,14 @@ import { ScrollView, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { TRACKS } from '../data/tracks';
-import { makeStyles } from '../design/DesignProvider';
+import { makeStyles } from '../design/styles';
 import { levelForXp, levelProgress } from '../logic/rewards';
 import { formatDurationWords } from '../logic/sessionOptions';
 import { dayKey, displayedStreak } from '../logic/streak';
 import type { PlayerProfile, Session } from '../models/types';
 import { getProfile } from '../storage/profile';
 import { getSessions } from '../storage/sessions';
+import { Credits } from '../ui/Credits';
 import { Button, Card, ProgressBar, StatTile } from '../ui/kit';
 
 export default function SummaryScreen() {
@@ -67,7 +68,7 @@ export default function SummaryScreen() {
           <Text style={styles.cardLabel}>Rewards</Text>
           <View style={styles.rewardRow}>
             <Text style={styles.reward}>+{session.xpEarned} XP</Text>
-            <Text style={styles.reward}>+{session.creditsEarned} credits</Text>
+            <Credits amount={session.creditsEarned} prefix="+" size={22} textStyle={styles.reward} />
           </View>
         </Card>
 

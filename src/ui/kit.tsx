@@ -2,7 +2,7 @@ import type { ReactNode } from 'react';
 import { Pressable, Text, View } from 'react-native';
 import type { StyleProp, ViewStyle } from 'react-native';
 
-import { makeStyles } from '../design/DesignProvider';
+import { makeStyles } from '../design/styles';
 
 const useStyles = makeStyles((t) => ({
   sectionLabel: { ...t.type.label, color: t.colors.textMuted, marginTop: t.spacing.sm },
@@ -51,9 +51,7 @@ const useStyles = makeStyles((t) => ({
   },
   segment: { flex: 1, paddingVertical: t.spacing.sm, borderRadius: Math.max(0, t.radius.md - 2), alignItems: 'center' },
   segmentActive: { backgroundColor: t.colors.accent },
-  segmentCompact: { paddingVertical: 6 },
   segmentText: { color: t.colors.textMuted, fontSize: 14, fontWeight: '700' },
-  segmentTextCompact: { fontSize: 12 },
   segmentTextActive: { color: t.colors.accentText },
 }));
 
@@ -123,13 +121,11 @@ export function Segmented<T extends string>({
   value,
   onChange,
   labelFor,
-  compact,
 }: {
   options: readonly T[];
   value: T;
   onChange: (value: T) => void;
   labelFor?: (value: T) => string;
-  compact?: boolean;
 }) {
   const styles = useStyles();
   return (
@@ -137,12 +133,12 @@ export function Segmented<T extends string>({
       {options.map((option) => (
         <Pressable
           key={option}
-          style={[styles.segment, compact && styles.segmentCompact, option === value && styles.segmentActive]}
+          style={[styles.segment, option === value && styles.segmentActive]}
           onPress={() => onChange(option)}
           accessibilityRole="button"
           accessibilityState={{ selected: option === value }}
         >
-          <Text style={[styles.segmentText, compact && styles.segmentTextCompact, option === value && styles.segmentTextActive]}>{labelFor ? labelFor(option) : option}</Text>
+          <Text style={[styles.segmentText, option === value && styles.segmentTextActive]}>{labelFor ? labelFor(option) : option}</Text>
         </Pressable>
       ))}
     </View>

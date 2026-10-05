@@ -2,7 +2,7 @@ import { router, usePathname } from 'expo-router';
 import { Pressable, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { makeStyles } from '../design/DesignProvider';
+import { makeStyles } from '../design/styles';
 
 const TABS = [
   { label: 'Home', path: '/' },

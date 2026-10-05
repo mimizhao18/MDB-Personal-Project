@@ -4,7 +4,7 @@ import { FlatList, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { TRACKS } from '../data/tracks';
-import { makeStyles, useTheme } from '../design/DesignProvider';
+import { makeStyles, useTheme } from '../design/styles';
 import { recentDays } from '../logic/history';
 import type { DayActivity } from '../logic/history';
 import { formatDurationWords } from '../logic/sessionOptions';

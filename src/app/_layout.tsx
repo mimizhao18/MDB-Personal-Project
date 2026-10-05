@@ -2,8 +2,6 @@ import { DarkTheme, Stack, ThemeProvider, usePathname } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { Platform, StyleSheet, View } from 'react-native';
 
-import { DesignLab } from '../design/DesignLab';
-import { DesignProvider, useDesign } from '../design/DesignProvider';
 import { colors } from '../theme';
 import { TAB_PATHS, TabBar } from '../ui/TabBar';
 
@@ -13,21 +11,11 @@ const appTheme = {
   colors: { ...DarkTheme.colors, background: colors.background, card: colors.background, text: colors.text, border: colors.border },
 };
 
-export default function RootLayout() {
-  return (
-    <DesignProvider>
-      <Shell />
-    </DesignProvider>
-  );
-}
+// Home, Garage, History and Settings are the tabs: top-level screens, so no back button on them.
+const topLevel = { headerBackVisible: false, headerLeft: () => null };
 
-function Shell() {
-  const { settings } = useDesign();
+export default function RootLayout() {
   const pathname = usePathname();
-  const tabs = settings.nav === 'tabs';
-  const showTabBar = tabs && TAB_PATHS.includes(pathname);
-  // With the tab bar, Garage, History and Settings are top-level screens, so they get no back button.
-  const topLevel = tabs ? { headerBackVisible: false, headerLeft: () => null } : {};
 
   return (
     <ThemeProvider value={appTheme}>
@@ -43,7 +31,6 @@ function Shell() {
               contentStyle: { backgroundColor: colors.background },
             }}
           >
-            {/* The header is hidden, but the title is still what back buttons on other screens show. */}
             <Stack.Screen name="index" options={{ title: 'Home', headerShown: false }} />
             <Stack.Screen name="history" options={{ title: 'History', ...topLevel }} />
             <Stack.Screen name="garage" options={{ title: 'Garage', ...topLevel }} />
@@ -53,8 +40,7 @@ function Shell() {
             <Stack.Screen name="summary" options={{ title: 'Race Summary', headerBackVisible: false, headerLeft: () => null, gestureEnabled: false }} />
             <Stack.Screen name="session" options={{ title: 'Race', headerBackVisible: false, headerLeft: () => null, gestureEnabled: false }} />
           </Stack>
-          {showTabBar && <TabBar />}
-          <DesignLab />
+          {TAB_PATHS.includes(pathname) && <TabBar />}
         </View>
       </View>
     </ThemeProvider>

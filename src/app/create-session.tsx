@@ -6,7 +6,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Slider } from '../components/Slider';
 import { TrackCarousel } from '../components/TrackCarousel';
 import { TRACK_LIST } from '../data/tracks';
-import { makeStyles } from '../design/DesignProvider';
+import { makeStyles } from '../design/styles';
 import { clampLaps, lapsFromMinutes, maxMinutes, minutesForLaps } from '../logic/raceLength';
 import { distanceKm, lapsToSeconds } from '../logic/rewards';
 import { DEFAULT_LAPS, formatDurationWords } from '../logic/sessionOptions';

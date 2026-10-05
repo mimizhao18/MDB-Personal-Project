@@ -5,7 +5,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { TrackView } from '../components/TrackView';
 import { TRACKS, isTrackId } from '../data/tracks';
-import { makeStyles } from '../design/DesignProvider';
+import { makeStyles } from '../design/styles';
 import { useSessionTimer } from '../hooks/useSessionTimer';
 import { formatClock } from '../logic/lapProgress';
 import { buildSession } from '../logic/rewards';

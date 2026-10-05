@@ -109,12 +109,12 @@ Design rule: **rules live in `src/logic/`** as plain functions, and screens only
 - `hooks/useSessionTimer.ts`: the race clock (idle, running, paused, finished, ended). Elapsed time comes from the real clock, not counted ticks, so it stays correct if the app is throttled. Updates once per screen frame for smooth motion.
 - `storage/`: `storage.ts` wraps AsyncStorage and falls back to defaults if data is missing or corrupt; `profile.ts` and `sessions.ts` hold the profile and race list; `sessions.ts > recordSession` saves a race and adds its rewards to the profile.
 
-## Design system and the design lab
+## Design system
 
-- **Design values** live in `src/design/tokens.ts` (colors, spacing, corner radius, text styles) and are read by every screen through `useTheme()`. Styles that depend on them are declared with `makeStyles` (`src/design/DesignProvider.tsx`). Shared building blocks (buttons, cards, section labels, stat tiles, progress bars, segmented controls) are in `src/ui/kit.tsx`, so screens look consistent.
-- **Look:** dark and minimal, fixed F1 red accent, hairline borders, slightly rounded corners (4 to 6 px by default, so it is clean but not harsh), small uppercase section labels.
-- **Design lab (development only):** tap the **Design** tab on the right edge of any screen to open a panel that changes the whole app live and remembers the choice. Options: **corners** (sharp, subtle, soft), **spacing** (compact, comfortable, roomy), **Home layout** (hub, cards, dashboard) and **navigation** (small links or a bottom tab bar). Defaults are subtle, comfortable, hub and links. The design lab and its stored settings are not part of a release build.
-- To add a design option: add it to `DesignSettings` and `DESIGN_OPTIONS` in `tokens.ts`, use it in `buildTheme` or a screen, and add a row in `src/design/DesignLab.tsx`.
+- **Look:** dark and minimal, a fixed F1 red accent, **sharp corners** (nearly square), hairline borders, comfortable spacing, small uppercase section labels, and a **bottom tab bar** (Home, Garage, History, Settings). Home is the "hub" layout: your car in the middle, stats underneath, one big Start Race button.
+- **Design values** live in `src/design/tokens.ts` (colors, spacing, corner radius, text styles). Styles are built from them with `makeStyles` (`src/design/styles.ts`). Shared building blocks (buttons, cards, section labels, stat tiles, progress bars, segmented controls) are in `src/ui/kit.tsx`, and the tab bar is `src/ui/TabBar.tsx`, so every screen follows the same rules. To change the look app-wide, change a value in `tokens.ts`.
+- **Credits** are shown with a gold octagonal coin icon (`src/components/CreditIcon.tsx`, used through `src/ui/Credits.tsx`). The icon is a placeholder, easy to swap.
+- The app went through a development-only "design lab" to choose between corner styles, spacings, Home layouts and navigation styles. The choices (sharp, comfortable, hub, tab bar) are now the only look, and the lab and the unused variants were removed. They are in git history (commit a6e6b9d) if you want to look again.
 
 ## Tracks
 

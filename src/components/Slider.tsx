@@ -1,7 +1,7 @@
 import { useRef, useState } from 'react';
 import { GestureResponderEvent, View } from 'react-native';
 
-import { makeStyles } from '../design/DesignProvider';
+import { makeStyles } from '../design/styles';
 
 interface Props {
   value: number;

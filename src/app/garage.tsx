@@ -5,12 +5,13 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { CarImage } from '../components/CarIcon';
 import { LIVERIES, MAX_CAR_NUMBER, MIN_CAR_NUMBER, getLivery } from '../data/liveries';
 import type { Livery } from '../data/liveries';
-import { makeStyles } from '../design/DesignProvider';
+import { makeStyles } from '../design/styles';
 import { buyLivery, equipLivery, ownsLivery, setCarNumber } from '../logic/garage';
 import type { GarageResult } from '../logic/garage';
 import type { PlayerProfile } from '../models/types';
 import { getProfile, saveProfile } from '../storage/profile';
 import { showAlert } from '../ui/alert';
+import { Credits } from '../ui/Credits';
 import { Button, Card, SectionLabel } from '../ui/kit';
 
 const useStyles = makeStyles((t) => ({
@@ -19,7 +20,6 @@ const useStyles = makeStyles((t) => ({
   preview: { alignItems: 'center', gap: t.spacing.xs },
   previewAction: { alignSelf: 'stretch', marginTop: t.spacing.sm },
   liveryName: { ...t.type.title, fontSize: 22, color: t.colors.text },
-  credits: { ...t.type.body, color: t.colors.textMuted, fontWeight: '600' },
   grid: { flexDirection: 'row', flexWrap: 'wrap', gap: t.spacing.sm },
   cardWrap: { flexGrow: 1, flexBasis: '45%' },
   card: { alignItems: 'center', gap: t.spacing.xs, paddingVertical: t.spacing.md },
@@ -27,6 +27,7 @@ const useStyles = makeStyles((t) => ({
   cardName: { ...t.type.heading, fontSize: 15, color: t.colors.text },
   cardStatus: { ...t.type.caption, color: t.colors.textMuted },
   cardStatusEquipped: { color: t.colors.accent, fontWeight: '700' },
+  cardPrice: { ...t.type.caption, fontWeight: '600', color: t.colors.textMuted },
   numberRow: { flexDirection: 'row', alignItems: 'center', gap: t.spacing.lg },
   stepper: {
     width: 44,
@@ -108,7 +109,7 @@ export default function GarageScreen() {
         <Card style={styles.preview}>
           <CarImage car={previewCar} size={300} />
           <Text style={styles.liveryName}>{previewed.name}</Text>
-          <Text style={styles.credits}>{profile.credits} credits</Text>
+          <Credits amount={profile.credits} />
           <View style={styles.previewAction}>
             {previewEquipped ? (
               <Button label="Equipped" variant="secondary" disabled onPress={() => {}} />
@@ -140,9 +141,11 @@ export default function GarageScreen() {
                 <Card selected={equipped} style={[styles.card, previewing && !equipped && styles.cardPreviewing]}>
                   <CarImage car={{ liveryId: livery.id, number: profile.car.number }} size={130} detail="simple" showNumber={false} />
                   <Text style={styles.cardName}>{livery.name}</Text>
-                  <Text style={[styles.cardStatus, equipped && styles.cardStatusEquipped]}>
-                    {equipped ? 'Equipped' : owned ? 'Owned' : `${livery.price} credits`}
-                  </Text>
+                  {owned ? (
+                    <Text style={[styles.cardStatus, equipped && styles.cardStatusEquipped]}>{equipped ? 'Equipped' : 'Owned'}</Text>
+                  ) : (
+                    <Credits amount={livery.price} size={14} textStyle={styles.cardPrice} />
+                  )}
                 </Card>
               </Pressable>
             );
