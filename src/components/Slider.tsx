@@ -12,7 +12,7 @@ interface Props {
   accessibilityLabel?: string;
 }
 
-const THUMB_W = 16;
+const THUMB_W = 14; // a tall bar handle with fully rounded ends
 const THUMB_H = 30;
 const TRACK_HEIGHT = 4;
 
@@ -24,9 +24,9 @@ const useStyles = makeStyles((t) => ({
     position: 'absolute',
     width: THUMB_W,
     height: THUMB_H,
-    borderRadius: t.radius.sm + 1,
+    borderRadius: THUMB_W / 2,
     backgroundColor: t.colors.text,
-    borderWidth: t.border.hairline,
+    borderWidth: 2,
     borderColor: t.colors.accent,
   },
 }));

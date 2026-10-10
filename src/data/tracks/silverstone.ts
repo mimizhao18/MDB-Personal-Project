@@ -11,8 +11,10 @@ export const SILVERSTONE: Track = {
   id: 'silverstone',
   name: 'Silverstone',
   country: 'Great Britain',
+  countryCode: 'GB',
   raceLaps: 52,
   lapLengthKm: 5.891,
+  raceDistanceKm: 306.198,
   lapTimeSeconds: 90, // lap record 1:27.097, rounded to the nearest 10 s
   viewBox: SILVERSTONE_VIEWBOX,
   roadWidth: SILVERSTONE_ROAD_WIDTH,

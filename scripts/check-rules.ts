@@ -23,6 +23,7 @@ import { recentDays } from '../src/logic/history.ts';
 import { buildDemoData } from '../src/logic/demo.ts';
 import { colors, theme } from '../src/design/tokens.ts';
 import { glowHexFor, hexToRgb255 } from '../src/components/car3d/glow.ts';
+import { TRACK_LIST } from '../src/data/tracks/index.ts';
 import { applySessionToStreak, daysBetween, displayedStreak } from '../src/logic/streak.ts';
 
 const track = { id: 'silverstone', lapLengthKm: 5.891, lapTimeSeconds: 90 };
@@ -298,5 +299,18 @@ assert.equal(glowHexFor('#E10600', '#FFFFFF'), '#E10600'); // a red car glows re
 assert.equal(glowHexFor('#1E41FF', '#FFD800'), '#1E41FF'); // a blue car glows blue
 assert.equal(glowHexFor('#1A1A1A', '#D4AF37'), '#D4AF37'); // a near-black car glows in its accent (gold)
 assert.deepEqual(hexToRgb255('#FF8000'), [255, 128, 0]);
+
+// track data shown on the New Race cards
+assert.equal(TRACK_LIST.length, 3);
+for (const t of TRACK_LIST) {
+  assert.ok(['GB', 'MC', 'BE'].includes(t.countryCode), `${t.id} has a flag`);
+  assert.ok(t.name.length > 0 && t.country.length > 0);
+  // the official race distance is laps x lap length (to within rounding of the published figures)
+  assert.ok(Math.abs(t.raceLaps * t.lapLengthKm - t.raceDistanceKm) < 0.5, `${t.id}: ${t.raceLaps} x ${t.lapLengthKm} vs ${t.raceDistanceKm}`);
+  assert.equal(t.lapTimeSeconds % 10, 0, `${t.id} lap time is a multiple of 10 s`);
+  assert.equal(t.points.length, 360);
+}
+assert.deepEqual(TRACK_LIST.map((t) => t.countryCode), ['GB', 'MC', 'BE']);
+assert.deepEqual(TRACK_LIST.map((t) => t.lapTimeSeconds), [90, 70, 100]);
 
 console.log('all rule checks passed');

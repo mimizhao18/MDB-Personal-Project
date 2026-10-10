@@ -24,7 +24,8 @@ const useStyles = makeStyles((t) => ({
   levelBlock: { flex: 1, gap: t.spacing.xs },
   level: { ...t.type.title, color: t.colors.text },
   caption: { ...t.type.caption, color: t.colors.textMuted },
-  carArea: { flex: 1 },
+  // the 3D car runs edge to edge (past the screen padding) so its floor glow has room to fade out before the edge
+  carArea: { flex: 1, marginHorizontal: -t.spacing.md },
   statRow: { flexDirection: 'row', gap: t.spacing.sm },
   focusTotal: { ...t.type.caption, color: t.colors.textMuted, textAlign: 'center' },
 }));
@@ -67,7 +68,7 @@ export default function HomeScreen() {
       </View>
 
       <View style={styles.carArea}>
-        <HeroCar car={profile.car} />
+        <HeroCar car={profile.car} autoSpin={false} />
       </View>
 
       <View style={styles.statRow}>

@@ -7,7 +7,7 @@ import type { CarSettings } from '../models/types';
 import { colors } from '../theme';
 import { CarImage } from './CarIcon';
 
-type RenderCar3D = (props: { car: CarSettings; height?: number; background?: string }) => ReactElement;
+type RenderCar3D = (props: { car: CarSettings; height?: number; background?: string; autoSpin?: boolean }) => ReactElement;
 
 const useStyles = makeStyles(() => ({
   fill: { flex: 1, width: '100%', alignItems: 'center', justifyContent: 'center' },
@@ -52,11 +52,14 @@ export function HeroCar({
   height,
   background = colors.background,
   fallbackSize = 300,
+  autoSpin = true,
 }: {
   car: CarSettings;
   height?: number;
   background?: string;
   fallbackSize?: number;
+  /** Whether the 3D car turns slowly by itself when left alone. */
+  autoSpin?: boolean;
 }) {
   const styles = useStyles();
   const render3D = useMemo(() => load3D(), []);
@@ -67,5 +70,5 @@ export function HeroCar({
     </View>
   );
   if (!render3D) return flat;
-  return <FallbackOnError fallback={flat}>{render3D({ car, height, background })}</FallbackOnError>;
+  return <FallbackOnError fallback={flat}>{render3D({ car, height, background, autoSpin })}</FallbackOnError>;
 }

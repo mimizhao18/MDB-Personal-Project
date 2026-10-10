@@ -20,6 +20,8 @@ const useStyles = makeStyles((t) => ({
   container: { flex: 1 },
   content: { padding: t.spacing.md, gap: t.spacing.md },
   preview: { alignItems: 'center', gap: t.spacing.xs },
+  // fills the card edge to edge (past its padding) so the 3D car's floor glow has room to fade out before the edge
+  heroBleed: { alignSelf: 'stretch', marginHorizontal: -t.spacing.md },
   previewAction: { alignSelf: 'stretch', marginTop: t.spacing.sm },
   liveryName: { ...t.type.title, fontSize: 22, color: t.colors.text },
   raceCard: { gap: t.spacing.sm },
@@ -125,7 +127,9 @@ export default function GarageScreen() {
     <SafeAreaView style={styles.container} edges={['bottom']}>
       <ScrollView contentContainerStyle={styles.content}>
         <Card style={styles.preview}>
-          <HeroCar car={previewCar} height={260} background={colors.surface} />
+          <View style={styles.heroBleed}>
+            <HeroCar car={previewCar} height={260} background={colors.surface} />
+          </View>
           <Text style={styles.liveryName}>{previewed.name}</Text>
           <Credits amount={profile.credits} />
           <View style={styles.previewAction}>

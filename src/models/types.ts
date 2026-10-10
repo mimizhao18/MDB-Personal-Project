@@ -1,12 +1,18 @@
 export type TrackId = 'silverstone' | 'monaco' | 'spa';
 
+/** Which flag to show (see src/components/Flag.tsx). */
+export type CountryCode = 'GB' | 'MC' | 'BE';
+
 export interface Track {
   id: TrackId;
   name: string;
   country: string;
+  countryCode: CountryCode;
   /** Laps in the real Grand Prix. */
   raceLaps: number;
   lapLengthKm: number;
+  /** The official Grand Prix distance (laps times lap length, as published by formula1.com). */
+  raceDistanceKm: number;
   /** Seconds one lap takes in the app: the lap record rounded to the nearest 10 s. */
   lapTimeSeconds: number;
   viewBox: { width: number; height: number };

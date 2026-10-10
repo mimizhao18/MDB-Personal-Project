@@ -5,8 +5,10 @@ export const SPA: Track = {
   id: 'spa',
   name: 'Spa-Francorchamps',
   country: 'Belgium',
+  countryCode: 'BE',
   raceLaps: 44,
   lapLengthKm: 7.004,
+  raceDistanceKm: 308.054,
   lapTimeSeconds: 100, // lap record 1:44.701, rounded to the nearest 10 s
   viewBox: SPA_VIEWBOX,
   roadWidth: SPA_ROAD_WIDTH,
