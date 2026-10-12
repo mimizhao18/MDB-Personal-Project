@@ -285,7 +285,7 @@ assert.ok(sp.xs < sp.sm && sp.sm < sp.md && sp.md < sp.lg && sp.lg < sp.xl, 'spa
 assert.ok(Object.values(sp).every((v) => Number.isInteger(v) && v > 0), 'spacing is whole numbers');
 assert.ok(Object.values(colors).every((c) => /^#[0-9A-Fa-f]{6}$/.test(c)), 'colors are #RRGGBB (the car and the credits coin shade them)');
 assert.equal(colors.accent, '#E10600'); // fixed F1 red
-assert.notEqual(colors.gold.toLowerCase(), colors.accent.toLowerCase());
+assert.notEqual(colors.coin.toLowerCase(), colors.accent.toLowerCase());
 assert.ok(theme.type.label.textTransform === 'uppercase');
 
 // 3D car glow follows the livery

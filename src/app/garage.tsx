@@ -16,42 +16,60 @@ import { Credits } from '../ui/Credits';
 import { Button, Card, SectionLabel } from '../ui/kit';
 import { colors } from '../theme';
 
+const ROAD_COLOR = '#E6E6E6';
+const KERB_COLOR = '#2B2B2B';
+// the car icon is drawn on a 68 unit square for a 26 unit wide road (see TrackView)
+const ICON_UNITS = 68;
+const ROAD_UNITS = 26;
+const KERB_UNITS = 2;
+
+/** A car at a given size on a piece of road that is in proportion to it. */
+function RaceStage({ car, size, caption }: { car: { liveryId: string; number: number }; size: number; caption: string }) {
+  const styles = useStyles();
+  const road = Math.round((size * ROAD_UNITS) / ICON_UNITS);
+  const kerb = Math.max(1, Math.round((size * KERB_UNITS) / ICON_UNITS));
+  return (
+    <View style={styles.raceCell}>
+      <View style={[styles.raceStage, { height: size }]}>
+        <View style={[styles.roadBand, { top: (size - road) / 2 - kerb, height: road + kerb * 2, borderTopWidth: kerb, borderBottomWidth: kerb }]} />
+        <CarImage car={car} size={size} detail="simple" showNumber={false} />
+      </View>
+      <Text style={styles.raceCaption}>{caption}</Text>
+    </View>
+  );
+}
+
 const useStyles = makeStyles((t) => ({
   container: { flex: 1 },
   content: { padding: t.spacing.md, gap: t.spacing.md },
   preview: { alignItems: 'center', gap: t.spacing.xs },
   // fills the card edge to edge (past its padding) so the 3D car's floor glow has room to fade out before the edge
   heroBleed: { alignSelf: 'stretch', marginHorizontal: -t.spacing.md },
+  previewHeader: { alignSelf: 'stretch', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
   previewAction: { alignSelf: 'stretch', marginTop: t.spacing.sm },
   liveryName: { ...t.type.title, fontSize: 22, color: t.colors.text },
-  raceCard: { gap: t.spacing.sm },
+  raceCard: { gap: t.spacing.md },
   raceLabel: { ...t.type.label, color: t.colors.textMuted },
-  // a stretch of the race track: light road between dark edges, like the Race screen
-  road: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-around',
-    backgroundColor: '#E6E6E6',
-    borderTopWidth: 5,
-    borderBottomWidth: 5,
-    borderColor: '#2B2B2B',
-    paddingVertical: t.spacing.sm,
-    minHeight: 76,
-  },
-  raceCar: { alignItems: 'center', gap: 2 },
-  raceCaption: { fontSize: 11, color: '#555555' },
+  raceRow: { flexDirection: 'row', alignItems: 'flex-end', gap: t.spacing.md },
+  raceCell: { flex: 1, alignItems: 'center', gap: t.spacing.sm },
+  // a stretch of road behind the car, drawn to the same proportions as on the Race screen
+  raceStage: { alignSelf: 'stretch', alignItems: 'center', justifyContent: 'center' },
+  roadBand: { position: 'absolute', left: 0, right: 0, backgroundColor: ROAD_COLOR, borderColor: KERB_COLOR },
+  raceCaption: { ...t.type.caption, color: t.colors.textMuted },
   grid: { flexDirection: 'row', flexWrap: 'wrap', gap: t.spacing.sm },
   cardWrap: { flexGrow: 1, flexBasis: '45%' },
   card: { alignItems: 'center', gap: t.spacing.xs, paddingVertical: t.spacing.md },
-  cardPreviewing: { borderColor: t.colors.text },
+  cardPreviewing: { borderColor: t.colors.textMuted },
+  cardEquipped: { borderColor: t.colors.text, borderWidth: t.border.selected },
   cardName: { ...t.type.heading, fontSize: 15, color: t.colors.text },
   cardStatus: { ...t.type.caption, color: t.colors.textMuted },
-  cardStatusEquipped: { color: t.colors.accent, fontWeight: '700' },
+  cardStatusEquipped: { color: t.colors.text, fontWeight: '700' },
   cardPrice: { ...t.type.caption, fontWeight: '600', color: t.colors.textMuted },
-  numberRow: { flexDirection: 'row', alignItems: 'center', gap: t.spacing.lg },
+  numberCard: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
+  numberRow: { flexDirection: 'row', alignItems: 'center', gap: t.spacing.md },
   stepper: {
-    width: 44,
-    height: 44,
+    width: 40,
+    height: 40,
     borderRadius: t.radius.md,
     backgroundColor: t.colors.surface,
     borderWidth: t.border.hairline,
@@ -60,7 +78,7 @@ const useStyles = makeStyles((t) => ({
     justifyContent: 'center',
   },
   stepperText: { color: t.colors.text, fontSize: 24, fontWeight: '700' },
-  number: { fontSize: 32, fontWeight: '800', color: t.colors.text, minWidth: 56, textAlign: 'center' },
+  number: { fontSize: 28, fontWeight: '800', color: t.colors.text, minWidth: 48, textAlign: 'center' },
 }));
 
 export default function GarageScreen() {
@@ -130,8 +148,10 @@ export default function GarageScreen() {
           <View style={styles.heroBleed}>
             <HeroCar car={previewCar} height={260} background={colors.surface} />
           </View>
-          <Text style={styles.liveryName}>{previewed.name}</Text>
-          <Credits amount={profile.credits} />
+          <View style={styles.previewHeader}>
+            <Text style={styles.liveryName}>{previewed.name}</Text>
+            <Credits amount={profile.credits} />
+          </View>
           <View style={styles.previewAction}>
             {previewEquipped ? (
               <Button label="Equipped" variant="secondary" disabled onPress={() => {}} />
@@ -149,15 +169,9 @@ export default function GarageScreen() {
 
         <Card style={styles.raceCard}>
           <Text style={styles.raceLabel}>In a race</Text>
-          <View style={styles.road}>
-            <View style={styles.raceCar}>
-              <CarImage car={previewCar} size={30} detail="simple" showNumber={false} />
-              <Text style={styles.raceCaption}>Actual size</Text>
-            </View>
-            <View style={styles.raceCar}>
-              <CarImage car={previewCar} size={96} detail="simple" showNumber={false} />
-              <Text style={styles.raceCaption}>Zoomed</Text>
-            </View>
+          <View style={styles.raceRow}>
+            <RaceStage car={previewCar} size={30} caption="Actual size" />
+            <RaceStage car={previewCar} size={96} caption="Zoomed" />
           </View>
         </Card>
 
@@ -174,7 +188,7 @@ export default function GarageScreen() {
                 onPress={() => setPreviewId(livery.id)}
                 accessibilityLabel={`${livery.name} livery, ${equipped ? 'equipped' : owned ? 'owned' : `${livery.price} credits`}. Tap to preview.`}
               >
-                <Card selected={equipped} style={[styles.card, previewing && !equipped && styles.cardPreviewing]}>
+                <Card style={[styles.card, previewing && styles.cardPreviewing, equipped && styles.cardEquipped]}>
                   <CarImage car={{ liveryId: livery.id, number: profile.car.number }} size={130} detail="simple" showNumber={false} />
                   <Text style={styles.cardName}>{livery.name}</Text>
                   {owned ? (
@@ -188,16 +202,18 @@ export default function GarageScreen() {
           })}
         </View>
 
-        <SectionLabel>Race number</SectionLabel>
-        <View style={styles.numberRow}>
-          <Pressable style={styles.stepper} onPress={() => changeNumber(-1)} hitSlop={8} accessibilityLabel="Lower race number">
-            <Text style={styles.stepperText}>−</Text>
-          </Pressable>
-          <Text style={styles.number}>{profile.car.number}</Text>
-          <Pressable style={styles.stepper} onPress={() => changeNumber(1)} hitSlop={8} accessibilityLabel="Raise race number">
-            <Text style={styles.stepperText}>+</Text>
-          </Pressable>
-        </View>
+        <Card style={styles.numberCard}>
+          <Text style={styles.raceLabel}>Race number</Text>
+          <View style={styles.numberRow}>
+            <Pressable style={styles.stepper} onPress={() => changeNumber(-1)} hitSlop={8} accessibilityLabel="Lower race number">
+              <Text style={styles.stepperText}>−</Text>
+            </Pressable>
+            <Text style={styles.number}>{profile.car.number}</Text>
+            <Pressable style={styles.stepper} onPress={() => changeNumber(1)} hitSlop={8} accessibilityLabel="Raise race number">
+              <Text style={styles.stepperText}>+</Text>
+            </Pressable>
+          </View>
+        </Card>
       </ScrollView>
     </SafeAreaView>
   );

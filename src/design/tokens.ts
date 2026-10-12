@@ -12,7 +12,7 @@ export const colors = {
   accentText: '#FFFFFF',
   positive: '#3DDC84',
   /** The credits coin. */
-  gold: '#F2B705',
+  coin: '#F4F4F5',
 } as const;
 
 export const theme = {
