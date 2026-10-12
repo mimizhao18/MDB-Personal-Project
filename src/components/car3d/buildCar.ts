@@ -230,6 +230,28 @@ function buildWheel(radius: number, width: number, side: 1 | -1, m: Materials): 
   return wheel;
 }
 
+/**
+ * The floor: a thin plank that is widest beside the sidepods, curves in toward the nose and the rear, and stays
+ * between the wheels (their inner faces are about 0.65 from the centre line).
+ */
+function buildFloor(material: THREE.Material): THREE.Mesh {
+  const shape = new THREE.Shape();
+  shape.moveTo(1.35, 0.12);
+  shape.bezierCurveTo(0.9, 0.2, 0.7, 0.5, 0.3, 0.58);
+  shape.lineTo(-0.9, 0.6);
+  shape.bezierCurveTo(-1.4, 0.6, -1.7, 0.45, -2.0, 0.34);
+  shape.lineTo(-2.0, -0.34);
+  shape.bezierCurveTo(-1.7, -0.45, -1.4, -0.6, -0.9, -0.6);
+  shape.lineTo(0.3, -0.58);
+  shape.bezierCurveTo(0.7, -0.5, 0.9, -0.2, 1.35, -0.12);
+  shape.closePath();
+  const geometry = new THREE.ExtrudeGeometry(shape, { depth: 0.03, bevelEnabled: false });
+  geometry.rotateX(-Math.PI / 2); // lie flat: the outline becomes the floor plan, extruded upward
+  const floor = new THREE.Mesh(geometry, material);
+  floor.position.y = 0.07;
+  return floor;
+}
+
 /** Builds the whole car in the given livery. Call `disposeCar` when it is no longer needed. */
 export function buildCar(livery: Livery): THREE.Group {
   const car = new THREE.Group();
@@ -250,7 +272,7 @@ export function buildCar(livery: Livery): THREE.Group {
   car.add(new THREE.Mesh(buildBodyGeometry(), m.paint));
 
   // floor
-  car.add(box(4.0, 0.03, 1.45, m.carbon, -0.05, 0.08, 0));
+  car.add(buildFloor(m.carbon));
   car.add(box(0.7, 0.02, 1.25, m.carbon, -1.95, 0.17, 0, -0.32)); // rear diffuser
 
   // cockpit: opening, helmet, halo

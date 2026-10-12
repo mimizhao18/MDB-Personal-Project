@@ -50,8 +50,8 @@ export function CarShape({ car, detail = 'simple', showNumber = false }: ShapePr
         </ClipPath>
       </Defs>
 
-      {/* soft shadow under the floor */}
-      <Path d="M -20 -13 L 12 -13 L 16 -6 L 16 6 L 12 13 L -20 13 Z" fill="#000000" fillOpacity={0.22} />
+      {/* soft shadow of the floor: widest beside the sidepods, tapering to the nose and tail, clear of the wheels */}
+      <Path d="M -20 -7 C -16 -10, -12 -11, -6 -11 L 2 -10.6 C 8 -8, 12 -4.5, 17 -3 L 17 3 C 12 4.5, 8 8, 2 10.6 L -6 11 C -12 11, -16 10, -20 7 Z" fill="#000000" fillOpacity={0.22} />
 
       {/* rear wing */}
       <Rect x={-27} y={-15} width={6} height={30} rx={1} fill={body} stroke={edge} strokeWidth={0.6} />
