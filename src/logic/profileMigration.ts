@@ -6,6 +6,8 @@ export interface LiveryCatalog {
   /** Liveries everyone owns. */
   freeIds: readonly string[];
   defaultId: string;
+  /** Old livery ids and the current livery that replaces each (so owners keep something similar). */
+  renamed?: Readonly<Record<string, string>>;
 }
 
 /**
@@ -26,11 +28,13 @@ export function normalizeProfile(raw: unknown, catalog: LiveryCatalog, minNumber
     return null;
   }
 
-  const stored = Array.isArray(p.unlockedLiveries) ? p.unlockedLiveries.filter((id): id is string => typeof id === 'string') : [];
+  const current = (id: string) => catalog.renamed?.[id] ?? id;
+  const stored = Array.isArray(p.unlockedLiveries) ? p.unlockedLiveries.filter((id): id is string => typeof id === 'string').map(current) : [];
   const unlocked = Array.from(new Set([...catalog.freeIds, ...stored.filter((id) => catalog.knownIds.includes(id))]));
 
   const car = typeof p.car === 'object' && p.car !== null ? (p.car as Record<string, unknown>) : {};
-  const wornId = typeof car.liveryId === 'string' && catalog.knownIds.includes(car.liveryId) ? car.liveryId : catalog.defaultId;
+  const wornRaw = typeof car.liveryId === 'string' ? current(car.liveryId) : null;
+  const wornId = wornRaw !== null && catalog.knownIds.includes(wornRaw) ? wornRaw : catalog.defaultId;
   const number =
     typeof car.number === 'number' && Number.isInteger(car.number) && car.number >= minNumber && car.number <= maxNumber ? car.number : minNumber;
 

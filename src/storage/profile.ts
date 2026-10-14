@@ -1,4 +1,4 @@
-import { DEFAULT_LIVERY_ID, FREE_LIVERY_IDS, LIVERIES, MAX_CAR_NUMBER, MIN_CAR_NUMBER } from '../data/liveries';
+import { DEFAULT_LIVERY_ID, FREE_LIVERY_IDS, LIVERIES, MAX_CAR_NUMBER, MIN_CAR_NUMBER, RENAMED_LIVERY_IDS } from '../data/liveries';
 import { normalizeProfile } from '../logic/profileMigration';
 import { applySessionToStreak, dayKey } from '../logic/streak';
 import type { PlayerProfile, Session } from '../models/types';
@@ -16,7 +16,7 @@ export const DEFAULT_PROFILE: PlayerProfile = {
   car: { liveryId: DEFAULT_LIVERY_ID, number: MIN_CAR_NUMBER },
 };
 
-const CATALOG = { knownIds: LIVERIES.map((l) => l.id), freeIds: FREE_LIVERY_IDS, defaultId: DEFAULT_LIVERY_ID };
+const CATALOG = { knownIds: LIVERIES.map((l) => l.id), freeIds: FREE_LIVERY_IDS, defaultId: DEFAULT_LIVERY_ID, renamed: RENAMED_LIVERY_IDS };
 
 /** Reads the saved profile. Older saves are upgraded on the way in, so XP, credits and streak are never lost. */
 export async function getProfile(): Promise<PlayerProfile> {

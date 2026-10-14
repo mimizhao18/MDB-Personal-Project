@@ -21,7 +21,7 @@ const DEMO_RACES: DemoRace[] = [
   { daysAgo: 1, track: 'silverstone', plannedLaps: 10, focusedSeconds: 900 },
 ];
 
-const COBALT_PRICE = 50; // the demo owner has already bought the Cobalt livery
+const OWNED_LIVERY_PRICE = 50; // the demo owner has already bought the Mercedes livery
 
 export interface DemoData {
   sessions: Session[];
@@ -50,12 +50,12 @@ export function buildDemoData(now: Date, tracks: Record<TrackId, Track>): DemoDa
     sessions,
     profile: {
       totalXp,
-      credits: earnedCredits - COBALT_PRICE, // enough left to buy the 100-credit Papaya livery live
+      credits: earnedCredits - OWNED_LIVERY_PRICE, // enough left to buy the 100-credit McLaren livery live
       currentStreak: 5,
       longestStreak: 7,
       lastSessionDay: dayKey(yesterday),
-      unlockedLiveries: ['scarlet', 'cobalt'],
-      car: { liveryId: 'cobalt', number: 1 },
+      unlockedLiveries: ['ferrari-2022', 'mercedes-2022'],
+      car: { liveryId: 'mercedes-2022', number: 1 },
     },
   };
 }

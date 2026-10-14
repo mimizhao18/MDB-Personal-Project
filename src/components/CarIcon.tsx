@@ -1,8 +1,10 @@
 import { StyleSheet, View } from 'react-native';
-import Svg, { Circle, ClipPath, Defs, Ellipse, G, Line, Path, Polygon, Rect, Text as SvgText } from 'react-native-svg';
+import Svg, { ClipPath, Defs, Ellipse, G, Line, Path, Polygon, Rect, Text as SvgText } from 'react-native-svg';
 
+import { GEN2022, frontWingSection, rearWingSection } from '../data/cars/gen2022';
+import type { PodStyle } from '../data/cars/gen2022';
+import { spline } from '../data/cars/spline';
 import { getLivery } from '../data/liveries';
-import type { Livery } from '../data/liveries';
 import type { CarSettings } from '../models/types';
 
 const TYRE = '#1B1B1B';
@@ -10,11 +12,59 @@ const TYRE_OUTLINE = '#7C7C7C'; // keeps the tires visible on dark backgrounds
 const DARK = '#141414';
 const BODY_CLIP_ID = 'f1-car-body-clip';
 
-/** Engine cover, sidepods and nose in one outline, pointing right. */
-const BODY_PATH =
-  'M -22 -4.5 C -20 -8, -14 -10.8, -8 -10.2 C -2 -9.6, 2 -6, 7 -4.2 L 22 -1.7 Q 24.2 0 22 1.7 L 7 4.2 C 2 6, -2 9.6, -8 10.2 C -14 10.8, -20 8, -22 4.5 Z';
+// The icon is the car seen from above, drawn from the same measurements as the 3D model: 10 icon units to the metre,
+// facing right, with the middle of the car at the origin.
+const SCALE = 10;
+const CENTRE_X = 0.15;
+const ix = (x: number) => (x - CENTRE_X) * SCALE;
+const iy = (z: number) => z * SCALE;
+const fmt = (n: number) => n.toFixed(2);
 
-/** Darkens a #RRGGBB color (factor 0 to 1) for wing end plates and shadows. */
+/** `steps` points along a smoothed station table, as [x, z]. */
+function along(xs: readonly number[], zs: readonly number[], steps = 28): [number, number][] {
+  return Array.from({ length: steps + 1 }, (_, i) => [spline(xs, i / steps), spline(zs, i / steps)] as [number, number]);
+}
+
+const toPath = (points: readonly (readonly [number, number])[]) => `M ${points.map(([x, z]) => `${fmt(ix(x))} ${fmt(iy(z))}`).join(' L ')} Z`;
+
+/** A shape that is the same on both sides of the car: the right edge out and the left edge back. */
+function symmetric(xs: readonly number[], hw: readonly number[]): string {
+  const right = along(xs, hw);
+  return toPath([...right, ...right.map(([x, z]) => [x, -z] as [number, number]).reverse()]);
+}
+
+/** One sidepod of a team's design on the right (side 1) or left (-1): between its inner and outer edge. */
+function sidepod(style: PodStyle, side: 1 | -1): string {
+  const pod = GEN2022.pods[style];
+  const outer = along(pod.x, pod.zOut).map(([x, z]) => [x, z * side] as [number, number]);
+  const inner = along(pod.x, pod.zIn).map(([x, z]) => [x, z * side] as [number, number]);
+  return toPath([...outer, ...inner.reverse()]);
+}
+
+const POD_PATHS: Record<PodStyle, readonly [string, string]> = {
+  downwash: [sidepod('downwash', 1), sidepod('downwash', -1)],
+  scoop: [sidepod('scoop', 1), sidepod('scoop', -1)],
+  slim: [sidepod('slim', 1), sidepod('slim', -1)],
+};
+
+/** A wing element seen from above: its leading edge and trailing edge, from one tip to the other. */
+function wingPath(section: (z: number) => { x: number; chord: number }, span: number, steps = 24): string {
+  const zs = Array.from({ length: steps + 1 }, (_, i) => -span + (2 * span * i) / steps);
+  const leading = zs.map((z) => [section(z).x, z] as [number, number]);
+  const trailing = zs.map((z) => [section(z).x - section(z).chord, z] as [number, number]).reverse();
+  return toPath([...leading, ...trailing]);
+}
+
+const FRONT_WING_PATHS = GEN2022.frontWing.elements.map((e) => wingPath((z) => frontWingSection(e, z), GEN2022.frontWing.span));
+const REAR_WING_PATHS = GEN2022.rearWing.elements.map((e) => wingPath((z) => rearWingSection(e, z), GEN2022.rearWing.span));
+const xRange = (outline: readonly (readonly [number, number])[]) => [Math.min(...outline.map(([x]) => x)), Math.max(...outline.map(([x]) => x))] as const;
+const FRONT_PLATE = xRange(GEN2022.frontWing.endplate);
+const REAR_PLATE = xRange(GEN2022.rearWing.endplate);
+
+const SPINE_PATH = symmetric(GEN2022.spine.x, GEN2022.spine.hw);
+const FLOOR_PATH = symmetric(GEN2022.floor.x, GEN2022.floor.hw);
+
+/** Darkens a #RRGGBB color (factor 0 to 1) for edges. */
 function shade(hex: string, factor: number): string {
   const n = parseInt(hex.slice(1), 16);
   const channel = (shift: number) => Math.round(((n >> shift) & 255) * factor);
@@ -31,145 +81,119 @@ interface ShapeProps {
 }
 
 /**
- * A top-down single-seater, about 55 units long and 40 wide, centred on (0, 0) and facing right.
- * The look comes from the car's livery: body color, accent color and a pattern laid over the body.
+ * The 2022 car from above, about 55 units long and 20 wide, centred on (0, 0) and facing right.
+ * Its colors and shapes come from the livery, laid over the bodywork the same way they are on the 3D car.
  */
 export function CarShape({ car, detail = 'simple', showNumber = false }: ShapeProps) {
   const livery = getLivery(car.liveryId);
-  const body = livery.primary;
-  const accent = livery.secondary;
   const full = detail === 'full';
-  const edge = shade(body, 0.6);
-  const end = shade(body, 0.45);
+  const pods = POD_PATHS[livery.sidepod];
+  const podShape = GEN2022.pods[livery.sidepod];
+  const { front, rear } = GEN2022.wheels;
+  const edge = shade(livery.primary, 0.55);
+
+  const tire = (axle: { x: number; radius: number; width: number; z: number }, side: 1 | -1) => {
+    const inner = (axle.z - axle.width / 2) * SCALE;
+    return (
+      <Rect
+        key={`${axle.x}${side}`}
+        x={ix(axle.x - axle.radius)}
+        y={side > 0 ? inner : -(inner + axle.width * SCALE)}
+        width={axle.radius * 2 * SCALE}
+        height={axle.width * SCALE}
+        rx={1.6}
+        fill={TYRE}
+        stroke={TYRE_OUTLINE}
+        strokeWidth={0.7}
+      />
+    );
+  };
 
   return (
     <G>
       <Defs>
         <ClipPath id={BODY_CLIP_ID}>
-          <Path d={BODY_PATH} />
+          <Path d={SPINE_PATH} />
+          <Path d={pods[0]} />
+          <Path d={pods[1]} />
         </ClipPath>
       </Defs>
 
-      {/* soft shadow of the floor: widest beside the sidepods, tapering to the nose and tail, clear of the wheels */}
-      <Path d="M -20 -7 C -16 -10, -12 -11, -6 -11 L 2 -10.6 C 8 -8, 12 -4.5, 17 -3 L 17 3 C 12 4.5, 8 8, 2 10.6 L -6 11 C -12 11, -16 10, -20 7 Z" fill="#000000" fillOpacity={0.22} />
-
-      {/* rear wing */}
-      <Rect x={-27} y={-15} width={6} height={30} rx={1} fill={body} stroke={edge} strokeWidth={0.6} />
-      <Rect x={-28} y={-16.5} width={8} height={2.2} rx={0.8} fill={end} />
-      <Rect x={-28} y={14.3} width={8} height={2.2} rx={0.8} fill={end} />
-      {full && (
-        <>
-          <Rect x={-24.6} y={-15} width={0.8} height={30} fill={end} />
-          <Rect x={-22.2} y={-12} width={1.2} height={24} rx={0.5} fill={accent} fillOpacity={0.9} />
-          <Circle cx={-22.4} cy={0} r={1} fill={DARK} />
-        </>
-      )}
-
       {/* suspension arms */}
-      <Line x1={-13} y1={-8} x2={-13} y2={-12} stroke={DARK} strokeWidth={1.1} />
-      <Line x1={-13} y1={8} x2={-13} y2={12} stroke={DARK} strokeWidth={1.1} />
-      <Line x1={14} y1={-3} x2={14} y2={-10} stroke={DARK} strokeWidth={1.1} />
-      <Line x1={14} y1={3} x2={14} y2={10} stroke={DARK} strokeWidth={1.1} />
-
-      {/* tires: rear (larger) and front */}
-      <Rect x={-19} y={-19.5} width={12} height={8.5} rx={2.2} fill={TYRE} stroke={TYRE_OUTLINE} strokeWidth={0.8} />
-      <Rect x={-19} y={11} width={12} height={8.5} rx={2.2} fill={TYRE} stroke={TYRE_OUTLINE} strokeWidth={0.8} />
-      <Rect x={9.5} y={-16.5} width={9.5} height={6.5} rx={2} fill={TYRE} stroke={TYRE_OUTLINE} strokeWidth={0.8} />
-      <Rect x={9.5} y={10} width={9.5} height={6.5} rx={2} fill={TYRE} stroke={TYRE_OUTLINE} strokeWidth={0.8} />
-      {full && (
-        <>
-          {/* tread grooves and a colored sidewall band */}
-          {[-17, -14.5, -12, -9.5].map((x) => (
-            <G key={x}>
-              <Line x1={x} y1={-19} x2={x} y2={-11.5} stroke="#3A3A3A" strokeWidth={0.5} />
-              <Line x1={x} y1={11.5} x2={x} y2={19} stroke="#3A3A3A" strokeWidth={0.5} />
-            </G>
-          ))}
-          {[11.5, 13.5, 15.5, 17.5].map((x) => (
-            <G key={x}>
-              <Line x1={x} y1={-16} x2={x} y2={-10.5} stroke="#3A3A3A" strokeWidth={0.5} />
-              <Line x1={x} y1={10.5} x2={x} y2={16} stroke="#3A3A3A" strokeWidth={0.5} />
-            </G>
-          ))}
-          <Rect x={-18} y={-12.2} width={10} height={1} fill={accent} fillOpacity={0.85} />
-          <Rect x={-18} y={11.2} width={10} height={1} fill={accent} fillOpacity={0.85} />
-        </>
+      {[front, rear].map((axle) =>
+        [1, -1].map((side) => (
+          <Line key={`${axle.x}${side}`} x1={ix(axle.x)} y1={iy(0.12) * side} x2={ix(axle.x)} y2={iy(axle.z - axle.width / 2) * side} stroke={DARK} strokeWidth={0.9} />
+        )),
       )}
 
-      {/* front wing */}
-      <Rect x={21} y={-15} width={5.5} height={30} rx={1.2} fill={body} stroke={edge} strokeWidth={0.6} />
-      <Rect x={24.3} y={-15} width={1.3} height={30} fill={accent} />
-      {full && <Rect x={22.5} y={-15} width={0.7} height={30} fill={end} />}
-      <Rect x={20.5} y={-16.2} width={7} height={2.2} rx={0.8} fill={end} />
-      <Rect x={20.5} y={14} width={7} height={2.2} rx={0.8} fill={end} />
+      {/* tires */}
+      {[1, -1].flatMap((side) => [tire(front, side as 1 | -1), tire(rear, side as 1 | -1)])}
 
-      {/* body */}
-      <Path d={BODY_PATH} fill={body} />
+      {/* floor, a little wider than the bodywork */}
+      <Path d={FLOOR_PATH} fill="#0B0B0B" fillOpacity={0.9} />
+
+      {/* rear wing: main plane and flap, with tall end plates */}
+      {REAR_WING_PATHS.map((d, i) => (
+        <Path key={`r${i}`} d={d} fill={GEN2022.rearWing.elements[i].flap ? livery.parts.flap : livery.parts.wing} stroke={edge} strokeWidth={0.3} />
+      ))}
+      {[1, -1].map((side) => (
+        <Rect key={`rp${side}`} x={ix(REAR_PLATE[0])} y={iy(GEN2022.rearWing.span * side) - 0.45} width={(REAR_PLATE[1] - REAR_PLATE[0]) * SCALE} height={0.9} rx={0.3} fill={livery.parts.endplate} stroke={edge} strokeWidth={0.3} />
+      ))}
+
+      {/* front wing: arrow shaped, main plane and flaps, with end plates */}
+      {FRONT_WING_PATHS.map((d, i) => (
+        <Path key={`f${i}`} d={d} fill={GEN2022.frontWing.elements[i].flap ? livery.parts.flap : livery.parts.wing} stroke={edge} strokeWidth={0.3} />
+      ))}
+      {[1, -1].map((side) => (
+        <Rect key={`fp${side}`} x={ix(FRONT_PLATE[0])} y={iy(GEN2022.frontWing.span * side) - 0.45} width={(FRONT_PLATE[1] - FRONT_PLATE[0]) * SCALE} height={0.9} rx={0.3} fill={livery.parts.endplate} stroke={edge} strokeWidth={0.3} />
+      ))}
+
+      {/* bodywork in the base color, then the livery shapes laid over it */}
+      <Path d={SPINE_PATH} fill={livery.primary} />
+      <Path d={pods[0]} fill={livery.primary} />
+      <Path d={pods[1]} fill={livery.primary} />
       <G clipPath={`url(#${BODY_CLIP_ID})`}>
-        <LiveryPattern livery={livery} />
-        {full && (
-          <>
-            {/* sidepod undercut shading and a soft highlight along the top edge */}
-            <Path d="M -10 -10.4 C -5 -10, 0 -8.2, 4.5 -5.4 L 4.5 -4.2 C 0 -6.8, -5 -8.6, -10 -9 Z" fill="#000000" fillOpacity={0.22} />
-            <Path d="M -10 10.4 C -5 10, 0 8.2, 4.5 5.4 L 4.5 4.2 C 0 6.8, -5 8.6, -10 9 Z" fill="#000000" fillOpacity={0.22} />
-            <Path d="M -18 -6.8 C -10 -9.6, 0 -7.6, 18 -2.4" fill="none" stroke="#FFFFFF" strokeOpacity={0.2} strokeWidth={1} />
-          </>
-        )}
+        {livery.top.map((layer, i) => (
+          <Polygon key={i} points={layer.points.map(([x, z]) => `${fmt(ix(x))},${fmt(iy(z))}`).join(' ')} fill={layer.color} />
+        ))}
       </G>
-      <Path d={BODY_PATH} fill="none" stroke={accent} strokeOpacity={0.55} strokeWidth={0.7} />
+      <Path d={SPINE_PATH} fill="none" stroke={edge} strokeWidth={0.4} />
+      <Path d={pods[0]} fill="none" stroke={edge} strokeWidth={0.4} />
+      <Path d={pods[1]} fill="none" stroke={edge} strokeWidth={0.4} />
 
-      {/* sidepod inlets */}
-      <Path d="M -3 -7.6 L 3 -5.6 L 3 -4.2 L -3 -5.2 Z" fill={end} />
-      <Path d="M -3 7.6 L 3 5.6 L 3 4.2 L -3 5.2 Z" fill={end} />
+      {/* sidepod inlets, cockpit, airbox intake, halo */}
+      {[1, -1].map((side) => (
+        <Rect key={`inlet${side}`} x={ix(podShape.x[0] - 0.03)} y={side > 0 ? iy(podShape.zIn[0]) : -iy(podShape.zOut[0])} width={0.9} height={iy(podShape.zOut[0] - podShape.zIn[0])} fill={DARK} />
+      ))}
+      <Ellipse cx={ix(0.5)} cy={0} rx={4.2} ry={1.8} fill={DARK} />
+      <Ellipse cx={ix(0.0)} cy={0} rx={0.5} ry={0.9} fill={DARK} />
+      <Path
+        d={`M ${fmt(ix(0.98))} 0 L ${fmt(ix(0.84))} 0 C ${fmt(ix(0.5))} -1.5, ${fmt(ix(0.15))} -2.3, ${fmt(ix(-0.2))} -1.9 M ${fmt(ix(0.84))} 0 C ${fmt(ix(0.5))} 1.5, ${fmt(ix(0.15))} 2.3, ${fmt(ix(-0.2))} 1.9`}
+        fill="none"
+        stroke="#9A9DA3"
+        strokeWidth={0.7}
+        strokeLinecap="round"
+      />
 
-      {/* engine cover fin (full only), airbox, mirrors, helmet and halo */}
-      {full && <Line x1={-20} y1={0} x2={-10.5} y2={0} stroke={DARK} strokeOpacity={0.55} strokeWidth={0.7} />}
-      <Ellipse cx={-7.5} cy={0} rx={3.2} ry={2.4} fill={DARK} />
-      {full && (
-        <>
-          <Ellipse cx={2.4} cy={-5.6} rx={1.5} ry={0.9} fill={DARK} stroke={accent} strokeOpacity={0.6} strokeWidth={0.4} />
-          <Ellipse cx={2.4} cy={5.6} rx={1.5} ry={0.9} fill={DARK} stroke={accent} strokeOpacity={0.6} strokeWidth={0.4} />
-        </>
-      )}
-      <Circle cx={-1.5} cy={0} r={3.1} fill={accent} stroke={DARK} strokeWidth={0.8} />
-      <Path d="M 1.2 -3.9 Q 4.2 0 1.2 3.9" fill="none" stroke={DARK} strokeWidth={1.1} strokeLinecap="round" />
+      {full && <Line x1={ix(-2.2)} y1={0} x2={ix(2.3)} y2={0} stroke="#FFFFFF" strokeOpacity={0.12} strokeWidth={0.4} />}
 
-      {/* race number, run along the rear wing like on a real car */}
+      {/* race number on the rear wing */}
       {showNumber && (
         <SvgText
-          x={-24}
-          y={1.9}
-          fontSize={5.6}
+          x={ix(-2.45)}
+          y={1.5}
+          fontSize={4.2}
           fontWeight="bold"
           fontFamily="Arial"
-          fill={accent}
+          fill={livery.secondary}
           textAnchor="middle"
-          transform="rotate(90 -24 0)"
+          transform={`rotate(90 ${fmt(ix(-2.45))} 0)`}
         >
           {car.number}
         </SvgText>
       )}
     </G>
   );
-}
-
-/** The accent color laid over the body in the livery's pattern. Drawn inside the body outline. */
-function LiveryPattern({ livery }: { livery: Livery }) {
-  const accent = livery.secondary;
-  switch (livery.pattern) {
-    case 'stripe':
-      return <Rect x={-23} y={-1.9} width={47} height={3.8} fill={accent} fillOpacity={0.95} />;
-    case 'split':
-      // the whole nose section in the accent color, cut on a diagonal
-      return <Polygon points="5,-12 25,-12 25,12 -1,12" fill={accent} />;
-    case 'chevron':
-      return (
-        <>
-          <Path d="M -21 -9.5 L -14.5 0 L -21 9.5" fill="none" stroke={accent} strokeWidth={2.2} strokeLinejoin="miter" />
-          <Path d="M -16 -9.5 L -9.5 0 L -16 9.5" fill="none" stroke={accent} strokeWidth={2.2} strokeLinejoin="miter" />
-        </>
-      );
-  }
 }
 
 /** The car on its own, for screens like Home and the garage. Faces right. */

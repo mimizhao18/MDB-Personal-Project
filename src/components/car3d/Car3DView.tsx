@@ -18,17 +18,19 @@ import { buildStudioEnvironment, radialTexture } from './studio';
 interface Orbit {
   yaw: number;
   pitch: number;
+  /** 1 is the normal framing; smaller moves the camera closer (set from the browser console when reviewing the model). */
+  zoom: number;
   dragging: boolean;
   lastTouchAt: number;
   lastX: number;
   lastY: number;
 }
 
-const MIN_DISTANCE = 9;
+const MIN_DISTANCE = 10.5;
 const GLOW_PLANE_SIZE = 11; // the glow plane's full width in world units; scaled down to fit the view
 const GLOW_FILL = 0.96; // how much of the view's half-width the glow may reach (below 1 so it fades out before the edge)
-const FIT_WIDTH = 12.6; // camera distance times the view's width/height ratio needed to fit the car side-on with some margin
-const TARGET = new THREE.Vector3(0.1, 0.5, 0);
+const FIT_WIDTH = 14.8; // camera distance times the view's width/height ratio needed to fit the car side-on with some margin
+const TARGET = new THREE.Vector3(0.15, 0.45, 0);
 const AUTO_SPIN_RADIANS_PER_SECOND = 0.32;
 const IDLE_BEFORE_SPIN_MS = 1800;
 const MIN_PITCH = 0.04;
@@ -38,7 +40,7 @@ function Scene({ livery, orbit, background, autoSpin }: { livery: Livery; orbit:
   const { camera, gl, scene } = useThree();
   const car = useMemo(() => buildCar(livery), [livery]);
   // The floor glow and the rim lights take the car's color (the accent color for very dark paint).
-  const glowHex = glowHexFor(livery.primary, livery.secondary);
+  const glowHex = livery.glow ?? glowHexFor(livery.primary, livery.secondary);
   const glow = useMemo(() => radialTexture(hexToRgb255(glowHex), 0.9, 1.3), [glowHex]);
   const groundTint = useMemo(() => new THREE.Color(glowHex).multiplyScalar(0.3), [glowHex]);
   const shadow = useMemo(() => radialTexture([0, 0, 0], 0.85, 1.4), []);
@@ -68,7 +70,7 @@ function Scene({ livery, orbit, background, autoSpin }: { livery: Livery; orbit:
     const o = orbit.current;
     // Back the camera off in tall or narrow spaces so the car (about 5 long, side-on) always fits.
     const aspect = state.size.width / Math.max(1, state.size.height);
-    const distance = Math.max(MIN_DISTANCE, FIT_WIDTH / Math.max(0.5, aspect));
+    const distance = Math.max(MIN_DISTANCE, FIT_WIDTH / Math.max(0.5, aspect)) * o.zoom;
     if (autoSpin && !o.dragging && Date.now() - o.lastTouchAt > IDLE_BEFORE_SPIN_MS) o.yaw += Math.min(delta, 0.1) * AUTO_SPIN_RADIANS_PER_SECOND; // capped so a long pause cannot make it jump
     // Size the floor glow to the space it has, so it fades out before the edge of the view instead of being cut off there.
     const halfWidth = Math.tan(THREE.MathUtils.degToRad((camera as THREE.PerspectiveCamera).fov) / 2) * distance * aspect;
@@ -130,7 +132,7 @@ export function Car3DView({
       return () => setFocused(false);
     }, []),
   );
-  const orbit = useRef<Orbit>({ yaw: 0.75, pitch: 0.2, dragging: false, lastTouchAt: 0, lastX: 0, lastY: 0 });
+  const orbit = useRef<Orbit>({ yaw: 0.75, pitch: 0.2, zoom: 1, dragging: false, lastTouchAt: 0, lastX: 0, lastY: 0 });
   // Development only: lets the camera be set from the browser console when reviewing the model from different angles.
   useEffect(() => {
     if (__DEV__ && typeof window !== 'undefined') (window as unknown as { __carOrbit?: Orbit }).__carOrbit = orbit.current;

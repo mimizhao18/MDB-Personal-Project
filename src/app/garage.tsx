@@ -4,6 +4,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { CarImage } from '../components/CarIcon';
 import { HeroCar } from '../components/HeroCar';
+import { ERAS } from '../data/eras';
 import { LIVERIES, MAX_CAR_NUMBER, MIN_CAR_NUMBER, getLivery } from '../data/liveries';
 import type { Livery } from '../data/liveries';
 import { makeStyles } from '../design/styles';
@@ -13,8 +14,11 @@ import type { PlayerProfile } from '../models/types';
 import { getProfile, saveProfile } from '../storage/profile';
 import { showAlert } from '../ui/alert';
 import { Credits } from '../ui/Credits';
-import { Button, Card, SectionLabel } from '../ui/kit';
+import { Button, Card, Segmented } from '../ui/kit';
 import { colors } from '../theme';
+
+type Tab = 'Owned' | 'Store';
+const TABS: readonly Tab[] = ['Owned', 'Store'];
 
 const ROAD_COLOR = '#E6E6E6';
 const KERB_COLOR = '#2B2B2B';
@@ -56,6 +60,12 @@ const useStyles = makeStyles((t) => ({
   raceStage: { alignSelf: 'stretch', alignItems: 'center', justifyContent: 'center' },
   roadBand: { position: 'absolute', left: 0, right: 0, backgroundColor: ROAD_COLOR, borderColor: KERB_COLOR },
   raceCaption: { ...t.type.caption, color: t.colors.textMuted },
+  group: { gap: t.spacing.sm },
+  groupHeader: { flexDirection: 'row', alignItems: 'baseline', gap: t.spacing.sm, marginTop: t.spacing.xs },
+  groupName: { ...t.type.heading, color: t.colors.text },
+  groupYears: { ...t.type.caption, color: t.colors.textMuted },
+  empty: { ...t.type.body, color: t.colors.textMuted, textAlign: 'center', paddingVertical: t.spacing.lg },
+  nameBlock: { flex: 1, gap: 2 },
   grid: { flexDirection: 'row', flexWrap: 'wrap', gap: t.spacing.sm },
   cardWrap: { flexGrow: 1, flexBasis: '45%' },
   card: { alignItems: 'center', gap: t.spacing.xs, paddingVertical: t.spacing.md },
@@ -86,6 +96,7 @@ export default function GarageScreen() {
   const [profile, setProfile] = useState<PlayerProfile | null>(null);
   // The livery shown on the big car. Tapping a card previews it, owned or not; the button below equips or buys it.
   const [previewId, setPreviewId] = useState<string | null>(null);
+  const [tab, setTab] = useState<Tab>('Owned');
 
   useEffect(() => {
     getProfile().then(setProfile);
@@ -140,6 +151,11 @@ export default function GarageScreen() {
   const previewEquipped = previewed.id === profile.car.liveryId;
   const canAfford = profile.credits >= previewed.price;
   const previewCar = { liveryId: previewed.id, number: profile.car.number };
+  // the liveries on show: the ones you own, or the ones for sale, grouped by generation of car
+  const groups = ERAS.map((era) => ({
+    era,
+    liveries: LIVERIES.filter((l) => l.era === era.id && ownsLivery(profile, l) === (tab === 'Owned')),
+  })).filter((g) => g.liveries.length > 0);
 
   return (
     <SafeAreaView style={styles.container} edges={['bottom']}>
@@ -149,7 +165,10 @@ export default function GarageScreen() {
             <HeroCar car={previewCar} height={260} background={colors.surface} />
           </View>
           <View style={styles.previewHeader}>
-            <Text style={styles.liveryName}>{previewed.name}</Text>
+            <View style={styles.nameBlock}>
+              <Text style={styles.liveryName}>{previewed.name}</Text>
+              <Text style={styles.raceLabel}>{ERAS.find((e) => e.id === previewed.era)?.name} car</Text>
+            </View>
             <Credits amount={profile.credits} />
           </View>
           <View style={styles.previewAction}>
@@ -175,32 +194,44 @@ export default function GarageScreen() {
           </View>
         </Card>
 
-        <SectionLabel>Liveries</SectionLabel>
-        <View style={styles.grid}>
-          {LIVERIES.map((livery) => {
-            const owned = ownsLivery(profile, livery);
-            const equipped = livery.id === profile.car.liveryId;
-            const previewing = livery.id === previewed.id;
-            return (
-              <Pressable
-                key={livery.id}
-                style={styles.cardWrap}
-                onPress={() => setPreviewId(livery.id)}
-                accessibilityLabel={`${livery.name} livery, ${equipped ? 'equipped' : owned ? 'owned' : `${livery.price} credits`}. Tap to preview.`}
-              >
-                <Card style={[styles.card, previewing && styles.cardPreviewing, equipped && styles.cardEquipped]}>
-                  <CarImage car={{ liveryId: livery.id, number: profile.car.number }} size={130} detail="simple" showNumber={false} />
-                  <Text style={styles.cardName}>{livery.name}</Text>
-                  {owned ? (
-                    <Text style={[styles.cardStatus, equipped && styles.cardStatusEquipped]}>{equipped ? 'Equipped' : 'Owned'}</Text>
-                  ) : (
-                    <Credits amount={livery.price} size={14} textStyle={styles.cardPrice} />
-                  )}
-                </Card>
-              </Pressable>
-            );
-          })}
-        </View>
+        <Segmented options={TABS} value={tab} onChange={setTab} />
+        {groups.length === 0 ? (
+          <Text style={styles.empty}>You own every livery so far. More are on the way.</Text>
+        ) : (
+          groups.map(({ era, liveries }) => (
+            <View key={era.id} style={styles.group}>
+              <View style={styles.groupHeader}>
+                <Text style={styles.groupName}>{era.name}</Text>
+                <Text style={styles.groupYears}>{era.years}</Text>
+              </View>
+              <View style={styles.grid}>
+                {liveries.map((livery) => {
+                  const owned = ownsLivery(profile, livery);
+                  const equipped = livery.id === profile.car.liveryId;
+                  const previewing = livery.id === previewed.id;
+                  return (
+                    <Pressable
+                      key={livery.id}
+                      style={styles.cardWrap}
+                      onPress={() => setPreviewId(livery.id)}
+                      accessibilityLabel={`${livery.name} ${era.name} livery, ${equipped ? 'equipped' : owned ? 'owned' : `${livery.price} credits`}. Tap to preview.`}
+                    >
+                      <Card style={[styles.card, previewing && styles.cardPreviewing, equipped && styles.cardEquipped]}>
+                        <CarImage car={{ liveryId: livery.id, number: profile.car.number }} size={130} detail="simple" showNumber={false} />
+                        <Text style={styles.cardName}>{livery.name}</Text>
+                        {owned ? (
+                          <Text style={[styles.cardStatus, equipped && styles.cardStatusEquipped]}>{equipped ? 'Equipped' : 'Owned'}</Text>
+                        ) : (
+                          <Credits amount={livery.price} size={14} textStyle={styles.cardPrice} />
+                        )}
+                      </Card>
+                    </Pressable>
+                  );
+                })}
+              </View>
+            </View>
+          ))
+        )}
 
         <Card style={styles.numberCard}>
           <Text style={styles.raceLabel}>Race number</Text>
