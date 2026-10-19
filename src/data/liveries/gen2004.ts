@@ -17,6 +17,7 @@ const FERRARI: Livery = {
   secondary: '#FFFFFF',
   sidepod: 'v10',
   finish: 'gloss',
+  helmet: '#D80000',
   parts: solidParts('#F4F4F4', '#17171A', '#D80000'),
   top: [
     // white nose bands (the "barcode"), the white back of the airbox, black tail, white panel on the front of the sidepods
@@ -56,6 +57,7 @@ const MCLAREN: Livery = {
   glow: '#E10600',
   sidepod: 'v10',
   finish: 'gloss',
+  helmet: '#DADDE2',
   parts: solidParts('#838890', BLACK, BLACK),
   top: [
     { color: BLACK, points: noseCapShape(1.95, 2.3, 0.1) },
@@ -85,6 +87,7 @@ const WILLIAMS: Livery = {
   glow: '#2F5BD6',
   sidepod: 'v10',
   finish: 'gloss',
+  helmet: '#DDE6F8',
   parts: solidParts('#F2F2F2', '#F2F2F2', '#F2F2F2'),
   frontParts: { wing: '#1B2F7A', flap: '#1B2F7A', endplate: '#1B2F7A' },
   top: [
@@ -118,6 +121,7 @@ const RENAULT: Livery = {
   secondary: '#FFD800',
   sidepod: 'v10',
   finish: 'gloss',
+  helmet: '#FFD800',
   parts: solidParts(BLACK, BLACK, '#2E8AD8'),
   top: [
     // yellow nose and cockpit surround, azure blue behind, black tail
@@ -154,6 +158,7 @@ const BAR: Livery = {
   glow: '#E10600',
   sidepod: 'v10',
   finish: 'gloss',
+  helmet: '#F4F4F4',
   parts: solidParts('#F2F2F2', '#F2F2F2', '#E10600'),
   frontParts: { wing: '#17171A', flap: '#17171A', endplate: '#17171A' },
   top: [
@@ -191,6 +196,7 @@ const JAGUAR: Livery = {
   glow: '#18B26B',
   sidepod: 'v10',
   finish: 'gloss',
+  helmet: '#FFD500',
   parts: solidParts('#0A4D2E', '#C0C0C0', '#0A4D2E'),
   top: [
     { color: '#C0C0C0', points: noseCapShape(1.85, 2.3, 0.12) },
@@ -218,6 +224,7 @@ const TOYOTA: Livery = {
   secondary: '#E10600',
   sidepod: 'v10',
   finish: 'gloss',
+  helmet: '#1E88E5',
   parts: solidParts('#F2F2F2', '#E10600', '#F2F2F2'),
   top: [
     { color: '#E10600', points: noseCapShape(1.85, 2.3, 0.12) },

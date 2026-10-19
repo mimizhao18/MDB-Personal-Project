@@ -222,6 +222,7 @@ export function buildModernCar(spec: CarSpec, livery: Livery, options: CarOption
     light: new THREE.MeshStandardMaterial({ color: 0xff2a2a, emissive: 0xff0000, emissiveIntensity: 1.2 }),
     rim: new THREE.MeshStandardMaterial({ color: spec.wheelLook.rimColor, metalness: 0.9, roughness: 0.35 }),
     mark: new THREE.MeshStandardMaterial({ color: 0xe6e6e6, metalness: 0, roughness: 0.7 }),
+    helmet: new THREE.MeshStandardMaterial({ color: livery.helmet ?? '#E6E6E6', metalness: 0.1, roughness: 0.3 }),
   };
   const partMaterial = (part: ExtraPart): THREE.Material => (part === 'paint' ? paint : m[part]);
 
@@ -279,6 +280,15 @@ export function buildModernCar(spec: CarSpec, livery: Livery, options: CarOption
   wheelRim.rotation.z = -0.5;
   car.add(wheelRim);
   car.add(box(0.05, 0.12, ck.rz * 1.5, m.dark, ck.x - ck.rx * 0.65, ck.y + 0.08, 0));
+  // the driver's helmet, in the livery's helmet color, sitting low so the halo passes over it
+  const helmetMesh = new THREE.Mesh(new THREE.SphereGeometry(1, 20, 14), m.helmet);
+  helmetMesh.scale.set(0.12, 0.105, 0.105);
+  helmetMesh.position.set(ck.x - 0.12, ck.y + 0.06, 0);
+  car.add(helmetMesh);
+  const visorMesh = new THREE.Mesh(new THREE.SphereGeometry(1, 16, 10), m.dark);
+  visorMesh.scale.set(0.06, 0.04, 0.085);
+  visorMesh.position.set(ck.x - 0.06, ck.y + 0.07, 0);
+  car.add(visorMesh);
   // the raised rim around the cockpit opening, in body paint
   const rimPoints = Array.from({ length: 28 }, (_, i) => {
     const a = (i / 28) * Math.PI * 2;

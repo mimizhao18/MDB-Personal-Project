@@ -19,6 +19,7 @@ const FERRARI: Livery = {
   secondary: '#FFFFFF',
   sidepod: 'hybrid',
   finish: 'gloss',
+  helmet: '#E8E8E8',
   parts: parts(CARBON, CARBON, CARBON),
   frontParts: { wing: CARBON, flap: '#DC0000', endplate: '#DC0000' },
   top: [
@@ -55,6 +56,7 @@ const MERCEDES: Livery = {
   glow: '#00D2BE',
   sidepod: 'hybrid',
   finish: 'gloss',
+  helmet: '#FFD500',
   parts: parts(BLACK, '#00D2BE', BLACK),
   top: [
     // silver in front, black from the airbox back, teal flowing lines and nose tip
@@ -89,6 +91,7 @@ const MCLAREN: Livery = {
   secondary: '#2B3FA8',
   sidepod: 'hybrid',
   finish: 'gloss',
+  helmet: '#E10600',
   parts: parts('#FF8000', '#2B3FA8', '#FF8000'),
   top: [
     { color: '#1B2A6B', points: stripe(-0.5, L.tail - 0.05, 0.14) },
@@ -122,6 +125,7 @@ const REDBULL: Livery = {
   glow: '#E4002B',
   sidepod: 'hybrid',
   finish: 'matte',
+  helmet: '#E4002B',
   parts: parts('#16192E', '#E4002B', '#16192E'),
   top: [
     // yellow nose, a yellow airbox with a red flame, red flames across the sidepods and engine cover
@@ -161,6 +165,7 @@ const FORCEINDIA: Livery = {
   glow: '#E87CA5',
   sidepod: 'hybrid',
   finish: 'gloss',
+  helmet: '#E8E8E8',
   parts: parts('#E87CA5', '#F4F4F4', '#E87CA5'),
   top: [
     // white airbox top and engine cover top, silver-white pod panels
@@ -196,6 +201,7 @@ const RENAULT: Livery = {
   glow: '#FFD800',
   sidepod: 'hybrid',
   finish: 'gloss',
+  helmet: '#FFD800',
   parts: parts(BLACK, '#FFD800', BLACK),
   top: [
     // yellow nose, yellow front of the car and sidepod fronts, black behind
@@ -231,6 +237,7 @@ const WILLIAMS: Livery = {
   secondary: '#0B3D91',
   sidepod: 'hybrid',
   finish: 'gloss',
+  helmet: '#1B2F7A',
   parts: parts(BLACK, BLACK, BLACK),
   top: [
     // the Martini stripes: dark blue, red and light blue side by side down the nose, then again over the engine cover

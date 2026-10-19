@@ -20,6 +20,7 @@ const FERRARI: Livery = {
   secondary: '#FFEB00',
   sidepod: 'scoop',
   finish: 'gloss',
+  helmet: '#D40000',
   parts: parts(CARBON),
   top: [
     ...podBand(BLACK, -0.2, -0.65, 0.17, 0.3),
@@ -57,6 +58,7 @@ const MERCEDES: Livery = {
   secondary: '#00D2BE',
   sidepod: 'slim',
   finish: 'matte',
+  helmet: '#FFD500',
   parts: parts(BLACK),
   top: [
     // teal nose tip, a thin teal line down the engine cover, and a teal edge along the outside of the sidepods
@@ -90,6 +92,7 @@ const MCLAREN: Livery = {
   secondary: '#47C7FC',
   sidepod: 'downwash',
   finish: 'gloss',
+  helmet: '#FFD500',
   parts: parts(BLACK, BLACK, '#FF8000'),
   top: [
     // black airbox, engine cover and rear, papaya sidepod fronts, blue stripes
@@ -125,6 +128,7 @@ const REDBULL: Livery = {
   glow: '#E4002B',
   sidepod: 'downwash',
   finish: 'matte',
+  helmet: '#FF8A00',
   parts: parts('#1C2B5E', '#E4002B', '#1C2B5E'),
   top: [
     // yellow nose and airbox, red sweep across the top of the sidepods, red stripe on the engine cover
@@ -170,6 +174,7 @@ const ALPINE: Livery = {
   glow: '#F5A0D0',
   sidepod: 'downwash',
   finish: 'gloss',
+  helmet: '#1F4DBF',
   parts: parts(BLACK, '#E9A3C8', BLACK),
   top: [
     ...podBand(BLACK, -0.45, -1.05, 0.17, 0.3),
@@ -207,6 +212,7 @@ const ASTONMARTIN: Livery = {
   secondary: '#CFE600',
   sidepod: 'slim',
   finish: 'gloss',
+  helmet: '#0D6A5E',
   parts: parts(BLACK, BLACK, BLACK),
   top: [
     ...podBand(BLACK, -0.15, -0.5, 0.17, 0.3),
@@ -242,6 +248,7 @@ const ALPHATAURI: Livery = {
   secondary: '#F4F4F4',
   sidepod: 'downwash',
   finish: 'matte',
+  helmet: '#F4F4F4',
   parts: parts('#11203A', '#11203A', '#11203A'),
   top: [
     // the white airbox and engine cover with its navy bull splash, white nose
@@ -278,6 +285,7 @@ const ALFAROMEO: Livery = {
   secondary: '#F4F4F4',
   sidepod: 'slim',
   finish: 'gloss',
+  helmet: '#E8E8E8',
   parts: parts(BLACK, '#9C1527', BLACK),
   top: [
     // the white airbox and the white front of the sidepods
@@ -309,6 +317,7 @@ const HAAS: Livery = {
   secondary: '#E10600',
   sidepod: 'downwash',
   finish: 'gloss',
+  helmet: '#E10600',
   parts: parts('#F2F2F2', '#E10600', '#F2F2F2'),
   top: [
     ...podBand(BLACK, 0.22, -0.57, 0.18, 0.3),
@@ -342,6 +351,7 @@ const WILLIAMS: Livery = {
   glow: '#2B7DFF',
   sidepod: 'downwash',
   finish: 'gloss',
+  helmet: '#2A6BF0',
   parts: parts(BLACK, BLACK, '#0B1C52'),
   top: [
     // bright blue edges and nose, black tail

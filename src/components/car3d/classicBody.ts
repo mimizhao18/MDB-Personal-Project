@@ -58,7 +58,7 @@ function addFloor(c: BodyContext, edge: boolean, diffuser: boolean) {
 
 /** The driver: a helmet and a dark visor, and the shoulders, sitting low in the cockpit. */
 function addDriver(c: BodyContext, x: number, y: number, size = 0.12) {
-  const helmet = ellipsoid(size * 1.05, size, size * 0.95, c.m.mark, x, y, 0);
+  const helmet = ellipsoid(size * 1.05, size, size * 0.95, c.m.helmet, x, y, 0);
   c.car.add(helmet);
   const visor = ellipsoid(size * 0.5, size * 0.38, size * 0.82, c.m.dark, x + size * 0.62, y + size * 0.1, 0);
   c.car.add(visor);

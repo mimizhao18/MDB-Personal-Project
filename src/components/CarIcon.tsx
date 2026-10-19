@@ -203,7 +203,7 @@ export function CarShape({ car, detail = 'simple', showNumber = false }: ShapePr
       ))}
       <Ellipse cx={ix(spec.details.cockpit.x)} cy={0} rx={spec.details.cockpit.rx * SCALE} ry={spec.details.cockpit.rz * SCALE} fill={DARK} />
       {/* the driver's helmet in the cockpit */}
-      <Ellipse cx={ix(spec.details.cockpit.x - 0.1)} cy={0} rx={1.15} ry={1.05} fill="#E6E6E6" stroke={DARK} strokeWidth={0.2} />
+      <Ellipse cx={ix(spec.details.cockpit.x - 0.1)} cy={0} rx={1.15} ry={1.05} fill={livery.helmet ?? '#E6E6E6'} stroke={DARK} strokeWidth={0.2} />
       <Ellipse cx={ix(spec.details.cockpit.x - 0.1) + 0.7} cy={0} rx={0.45} ry={0.8} fill={DARK} />
       <Ellipse cx={ix(spec.details.intake[0] + 0.02)} cy={0} rx={0.5} ry={0.9} fill={DARK} />
       {spec.halo && (

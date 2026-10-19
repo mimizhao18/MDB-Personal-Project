@@ -17,6 +17,7 @@ const FERRARI: Livery = {
   secondary: '#FFFFFF',
   sidepod: 'turbo',
   finish: 'gloss',
+  helmet: '#D40000',
   parts: { wing: CARBON, flap: CARBON, endplate: CARBON, floor: CARBON },
   top: [
     { color: WHITE, points: stripe(1.4, 2.45, 0.03) },
@@ -51,6 +52,7 @@ const MCLAREN: Livery = {
   glow: '#E10600',
   sidepod: 'turbo',
   finish: 'gloss',
+  helmet: '#FFD500',
   parts: solidParts('#E10600', '#F2F2F2', '#E10600'),
   frontParts: { wing: '#F2F2F2', flap: '#F2F2F2', endplate: '#F2F2F2' },
   top: [
@@ -85,6 +87,7 @@ const LOTUS: Livery = {
   secondary: '#D4AF37',
   sidepod: 'turbo',
   finish: 'gloss',
+  helmet: '#FFD500',
   parts: { wing: BLACK, flap: BLACK, endplate: '#D4AF37', floor: CARBON },
   top: [
     { color: '#D4AF37', points: stripe(2.0, 2.5, 0.07) },
@@ -112,6 +115,7 @@ const WILLIAMS: Livery = {
   glow: '#2F5BD6',
   sidepod: 'turbo',
   finish: 'gloss',
+  helmet: '#1E3C8A',
   parts: solidParts('#F2F2F2', '#F2F2F2', '#F2F2F2'),
   frontParts: { wing: '#17171A', flap: '#17171A', endplate: '#FFD800' },
   top: [
@@ -148,6 +152,7 @@ const BENETTON: Livery = {
   glow: '#2F6BE0',
   sidepod: 'turbo',
   finish: 'gloss',
+  helmet: '#F4F4F4',
   parts: solidParts('#1F4FB3', '#F2F2F2', '#1F4FB3'),
   top: [
     { color: '#F2F2F2', points: noseCapShape(2.0, 2.45, 0.1) },
@@ -178,6 +183,7 @@ const CAMEL: Livery = {
   glow: '#FFD500',
   sidepod: 'turbo',
   finish: 'gloss',
+  helmet: '#FFD500',
   parts: solidParts('#FFD500', '#FFD500', '#FFD500'),
   top: [
     // all yellow with blue lettering and the blue camel on the nose
@@ -210,6 +216,7 @@ const BRABHAM: Livery = {
   glow: '#2F6BE0',
   sidepod: 'turbo',
   finish: 'gloss',
+  helmet: '#FFD500',
   parts: solidParts('#1A2A6E', '#F2F2F2', '#1A2A6E'),
   top: [
     { color: '#1A2A6E', points: noseCapShape(1.9, 2.45, 0.11) },

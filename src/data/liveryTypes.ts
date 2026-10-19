@@ -43,6 +43,8 @@ export interface Livery {
   glow?: string;
   /** Which sidepod design the team ran (the shape of the car's side bodywork). */
   sidepod: PodStyle;
+  /** The color of the driver's helmet, as seen in the cockpit. Defaults to white. */
+  helmet?: string;
   /** Matte paint (a few teams run it) or glossy. */
   finish: 'gloss' | 'matte';
   /** Solid colors for the wings and floor. */

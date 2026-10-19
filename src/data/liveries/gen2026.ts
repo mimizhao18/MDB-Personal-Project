@@ -20,6 +20,7 @@ const FERRARI: Livery = {
   secondary: '#FFFFFF',
   sidepod: 'compact',
   finish: 'gloss',
+  helmet: '#FFD500',
   parts: parts(CARBON),
   top: [
     // white airbox and top of the engine cover, black tail, white nose cap
@@ -60,6 +61,7 @@ const MERCEDES: Livery = {
   glow: '#00D2BE',
   sidepod: 'compact',
   finish: 'matte',
+  helmet: '#E8E8E8',
   parts: parts(BLACK),
   top: [
     // grey nose with a teal stripe, a teal swoosh over the sidepods
@@ -95,6 +97,7 @@ const MCLAREN: Livery = {
   secondary: '#47C7FC',
   sidepod: 'compact',
   finish: 'gloss',
+  helmet: '#FFD500',
   parts: parts(BLACK, BLACK, '#FF8000'),
   top: [
     // black airbox and engine cover, papaya nose, a little blue
@@ -134,6 +137,7 @@ const REDBULL: Livery = {
   glow: '#E4002B',
   sidepod: 'compact',
   finish: 'matte',
+  helmet: '#FF8A00',
   parts: parts('#1C2B5E', '#1C2B5E', '#1C2B5E'),
   top: [
     // yellow airbox top, yellow nose tip, red accents
@@ -170,6 +174,7 @@ const RACINGBULLS: Livery = {
   secondary: '#F2F2F2',
   sidepod: 'compact',
   finish: 'gloss',
+  helmet: '#1F2F7A',
   parts: parts('#14172B', '#14172B', '#14172B'),
   frontParts: { wing: '#14172B', flap: WHITE, endplate: WHITE },
   top: [
@@ -209,6 +214,7 @@ const ALPINE: Livery = {
   glow: '#F06BAE',
   sidepod: 'compact',
   finish: 'gloss',
+  helmet: '#F06BAE',
   parts: parts('#12206A', '#12206A', '#F06BAE'),
   frontParts: { wing: '#12206A', flap: '#F06BAE', endplate: '#F06BAE' },
   top: [
@@ -239,6 +245,7 @@ const ASTONMARTIN: Livery = {
   secondary: '#C9E200',
   sidepod: 'compact',
   finish: 'gloss',
+  helmet: '#0D6A5E',
   parts: parts('#0A4D40', '#7FD8E8', '#0A4D40'),
   top: [
     { color: '#C9E200', points: noseCapShape(2.5, 2.85, 0.09) },
@@ -277,6 +284,7 @@ const WILLIAMS: Livery = {
   secondary: '#FFFFFF',
   sidepod: 'compact',
   finish: 'gloss',
+  helmet: '#2A6BF0',
   parts: parts(BLACK, BLACK, '#0B2B6A'),
   top: [
     { color: WHITE, points: noseCapShape(2.3, 2.85, 0.1) },
@@ -309,6 +317,7 @@ const HAAS: Livery = {
   secondary: '#E10600',
   sidepod: 'compact',
   finish: 'gloss',
+  helmet: '#E10600',
   parts: parts(BLACK, '#E10600', BLACK),
   top: [
     { color: '#E10600', points: noseCapShape(2.4, 2.85, 0.1) },
@@ -343,6 +352,7 @@ const AUDI: Livery = {
   glow: '#E5383B',
   sidepod: 'compact',
   finish: 'matte',
+  helmet: '#E5383B',
   parts: parts(BLACK, '#E5383B', BLACK),
   top: [
     // the red-orange airbox, a red patch on the back of the sidepods and the engine cover
@@ -375,6 +385,7 @@ const CADILLAC: Livery = {
   glow: '#C8102E',
   sidepod: 'compact',
   finish: 'gloss',
+  helmet: '#F4F4F4',
   parts: parts(BLACK, BLACK, '#111114'),
   top: [
     { color: BLACK, points: stripe(-1.0, L.tail - 0.05, 0.17) },
