@@ -90,14 +90,19 @@ const MCLAREN: Livery = {
   finish: 'gloss',
   parts: parts('#FF8000', '#2B3FA8', '#FF8000'),
   top: [
-    { color: '#2B3FA8', points: stripe(-0.2, L.tail - 0.05, 0.1) },
+    { color: '#1B2A6B', points: stripe(-0.5, L.tail - 0.05, 0.14) },
     { color: '#2B3FA8', points: noseCapShape(2.4, 2.85, 0.1) },
   ],
-  side: [{ color: '#2B3FA8', points: flank(-0.2, -2.1, 0.78, 1.05) }],
+  side: [
+    // the dark blue upper engine cover behind the airbox
+    { color: '#1B2A6B', points: [[-0.5, 0.98], [-0.5, 0.66], [-1.9, 0.62], [-1.9, 0.8]] },
+  ],
   texts: [
     sideText('DELL', 0.3, mid + 0.1, 0.1, BLACK),
     sideText('KIMOA', -0.2, mid + 0.14, 0.06, BLACK),
-    sideText('SAP', -1.0, mid + 0.04, 0.07, BLACK),
+    sideText('RENAULT', -1.35, mid - 0.02, 0.06, BLACK),
+    sideText('PETROBRAS', -0.2, mid + 0.18, 0.04, BLACK),
+    sideText('CHANDON', -0.1, 1.0, 0.06, BLACK),
     sideText('RICHARD MILLE', -1.3, 0.55, 0.04, BLACK),
     topText('KIMOA', 1.7, 0, 0.06, BLACK),
     wingText('CHANDON', -2.3, 0, 0.08, WHITE),
@@ -155,7 +160,7 @@ const FORCEINDIA: Livery = {
   glow: '#E87CA5',
   sidepod: 'hybrid',
   finish: 'gloss',
-  parts: parts('#E87CA5', '#F4F4F4', BLACK),
+  parts: parts('#E87CA5', '#F4F4F4', '#E87CA5'),
   top: [
     // white airbox top and engine cover top, silver-white pod panels
     { color: '#E6E8EA', points: stripe(0.06, -1.3, 0.14) },
@@ -176,7 +181,7 @@ const FORCEINDIA: Livery = {
     sideText('HYPE', -0.5, 0.72, 0.04, BLACK),
     wingText('BWT', -2.3, 0, 0.1, '#1D4ED8'),
   ],
-  plateTexts: { rear: [plateText('KINGFISHER', -2.35, 0.78, 0.05, WHITE)] },
+  plateTexts: { rear: [plateText('KINGFISHER', -2.35, 0.78, 0.05, '#7A1F4B')] },
 };
 
 const RENAULT: Livery = {
@@ -199,16 +204,20 @@ const RENAULT: Livery = {
   side: [
     { color: '#FFD800', points: flank(1.0, 0.1, 0.06, 0.55) },
     { color: '#FFD800', points: flank(0.06, -0.9, 0.9, ABOX_Y[1]) },
+    // thin yellow lines along the upper sidepod and engine cover
+    { color: '#FFD800', points: [[0.1, 0.46], [0.1, 0.49], [-1.9, 0.62], [-1.9, 0.59]] },
+    { color: '#FFD800', points: flank(0.1, -1.9, 0.9, 0.92) },
   ],
   texts: [
     sideText('MAPFRE', -0.2, mid + 0.14, 0.075, WHITE),
     sideText('RENAULT', -1.1, mid + 0.04, 0.09, '#FFD800'),
     sideText('INFINITI', 0.5, mid + 0.14, 0.05, BLACK),
-    sideText('CATERPILLAR', -1.4, 0.55, 0.045, WHITE),
+    sideText('RCI BANK', -0.45, mid + 0.0, 0.05, WHITE),
+    sideText('CASTROL EDGE', -1.2, 0.58, 0.05, WHITE),
     topText('RENAULT', 1.6, 0, 0.06, BLACK),
     wingText('RENAULT', -2.3, 0, 0.1, BLACK),
   ],
-  plateTexts: { rear: [plateText('TOTAL', -2.35, 0.78, 0.07, '#FFD800')] },
+  plateTexts: { rear: [plateText('CASTROL', -2.35, 0.78, 0.07, WHITE)] },
 };
 
 const WILLIAMS: Livery = {
@@ -223,22 +232,27 @@ const WILLIAMS: Livery = {
   finish: 'gloss',
   parts: parts(BLACK, BLACK, BLACK),
   top: [
-    // the Martini stripes: dark blue, light blue and red, side by side down the middle of the car
-    { color: '#0B3D91', points: stripe(L.nose, L.tail, 0.07) },
-    { color: '#1E88E5', points: stripe(L.nose, L.tail, 0.045) },
-    { color: '#E10600', points: stripe(L.nose, L.tail, 0.02) },
+    // the Martini stripes: dark blue, red and light blue side by side down the nose, then again over the engine cover
+    { color: '#0B3D91', points: stripe(1.0, L.nose, 0.07) },
+    { color: '#1E88E5', points: stripe(1.0, L.nose, 0.045) },
+    { color: '#E10600', points: stripe(1.0, L.nose, 0.02) },
+    { color: '#0B3D91', points: stripe(-0.4, L.tail, 0.14) },
+    { color: '#E10600', points: stripe(-0.4, L.tail, 0.09) },
+    { color: '#1E88E5', points: stripe(-0.4, L.tail, 0.045) },
   ],
   side: [
-    { color: '#0B3D91', points: flank(1.0, -2.1, 0.22, 0.27) },
-    { color: '#1E88E5', points: flank(1.0, -2.1, 0.17, 0.22) },
-    { color: '#E10600', points: flank(1.0, -2.1, 0.12, 0.17) },
-    // the red patch on the engine cover with the white Martini lettering
-    { color: '#E10600', points: ellipse(-1.0, 0.7, 0.3, 0.12) },
+    // the diagonal Martini bands over the rear of the engine cover
+    { color: '#0B3D91', points: [[-0.4, 1.0], [-0.4, 0.92], [-1.9, 0.62], [-1.9, 0.7]] },
+    { color: '#E10600', points: [[-0.4, 0.92], [-0.4, 0.82], [-1.9, 0.54], [-1.9, 0.62]] },
+    { color: '#1E88E5', points: [[-0.4, 0.82], [-0.4, 0.74], [-1.9, 0.46], [-1.9, 0.54]] },
+    // and the stripes curving down the nose side
+    { color: '#E10600', points: [[1.0, 0.2], [1.0, 0.24], [2.6, 0.36], [2.6, 0.32]] },
+    { color: '#0B3D91', points: [[1.0, 0.24], [1.0, 0.3], [2.6, 0.42], [2.6, 0.36]] },
   ],
   texts: [
-    sideText('MARTINI', -1.0, 0.7, 0.07, WHITE),
-    sideText('SMP RACING', 0.55, mid + 0.18, 0.05, '#0B3D91'),
-    sideText('ORIS', -0.2, mid + 0.14, 0.05, '#0B3D91'),
+    sideText('MARTINI', -1.1, 0.7, 0.075, WHITE),
+    sideText('REXONA', -0.15, mid - 0.02, 0.09, '#0B3D91'),
+    sideText('SMP RACING', 1.1, 0.5, 0.045, BLACK),
     topText('MARTINI', 1.6, 0.09, 0.05, '#0B3D91'),
     wingText('MARTINI', -2.3, 0, 0.09, WHITE),
   ],

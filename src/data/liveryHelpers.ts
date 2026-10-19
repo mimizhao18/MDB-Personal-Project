@@ -27,6 +27,14 @@ export const podBand = (color: string, x0: number, x1: number, z0: number, z1: n
 /** A tapered cap over the nose: `len` long, as wide as `hw` at its back. */
 export const noseCapShape = (x0: number, x1: number, hw: number): Point[] => [[x0, hw], [x0, -hw], [x1, -hw * 0.5], [x1, hw * 0.5]];
 
+/** A cooling grille on the side of the body: a black panel with `slats` lighter bars across it. */
+export function grille(x0: number, x1: number, y0: number, y1: number, slats = 4): LiveryLayer[] {
+  const layers: LiveryLayer[] = [{ color: BLACK, points: flank(x0, x1, y0, y1) }];
+  const step = (y1 - y0) / (slats + 1);
+  for (let i = 1; i <= slats; i++) layers.push({ color: '#3A3A40', points: flank(x0 + 0.01, x1 - 0.01, y0 + step * i - 0.004, y0 + step * i + 0.004) });
+  return layers;
+}
+
 /** An ellipse (a roundel, a badge) as a polygon. */
 export function ellipse(cx: number, cy: number, rx: number, ry: number, steps = 20): Point[] {
   return Array.from({ length: steps }, (_, i) => {

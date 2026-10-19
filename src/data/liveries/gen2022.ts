@@ -1,4 +1,4 @@
-import { BLACK, CARBON, WHITE, both, ellipse, flank, noseCapShape, plateText, podBand, sideText, stripe, topText, wingText, layout } from '../liveryHelpers';
+import { grille, BLACK, CARBON, WHITE, both, ellipse, flank, noseCapShape, plateText, podBand, sideText, stripe, topText, wingText, layout } from '../liveryHelpers';
 import type { Livery } from '../liveryTypes';
 
 // 2022 (ground effect): every team on the grid, drawn from photos of the real cars. Shapes are in the car's own
@@ -22,12 +22,14 @@ const FERRARI: Livery = {
   finish: 'gloss',
   parts: parts(CARBON),
   top: [
+    ...podBand(BLACK, -0.2, -0.65, 0.17, 0.3),
     // black tail of the engine cover, and the yellow Ferrari badge on it
     { color: BLACK, points: stripe(-1.45, L.tail - 0.1, 0.2) },
     { color: '#FFEB00', points: [[-0.82, 0.07], [-0.9, 0.0], [-0.82, -0.07], [-0.98, -0.07], [-1.06, 0.0], [-0.98, 0.07]] },
     { color: WHITE, points: stripe(2.34, 2.46, 0.11) },
   ],
   side: [
+    ...grille(-0.65, -0.2, 0.7, 0.82, 4),
     // the big yellow Shell scallop on the sidepod, and a thin black floor edge
     { color: '#FFD800', points: ellipse(0.2, mid + 0.02, 0.2, 0.15) },
     { color: BLACK, points: flank(L.podFront, L.podRear, 0.06, 0.12) },
@@ -170,12 +172,14 @@ const ALPINE: Livery = {
   finish: 'gloss',
   parts: parts(BLACK, '#E9A3C8', BLACK),
   top: [
+    ...podBand(BLACK, -0.45, -1.05, 0.17, 0.3),
     // black engine cover tail, a pink panel on the sidepods
     { color: BLACK, points: stripe(-1.2, L.tail - 0.1, 0.19) },
     ...podBand('#F5A0D0', 0.8, -0.8, 0.3, 0.6),
     { color: WHITE, points: noseCapShape(2.4, 2.92, 0.08) },
   ],
   side: [
+    ...grille(-1.05, -0.45, 0.74, 0.84, 4),
     // the lower body is black, with the pink panel above it
     { color: BLACK, points: flank(0.95, -2.05, 0.06, 0.2) },
     { color: '#F5A0D0', points: [[0.7, 0.2], [0.7, 0.46], [-0.3, 0.46], [-0.9, 0.3], [-0.9, 0.2]] },
@@ -205,12 +209,14 @@ const ASTONMARTIN: Livery = {
   finish: 'gloss',
   parts: parts(BLACK, BLACK, BLACK),
   top: [
+    ...podBand(BLACK, -0.15, -0.5, 0.17, 0.3),
     // lime lines along the engine cover and the sidepods, black tail
     { color: BLACK, points: stripe(-1.2, L.tail - 0.1, 0.2) },
     { color: '#CFE600', points: stripe(-0.2, -1.2, 0.02) },
     ...podBand('#CFE600', 0.9, -1.3, 0.34, 0.37),
   ],
   side: [
+    ...grille(-0.5, -0.15, 0.78, 0.88, 3),
     { color: BLACK, points: flank(0.95, -2.0, 0.06, 0.2) },
     // the lime line sweeping from the front of the sidepod up to the rear of the engine cover
     { color: '#CFE600', points: [[0.95, 0.15], [0.95, 0.2], [-1.9, 0.72], [-1.9, 0.67]] },
@@ -305,12 +311,14 @@ const HAAS: Livery = {
   finish: 'gloss',
   parts: parts('#F2F2F2', '#E10600', '#F2F2F2'),
   top: [
+    ...podBand(BLACK, 0.22, -0.57, 0.18, 0.3),
     // red nose tip and swooshes over the sidepods, a red stripe on the engine cover
     { color: '#E10600', points: noseCapShape(2.3, 2.92, 0.1) },
     { color: '#E10600', points: stripe(-0.8, L.tail - 0.1, 0.05) },
     ...podBand('#E10600', 0.8, -1.4, 0.5, 0.58),
   ],
   side: [
+    ...grille(-0.57, 0.22, 0.74, 0.84, 5),
     { color: BLACK, points: flank(0.95, -2.05, 0.06, 0.13) },
     { color: '#E10600', points: [[0.95, 0.4], [0.95, 0.46], [-0.6, 0.22], [-2.0, 0.5], [-2.0, 0.56], [-0.6, 0.3]] },
   ],
