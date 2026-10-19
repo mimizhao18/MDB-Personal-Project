@@ -7,6 +7,7 @@ import { makeStyles } from '../design/styles';
 const TABS = [
   { label: 'Home', path: '/' },
   { label: 'Garage', path: '/garage' },
+  { label: 'Store', path: '/store' },
   { label: 'History', path: '/history' },
   { label: 'Settings', path: '/settings' },
 ] as const;
@@ -22,7 +23,7 @@ const useStyles = makeStyles((t) => ({
     borderTopColor: t.colors.border,
   },
   tab: { flex: 1, alignItems: 'center', paddingTop: t.spacing.sm + 2, paddingBottom: t.spacing.sm + 2, gap: 6 },
-  indicator: { position: 'absolute', top: -t.border.hairline, left: '25%', right: '25%', height: 2, backgroundColor: t.colors.accent },
+  indicator: { position: 'absolute', top: -t.border.hairline, left: '30%', right: '30%', height: 2, backgroundColor: t.colors.accent },
   label: { ...t.type.caption, color: t.colors.textMuted, fontWeight: '600', letterSpacing: 0.4 },
   labelActive: { color: t.colors.text },
 }));

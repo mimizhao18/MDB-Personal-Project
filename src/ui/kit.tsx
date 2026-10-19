@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react';
-import { Pressable, Text, View } from 'react-native';
+import { Pressable, ScrollView, Text, View } from 'react-native';
 import type { StyleProp, ViewStyle } from 'react-native';
 
 import { makeStyles } from '../design/styles';
@@ -53,6 +53,22 @@ const useStyles = makeStyles((t) => ({
   segmentActive: { backgroundColor: t.colors.accent },
   segmentText: { color: t.colors.textMuted, fontSize: 14, fontWeight: '700' },
   segmentTextActive: { color: t.colors.accentText },
+  chipRow: { flexDirection: 'row', gap: t.spacing.sm, paddingRight: t.spacing.md },
+  chip: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: t.spacing.xs + 2,
+    height: 36,
+    paddingHorizontal: t.spacing.md - 2,
+    backgroundColor: t.colors.surface,
+    borderRadius: t.radius.md,
+    borderWidth: t.border.hairline,
+    borderColor: t.colors.border,
+  },
+  chipActive: { backgroundColor: t.colors.surfaceRaised, borderColor: t.colors.accent },
+  chipText: { color: t.colors.textMuted, fontSize: 14, fontWeight: '700' },
+  chipTextActive: { color: t.colors.text },
+  chipCount: { color: t.colors.textMuted, fontSize: 12, fontWeight: '600' },
 }));
 
 /** Small uppercase heading above a group of content. */
@@ -142,5 +158,42 @@ export function Segmented<T extends string>({
         </Pressable>
       ))}
     </View>
+  );
+}
+
+/** A row of filter chips that scrolls sideways, one selected, each with an optional count. */
+export function Chips<T extends string>({
+  options,
+  value,
+  onChange,
+  labelFor,
+  countFor,
+}: {
+  options: readonly T[];
+  value: T;
+  onChange: (value: T) => void;
+  labelFor?: (value: T) => string;
+  countFor?: (value: T) => string | undefined;
+}) {
+  const styles = useStyles();
+  return (
+    <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.chipRow}>
+      {options.map((option) => {
+        const active = option === value;
+        const count = countFor?.(option);
+        return (
+          <Pressable
+            key={option}
+            style={[styles.chip, active && styles.chipActive]}
+            onPress={() => onChange(option)}
+            accessibilityRole="button"
+            accessibilityState={{ selected: active }}
+          >
+            <Text style={[styles.chipText, active && styles.chipTextActive]}>{labelFor ? labelFor(option) : option}</Text>
+            {count !== undefined && <Text style={styles.chipCount}>{count}</Text>}
+          </Pressable>
+        );
+      })}
+    </ScrollView>
   );
 }

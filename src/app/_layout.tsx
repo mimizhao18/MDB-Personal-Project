@@ -11,7 +11,7 @@ const appTheme = {
   colors: { ...DarkTheme.colors, background: colors.background, card: colors.background, text: colors.text, border: colors.border },
 };
 
-// Home, Garage, History and Settings are the tabs: top-level screens, so no back button on them.
+// Home, Garage, Store, History and Settings are the tabs: top-level screens, so no back button on them.
 const topLevel = { headerBackVisible: false, headerLeft: () => null };
 
 export default function RootLayout() {
@@ -34,7 +34,9 @@ export default function RootLayout() {
             <Stack.Screen name="index" options={{ title: 'Home', headerShown: false }} />
             <Stack.Screen name="history" options={{ title: 'History', ...topLevel }} />
             <Stack.Screen name="garage" options={{ title: 'Garage', ...topLevel }} />
+            <Stack.Screen name="store" options={{ title: 'Store', ...topLevel }} />
             <Stack.Screen name="settings" options={{ title: 'Settings', ...topLevel }} />
+            <Stack.Screen name="livery" options={{ title: 'Livery' }} />
             <Stack.Screen name="compare" options={{ title: 'Compare generations' }} />
             {/* Swipe-back is off here because dragging the race-length slider to the right looks like a back swipe. */}
             <Stack.Screen name="create-session" options={{ title: 'New Race', gestureEnabled: false }} />
