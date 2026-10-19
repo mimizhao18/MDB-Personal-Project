@@ -20,7 +20,9 @@ const fmt = (n: number) => n.toFixed(2);
 const iy = (z: number) => z * SCALE;
 
 /** `steps` points along a smoothed station table, as [x, z]. */
-function along(xs: readonly number[], zs: readonly number[], steps = 28): [number, number][] {
+function along(xs: readonly number[], zs: readonly number[], steps = 28, straight = false): [number, number][] {
+  // a boxy car (the 1980s) is drawn with straight edges between its stations instead of smooth curves
+  if (straight) return xs.map((x, i) => [x, zs[i]] as [number, number]);
   return Array.from({ length: steps + 1 }, (_, i) => [spline(xs, i / steps), spline(zs, i / steps)] as [number, number]);
 }
 
@@ -30,7 +32,10 @@ const xRange = (outline: readonly (readonly [number, number])[]) => [Math.min(..
 interface IconShapes {
   ix: (x: number) => number;
   spine: string;
+  airbox: string;
   floor: string;
+  /** Thin dark vanes, bargeboards and fences seen from above: [x0, x1, z] on the right, mirrored on the left. */
+  vanes: readonly (readonly [number, number, number])[];
   pods: readonly [string, string];
   frontWing: string[];
   rearWing: string[];
@@ -48,15 +53,16 @@ function shapesFor(spec: CarSpec, style: PodStyle): IconShapes {
   const ix = (x: number) => (x - spec.centreX) * SCALE;
   const toPath = (points: readonly (readonly [number, number])[]) => `M ${points.map(([x, z]) => `${fmt(ix(x))} ${fmt(iy(z))}`).join(' L ')} Z`;
   /** A shape that is the same on both sides of the car: the right edge out and the left edge back. */
-  const symmetric = (xs: readonly number[], hw: readonly number[]) => {
-    const right = along(xs, hw);
+  const straight = spec.id === 'gen1980s';
+  const symmetric = (xs: readonly number[], hw: readonly number[], steps = 28) => {
+    const right = along(xs, hw, steps, straight);
     return toPath([...right, ...right.map(([x, z]) => [x, -z] as [number, number]).reverse()]);
   };
   /** One sidepod, on the right (side 1) or left (-1): between its inner and outer edge. */
   const sidepod = (side: 1 | -1) => {
     const pod = spec.pods[style] ?? Object.values(spec.pods)[0]!;
-    const outer = along(pod.x, pod.zOut).map(([x, z]) => [x, z * side] as [number, number]);
-    const inner = along(pod.x, pod.zIn).map(([x, z]) => [x, z * side] as [number, number]);
+    const outer = along(pod.x, pod.zOut, 28, straight).map(([x, z]) => [x, z * side] as [number, number]);
+    const inner = along(pod.x, pod.zIn, 28, straight).map(([x, z]) => [x, z * side] as [number, number]);
     return toPath([...outer, ...inner.reverse()]);
   };
   /** A wing element seen from above: its leading edge and trailing edge, from one tip to the other. */
@@ -70,6 +76,8 @@ function shapesFor(spec: CarSpec, style: PodStyle): IconShapes {
   const shapes: IconShapes = {
     ix,
     spine: symmetric(spec.spine.x, spec.spine.hw),
+    airbox: symmetric(spec.airbox.x, spec.airbox.hw),
+    vanes: spec.extras.plates.filter((p) => p.part !== 'paint' && p.z > 0).map((p) => [...xRange(p.outline), p.z] as const),
     floor: symmetric(spec.floor.x, spec.floor.hw),
     pods: [sidepod(1), sidepod(-1)],
     frontWing: spec.frontWing.elements.map((e) => wingPath((z) => frontWingSection(spec, e, z), spec.frontWing.span)),
@@ -104,7 +112,7 @@ interface ShapeProps {
 export function CarShape({ car, detail = 'simple', showNumber = false }: ShapeProps) {
   const livery = getLivery(car.liveryId);
   const spec = specFor(livery.era);
-  const { ix, spine, floor, pods, frontWing, rearWing, frontPlate, rearPlate } = shapesFor(spec, livery.sidepod);
+  const { ix, spine, airbox, vanes, floor, pods, frontWing, rearWing, frontPlate, rearPlate } = shapesFor(spec, livery.sidepod);
   const podShape = spec.pods[livery.sidepod] ?? Object.values(spec.pods)[0]!;
   const full = detail === 'full';
   const { front, rear } = spec.wheels;
@@ -139,6 +147,7 @@ export function CarShape({ car, detail = 'simple', showNumber = false }: ShapePr
           <Path d={spine} />
           <Path d={pods[0]} />
           <Path d={pods[1]} />
+          <Path d={airbox} />
         </ClipPath>
       </Defs>
 
@@ -171,6 +180,7 @@ export function CarShape({ car, detail = 'simple', showNumber = false }: ShapePr
       <Path d={spine} fill={livery.primary} />
       <Path d={pods[0]} fill={livery.primary} />
       <Path d={pods[1]} fill={livery.primary} />
+      <Path d={airbox} fill={livery.primary} />
       <G clipPath={`url(#${BODY_CLIP_ID})`}>
         {livery.top.map((layer, i) => (
           <Polygon key={i} points={layer.points.map(([x, z]) => `${fmt(ix(x))},${fmt(iy(z))}`).join(' ')} fill={layer.color} />
@@ -179,12 +189,22 @@ export function CarShape({ car, detail = 'simple', showNumber = false }: ShapePr
       <Path d={spine} fill="none" stroke={edge} strokeWidth={0.4} />
       <Path d={pods[0]} fill="none" stroke={edge} strokeWidth={0.4} />
       <Path d={pods[1]} fill="none" stroke={edge} strokeWidth={0.4} />
+      <Path d={airbox} fill="none" stroke={edge} strokeWidth={0.3} />
+
+      {/* bargeboards, turning vanes and floor fences, from above */}
+      {full &&
+        vanes.flatMap(([x0, x1, z]) =>
+          [1, -1].map((side) => <Line key={`v${x0}${z}${side}`} x1={ix(x0)} y1={iy(z) * side} x2={ix(x1)} y2={iy(z) * side} stroke={DARK} strokeWidth={0.45} strokeLinecap="round" />),
+        )}
 
       {/* sidepod inlets, cockpit, airbox intake, halo */}
       {[1, -1].map((side) => (
         <Rect key={`inlet${side}`} x={ix(podShape.x[0] - 0.03)} y={side > 0 ? iy(podShape.zIn[0]) : -iy(podShape.zOut[0])} width={0.9} height={iy(podShape.zOut[0] - podShape.zIn[0])} fill={DARK} />
       ))}
       <Ellipse cx={ix(spec.details.cockpit.x)} cy={0} rx={spec.details.cockpit.rx * SCALE} ry={spec.details.cockpit.rz * SCALE} fill={DARK} />
+      {/* the driver's helmet in the cockpit */}
+      <Ellipse cx={ix(spec.details.cockpit.x - 0.1)} cy={0} rx={1.15} ry={1.05} fill="#E6E6E6" stroke={DARK} strokeWidth={0.2} />
+      <Ellipse cx={ix(spec.details.cockpit.x - 0.1) + 0.7} cy={0} rx={0.45} ry={0.8} fill={DARK} />
       <Ellipse cx={ix(spec.details.intake[0] + 0.02)} cy={0} rx={0.5} ry={0.9} fill={DARK} />
       {spec.halo && (
         <Path

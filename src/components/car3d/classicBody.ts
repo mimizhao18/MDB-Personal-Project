@@ -304,13 +304,6 @@ function body2014(c: BodyContext) {
     car.add(ellipsoid(0.06, (sp.top[0] - sp.bottom[0]) * 0.5, (sp.zOut[0] - sp.zIn[0]) * 0.48, m.dark, sp.x[0] - 0.01, (sp.top[0] + sp.bottom[0]) / 2 + 0.02, zMid));
     // a dark undercut tray under the pod, so the cut-away shows
     car.add(box(1.0, 0.1, 0.3, m.dark, -0.2, 0.17, (sp.zOut[3] - 0.2) * side));
-    // a row of tall black bargeboard vanes between the front wheel and the pod, each a different curve
-    for (let i = 0; i < 6; i++) {
-      const z = (0.28 + i * 0.07) * side;
-      const h = 0.46 - i * 0.04;
-      const x0 = 1.38 - i * 0.02;
-      car.add(new THREE.Mesh(plateGeometry([[x0, 0.06], [x0 - 0.04, h * 0.6], [x0 - 0.2, h], [x0 - 0.42, h * 0.8], [x0 - 0.5, 0.06]], z, 0.008), m.carbon));
-    }
     // a deflector winglet on top of the pod, and a row of small fences on the floor edge ahead of the rear wheel
     car.add(box(0.28, 0.01, 0.12, m.carbon, 0.45, sp.top[2] + 0.015, (sp.zOut[2] - 0.12) * side, 0.05));
     for (let i = 0; i < 4; i++) car.add(box(0.2, 0.1 - i * 0.012, 0.006, m.carbon, -0.9 - i * 0.04, 0.1, (0.6 + i * 0.03) * side));
