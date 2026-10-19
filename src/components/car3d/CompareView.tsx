@@ -28,7 +28,7 @@ const BACKGROUND = '#202226'; // a neutral grey, the same behind every car
 
 function Scene({ era, angle, aero }: { era: EraId; angle: CompareAngle; aero: AeroMode }) {
   const { camera, gl, scene } = useThree();
-  const livery = COMPARISON_LIVERIES[era === 'gen2026' ? 'gen2026' : 'gen2022'];
+  const livery = COMPARISON_LIVERIES[era];
   const car = useMemo(() => buildCar(livery, { aero }), [livery, aero]);
   const shadow = useMemo(() => radialTexture([0, 0, 0], 0.85, 1.4), []);
 

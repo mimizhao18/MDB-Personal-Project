@@ -9,16 +9,19 @@ import type { CarSpec } from './spec';
 
 export const GEN2026: CarSpec = {
   id: 'gen2026',
+  notes: { label: '2026', frontWing: '2 elements, active flap', rearWing: 'Active, no DRS flap' },
+  halo: true,
+  wheelLook: { style: 'cover', coverRatio: 0.6, grooves: 0, rimColor: '#9A9DA3' },
   centreX: 0.12,
   paint: PAINT_BOX,
 
-  // Shorter and tighter than the 2022 car, with a raised nose. The cockpit and airbox stay where they were so the halo
+  // Shorter and tighter than the 2022 car, with a slightly raised nose. The cockpit and airbox stay where they were so the halo
   // (the same on both cars) sits in the same place.
   spine: {
     x: [2.78, 2.68, 2.48, 2.2, 1.85, 1.45, 1.05, 0.8, 0.45, 0.15, -0.15, -0.45, -0.9, -1.35, -1.8, -2.15],
     hw: [0.05, 0.075, 0.1, 0.12, 0.14, 0.165, 0.19, 0.215, 0.24, 0.25, 0.21, 0.18, 0.17, 0.14, 0.1, 0.07],
-    bottom: [0.2, 0.2, 0.2, 0.19, 0.18, 0.16, 0.14, 0.13, 0.1, 0.1, 0.1, 0.1, 0.1, 0.11, 0.13, 0.18],
-    top: [0.27, 0.29, 0.31, 0.34, 0.4, 0.49, 0.58, 0.64, 0.62, 0.64, 0.7, 0.9, 0.76, 0.62, 0.48, 0.38],
+    bottom: [0.16, 0.16, 0.16, 0.16, 0.15, 0.14, 0.13, 0.12, 0.1, 0.1, 0.1, 0.1, 0.1, 0.11, 0.13, 0.18],
+    top: [0.24, 0.26, 0.28, 0.32, 0.38, 0.47, 0.57, 0.64, 0.62, 0.64, 0.7, 0.9, 0.84, 0.72, 0.6, 0.5],
     squareness: [0.9, 0.9, 0.85, 0.8, 0.75, 0.7, 0.65, 0.6, 0.6, 0.62, 0.7, 0.8, 0.8, 0.75, 0.75, 0.75],
   },
 
@@ -27,7 +30,7 @@ export const GEN2026: CarSpec = {
     x: [0.1, -0.15, -0.45, -0.9, -1.35, -1.7],
     hw: [0.2, 0.27, 0.3, 0.26, 0.19, 0.1],
     bottom: [0.3, 0.3, 0.3, 0.3, 0.3, 0.3],
-    top: [0.66, 0.72, 0.82, 0.72, 0.57, 0.44],
+    top: [0.66, 0.72, 0.84, 0.8, 0.7, 0.56],
     squareness: [0.85, 0.85, 0.85, 0.85, 0.85, 0.85],
   },
 
@@ -46,7 +49,7 @@ export const GEN2026: CarSpec = {
     x: [0.06, -0.02, -0.2, -0.5, -0.9, -1.25],
     hw: [0.09, 0.115, 0.13, 0.12, 0.09, 0.045],
     bottom: [0.72, 0.7, 0.6, 0.6, 0.6, 0.6],
-    top: [0.88, 0.97, 1.0, 0.94, 0.78, 0.64],
+    top: [0.88, 1.02, 1.08, 1.02, 0.9, 0.78],
     squareness: [0.7, 0.7, 0.7, 0.75, 0.8, 0.8],
   },
 
@@ -101,7 +104,11 @@ export const GEN2026: CarSpec = {
     ],
   },
 
+  extras: { plates: [], wings: [], rods: [], boxes: [] },
+
   details: {
+    cockpit: { x: 0.5, rx: 0.42, rz: 0.18, y: 0.625, rimRx: 0.46, rimRz: 0.2 },
+    mirror: [0.7, 0.74, 0.4],
     intake: [-0.03, 0.67],
     cameraPod: [-0.3, 1.0],
     exhaust: [-2.15, 0.4],

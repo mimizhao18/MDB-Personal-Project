@@ -209,7 +209,7 @@ assert.equal(setCarNumber(gp, 100, 1, 99).ok, false);
 assert.equal(setCarNumber(gp, 4.5, 1, 99).ok, false);
 
 // the livery catalog
-assert.equal(LIVERIES.length, 8);
+assert.equal(LIVERIES.length, 20);
 assert.equal(new Set(LIVERIES.map((l) => l.id)).size, LIVERIES.length); // ids are unique
 assert.ok(LIVERIES.every((l) => /^#[0-9A-Fa-f]{6}$/.test(l.primary) && /^#[0-9A-Fa-f]{6}$/.test(l.secondary))); // the car shades #RRGGBB colors
 assert.ok(LIVERIES.every((l) => ERAS.some((e) => e.id === l.era && e.available))); // every livery belongs to a built generation
@@ -221,7 +221,7 @@ assert.ok(LIVERIES.every((l) => l.price >= 0 && Number.isInteger(l.price)));
 assert.ok(LIVERIES.every((l) => l.primary.toLowerCase() !== l.secondary.toLowerCase())); // the accent must show
 assert.deepEqual(FREE_LIVERY_IDS, [DEFAULT_LIVERY_ID]); // everyone starts with exactly the default
 assert.equal(getLivery('ferrari-2022').id, 'ferrari-2022');
-assert.equal(getLivery('no-such-livery').id, LIVERIES[0].id); // unknown ids still draw something
+assert.equal(getLivery('no-such-livery').id, DEFAULT_LIVERY_ID); // unknown ids still draw something
 
 // profile migration: old saves keep progress and get a livery
 const catalog = { knownIds: LIVERIES.map((l) => l.id), freeIds: FREE_LIVERY_IDS, defaultId: DEFAULT_LIVERY_ID, renamed: RENAMED_LIVERY_IDS };

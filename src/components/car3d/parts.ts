@@ -178,21 +178,29 @@ export function arm(from: THREE.Vector3, to: THREE.Vector3, chord: number, thick
   return m;
 }
 
-/** A rounded tire profile spun around the wheel axis. */
-function tireGeometry(radius: number, width: number): THREE.BufferGeometry {
+/** A rounded tire profile spun around the wheel axis, with `grooves` shallow grooves around the tread. */
+function tireGeometry(radius: number, width: number, innerRatio: number, grooves: number): THREE.BufferGeometry {
   const r = radius;
   const hw = width / 2;
   const round = Math.min(0.07, hw * 0.4);
   const profile: THREE.Vector2[] = [
-    new THREE.Vector2(r * 0.6, -hw),
+    new THREE.Vector2(r * innerRatio, -hw),
     new THREE.Vector2(r - round, -hw),
     new THREE.Vector2(r - round * 0.3, -hw + round * 0.3),
     new THREE.Vector2(r, -hw + round),
+  ];
+  const span = width - 2 * round;
+  for (let i = 0; i < grooves; i++) {
+    const c = -hw + round + (span * (i + 1)) / (grooves + 1);
+    const g = 0.011;
+    profile.push(new THREE.Vector2(r, c - g), new THREE.Vector2(r - 0.014, c - g * 0.7), new THREE.Vector2(r - 0.014, c + g * 0.7), new THREE.Vector2(r, c + g));
+  }
+  profile.push(
     new THREE.Vector2(r, hw - round),
     new THREE.Vector2(r - round * 0.3, hw - round * 0.3),
     new THREE.Vector2(r - round, hw),
-    new THREE.Vector2(r * 0.6, hw),
-  ];
+    new THREE.Vector2(r * innerRatio, hw),
+  );
   return new THREE.LatheGeometry(profile, 56);
 }
 
@@ -201,25 +209,68 @@ export interface WheelMaterials {
   carbon: THREE.Material;
   metal: THREE.Material;
   band: THREE.Material;
+  rim: THREE.Material;
+  dark: THREE.Material;
 }
 
-/** A tire with a flat wheel cover, a tire-compound band, and the brake duct behind it. `side` is which side of the car. */
-export function buildWheel(radius: number, width: number, side: 1 | -1, m: WheelMaterials): THREE.Group {
+export interface WheelLook {
+  style: 'cover' | 'spokes' | 'dish';
+  coverRatio: number;
+  grooves: number;
+}
+
+/**
+ * A tire with its wheel, the tire-compound band, and the brake duct behind it. `side` is which side of the car.
+ * The wheel is a flat cover (recent cars), open spokes (the V10 era) or a gold dish (the 1980s).
+ */
+export function buildWheel(radius: number, width: number, side: 1 | -1, m: WheelMaterials, look: WheelLook = { style: 'cover', coverRatio: 0.6, grooves: 0 }): THREE.Group {
   const wheel = new THREE.Group();
-  const tire = new THREE.Mesh(tireGeometry(radius, width), m.rubber);
+  const tire = new THREE.Mesh(tireGeometry(radius, width, Math.min(0.6, look.coverRatio), look.grooves), m.rubber);
   tire.rotation.x = Math.PI / 2;
   wheel.add(tire);
 
   const face = side * (width / 2);
-  const cover = new THREE.Mesh(new THREE.CylinderGeometry(radius * 0.6, radius * 0.6, 0.014, 48), m.carbon);
-  cover.rotation.x = Math.PI / 2;
-  cover.position.z = face - side * 0.004;
-  wheel.add(cover);
+  const rimR = radius * look.coverRatio;
+  const faceRing = (inner: number, outer: number, material: THREE.Material, lift: number) => {
+    const ring = new THREE.Mesh(new THREE.RingGeometry(inner, outer, 56), material);
+    ring.position.z = face + side * lift;
+    if (side < 0) ring.rotation.y = Math.PI;
+    wheel.add(ring);
+  };
+  const disc = (radiusOfDisc: number, material: THREE.Material, inset: number) => {
+    const d = new THREE.Mesh(new THREE.CylinderGeometry(radiusOfDisc, radiusOfDisc, 0.014, 48), material);
+    d.rotation.x = Math.PI / 2;
+    d.position.z = face - side * inset;
+    wheel.add(d);
+  };
 
-  const lip = new THREE.Mesh(new THREE.RingGeometry(radius * 0.58, radius * 0.63, 56), m.metal);
-  lip.position.z = face + side * 0.004;
-  if (side < 0) lip.rotation.y = Math.PI;
-  wheel.add(lip);
+  if (look.style === 'cover') {
+    disc(rimR, m.carbon, 0.004);
+    faceRing(rimR * 0.97, rimR * 1.05, m.metal, 0.004);
+  } else if (look.style === 'spokes') {
+    // open spokes with the dark brake disc showing between them
+    disc(rimR, m.dark, 0.006);
+    faceRing(rimR * 0.88, rimR * 1.04, m.rim, 0.006);
+    for (let i = 0; i < 6; i++) {
+      const a = (i / 6) * Math.PI * 2 + 0.2;
+      const spoke = new THREE.Mesh(new THREE.BoxGeometry(rimR * 0.9, 0.045, 0.012), m.rim);
+      spoke.position.set(Math.cos(a) * rimR * 0.5, Math.sin(a) * rimR * 0.5, face + side * 0.008);
+      spoke.rotation.z = a;
+      wheel.add(spoke);
+    }
+  } else {
+    // a gold dish with a ring of bolts
+    disc(rimR * 1.02, m.rim, 0.002);
+    faceRing(rimR * 0.5, rimR * 0.56, m.dark, 0.006);
+    for (let i = 0; i < 5; i++) {
+      const a = (i / 5) * Math.PI * 2;
+      const bolt = new THREE.Mesh(new THREE.CylinderGeometry(0.014, 0.014, 0.012, 10), m.dark);
+      bolt.rotation.x = Math.PI / 2;
+      bolt.position.set(Math.cos(a) * rimR * 0.78, Math.sin(a) * rimR * 0.78, face + side * 0.008);
+      wheel.add(bolt);
+    }
+    faceRing(rimR * 0.96, rimR * 1.06, m.metal, 0.004);
+  }
 
   const nut = new THREE.Mesh(new THREE.CylinderGeometry(0.035, 0.035, 0.03, 16), m.metal);
   nut.rotation.x = Math.PI / 2;
@@ -227,16 +278,10 @@ export function buildWheel(radius: number, width: number, side: 1 | -1, m: Wheel
   wheel.add(nut);
 
   // a colored ring around the wheel nut
-  const hubRing = new THREE.Mesh(new THREE.RingGeometry(0.05, 0.078, 32), m.band);
-  hubRing.position.z = face + side * 0.005;
-  if (side < 0) hubRing.rotation.y = Math.PI;
-  wheel.add(hubRing);
+  faceRing(0.05, 0.078, m.band, 0.005);
 
   // the tire-compound band on the sidewall
-  const band = new THREE.Mesh(new THREE.RingGeometry(radius * 0.74, radius * 0.81, 64), m.band);
-  band.position.z = face + side * 0.002;
-  if (side < 0) band.rotation.y = Math.PI;
-  wheel.add(band);
+  faceRing(radius * 0.74, radius * 0.81, m.band, 0.002);
 
   // brake duct fairing on the inside of the wheel
   const duct = new THREE.Mesh(new THREE.CylinderGeometry(radius * 0.46, radius * 0.46, 0.11, 24), m.carbon);

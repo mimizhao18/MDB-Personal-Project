@@ -8,7 +8,8 @@ export const PAINT_BOX = { xMin: -2.8, xMax: 3.1, zHalf: 1.1, yMax: 1.2 } as con
 /** Cornering is the high-downforce setting; straight is the low-drag "X-mode" (only cars with active wings change). */
 export type AeroMode = 'corner' | 'straight';
 
-export type PodStyle = 'downwash' | 'scoop' | 'slim' | 'compact';
+/** A sidepod design: three used in 2022, one in 2026, and one for each of the older generations. */
+export type PodStyle = 'downwash' | 'scoop' | 'slim' | 'compact' | 'hybrid' | 'v10' | 'turbo';
 
 /** Stations along the car; the shape is smoothed between them (see spline.ts). */
 export interface Stations {
@@ -76,6 +77,9 @@ export interface RearWingElement {
   straightAngle?: number;
 }
 
+/** Which material an extra part is made of. */
+export type ExtraPart = 'carbon' | 'paint' | 'wing' | 'flap' | 'endplate' | 'dark';
+
 /** A side-view outline: [x, y] points. */
 export type Outline = readonly (readonly [number, number])[];
 
@@ -90,7 +94,13 @@ export interface BeamElement {
 }
 
 export interface CarSpec {
-  id: 'gen2022' | 'gen2026';
+  id: 'gen1980s' | 'gen2004' | 'gen2014' | 'gen2022' | 'gen2026';
+  /** Short texts for the comparison screen. */
+  notes: { label: string; frontWing: string; rearWing: string };
+  /** False for the cars from before the halo was made compulsory (2018). */
+  halo: boolean;
+  /** How the wheels look: flat covers, open spokes or a gold dish; the tire's grooves; the color of the rims. */
+  wheelLook: { style: 'cover' | 'spokes' | 'dish'; coverRatio: number; grooves: number; rimColor: string };
   /** The middle of the car's length (x), where the 2D icon is centred. */
   centreX: number;
   paint: typeof PAINT_BOX;
@@ -139,10 +149,21 @@ export interface CarSpec {
     /** Small boxes: the rear light, actuator pods. */
     boxes: readonly { size: readonly [number, number, number]; at: readonly [number, number, number]; part: 'light' | 'carbon' }[];
   };
+  /** Extra parts that only some generations have: shark fins, bargeboards, T-wings, exhaust pipes. */
+  extras: {
+    plates: readonly { outline: Outline; z: number; thickness: number; mirror: boolean; part: ExtraPart }[];
+    wings: readonly { x: number; y: number; chord: number; angle: number; camber: number; span: number; from: number; part: ExtraPart }[];
+    rods: readonly { from: readonly [number, number, number]; to: readonly [number, number, number]; radius: number; mirror: boolean; part: ExtraPart }[];
+    boxes: readonly { size: readonly [number, number, number]; at: readonly [number, number, number]; mirror: boolean; part: ExtraPart }[];
+  };
   details: {
     intake: readonly [number, number];
-    /** x and the height of the camera pod's base. */
-    cameraPod: readonly [number, number];
+    /** The cockpit opening and the raised rim around it: where it is, how big, and its height. */
+    cockpit: { x: number; rx: number; rz: number; y: number; rimRx: number; rimRz: number };
+    /** A mirror: where its housing is (x, y, distance from the middle). */
+    mirror: readonly [number, number, number];
+    /** x and the height of the camera pod's base, for the generations that have one. */
+    cameraPod?: readonly [number, number];
     exhaust: readonly [number, number];
     slats: { x: number; ys: readonly number[] };
   };

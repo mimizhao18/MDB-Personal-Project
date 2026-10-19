@@ -184,15 +184,17 @@ export function CarShape({ car, detail = 'simple', showNumber = false }: ShapePr
       {[1, -1].map((side) => (
         <Rect key={`inlet${side}`} x={ix(podShape.x[0] - 0.03)} y={side > 0 ? iy(podShape.zIn[0]) : -iy(podShape.zOut[0])} width={0.9} height={iy(podShape.zOut[0] - podShape.zIn[0])} fill={DARK} />
       ))}
-      <Ellipse cx={ix(0.5)} cy={0} rx={4.2} ry={1.8} fill={DARK} />
-      <Ellipse cx={ix(0.0)} cy={0} rx={0.5} ry={0.9} fill={DARK} />
-      <Path
-        d={`M ${fmt(ix(0.98))} 0 L ${fmt(ix(0.84))} 0 C ${fmt(ix(0.5))} -1.5, ${fmt(ix(0.15))} -2.3, ${fmt(ix(-0.2))} -1.9 M ${fmt(ix(0.84))} 0 C ${fmt(ix(0.5))} 1.5, ${fmt(ix(0.15))} 2.3, ${fmt(ix(-0.2))} 1.9`}
-        fill="none"
-        stroke="#9A9DA3"
-        strokeWidth={0.7}
-        strokeLinecap="round"
-      />
+      <Ellipse cx={ix(spec.details.cockpit.x)} cy={0} rx={spec.details.cockpit.rx * SCALE} ry={spec.details.cockpit.rz * SCALE} fill={DARK} />
+      <Ellipse cx={ix(spec.details.intake[0] + 0.02)} cy={0} rx={0.5} ry={0.9} fill={DARK} />
+      {spec.halo && (
+        <Path
+          d={`M ${fmt(ix(0.98))} 0 L ${fmt(ix(0.84))} 0 C ${fmt(ix(0.5))} -1.5, ${fmt(ix(0.15))} -2.3, ${fmt(ix(-0.2))} -1.9 M ${fmt(ix(0.84))} 0 C ${fmt(ix(0.5))} 1.5, ${fmt(ix(0.15))} 2.3, ${fmt(ix(-0.2))} 1.9`}
+          fill="none"
+          stroke="#9A9DA3"
+          strokeWidth={0.7}
+          strokeLinecap="round"
+        />
+      )}
 
       {full && <Line x1={ix(spec.spine.x[spec.spine.x.length - 1])} y1={0} x2={ix(spec.spine.x[0] - 0.6)} y2={0} stroke="#FFFFFF" strokeOpacity={0.12} strokeWidth={0.4} />}
 

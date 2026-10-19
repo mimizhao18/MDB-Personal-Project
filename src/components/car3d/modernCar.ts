@@ -2,7 +2,7 @@ import * as THREE from 'three';
 
 import { spline } from '../../data/cars/spline';
 import { frontWingSection, rearWingSection } from '../../data/cars/spec';
-import type { AeroMode, CarSpec, PodShape } from '../../data/cars/spec';
+import type { AeroMode, CarSpec, ExtraPart, PodShape } from '../../data/cars/spec';
 import type { Livery } from '../../data/liveries';
 import { applyCarbonWeave, applyLiveryPaint, buildLiveryPictures } from './paint';
 import { arm, box, buildWheel, loftGeometry, plateGeometry, range, rod, wingGeometry } from './parts';
@@ -191,7 +191,9 @@ export function buildModernCar(spec: CarSpec, livery: Livery, options: CarOption
     band: new THREE.MeshStandardMaterial({ color: 0xf5d90a, metalness: 0, roughness: 0.6 }),
     dark: new THREE.MeshStandardMaterial({ color: 0x050507, metalness: 0.1, roughness: 0.8 }),
     light: new THREE.MeshStandardMaterial({ color: 0xff2a2a, emissive: 0xff0000, emissiveIntensity: 1.2 }),
+    rim: new THREE.MeshStandardMaterial({ color: spec.wheelLook.rimColor, metalness: 0.9, roughness: 0.35 }),
   };
+  const partMaterial = (part: ExtraPart): THREE.Material => (part === 'paint' ? paint : m[part]);
 
   // carbon-fibre weave on the floor and on any wing that is carbon black
   applyCarbonWeave(m.floor);
@@ -209,6 +211,7 @@ export function buildModernCar(spec: CarSpec, livery: Livery, options: CarOption
   car.add(box(0.14, 0.07, spec.airbox.hw[1] * 1.7, m.dark, slotX, slotY, 0));
 
   // the camera pod on top: a short stalk, a boxy housing leaning forward a little, and a lens
+  if (spec.details.cameraPod) {
   const [podX, podY] = spec.details.cameraPod;
   const stalk = new THREE.Mesh(new THREE.CylinderGeometry(0.022, 0.028, 0.05, 12), m.carbon);
   stalk.position.set(podX, podY + 0.02, 0);
@@ -220,16 +223,18 @@ export function buildModernCar(spec: CarSpec, livery: Livery, options: CarOption
   lens.rotation.z = Math.PI / 2;
   lens.position.set(podX + 0.07, podY + 0.085, 0);
   car.add(lens);
+  }
 
   // the cockpit opening, with a dark seat showing in it (no driver)
   const cockpit = new THREE.Mesh(new THREE.SphereGeometry(1, 28, 12), m.dark);
-  cockpit.scale.set(0.42, 0.045, 0.18);
-  cockpit.position.set(0.5, 0.625, 0);
+  const ck = spec.details.cockpit;
+  cockpit.scale.set(ck.rx, 0.045, ck.rz);
+  cockpit.position.set(ck.x, ck.y, 0);
   car.add(cockpit);
   // the raised rim around the cockpit opening, in body paint
   const rimPoints = Array.from({ length: 28 }, (_, i) => {
     const a = (i / 28) * Math.PI * 2;
-    return new THREE.Vector3(0.5 + 0.46 * Math.cos(a), 0.635, 0.2 * Math.sin(a));
+    return new THREE.Vector3(ck.x + ck.rimRx * Math.cos(a), ck.y + 0.01, ck.rimRz * Math.sin(a));
   });
   car.add(new THREE.Mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(rimPoints, true), 56, 0.022, 8, true), paint));
 
@@ -344,31 +349,53 @@ export function buildModernCar(spec: CarSpec, livery: Livery, options: CarOption
   for (const b of rw.boxes) car.add(box(b.size[0], b.size[1], b.size[2], b.part === 'light' ? m.light : m.carbon, b.at[0], b.at[1], b.at[2]));
 
   // ---- halo: a short pillar up from the nose cowl, then two arms running almost straight back over the driver
-  // to land on the airbox hump behind the cockpit (the same on every generation) ----
-  const front = new THREE.CatmullRomCurve3([new THREE.Vector3(0.98, 0.6, 0), new THREE.Vector3(0.93, 0.72, 0), new THREE.Vector3(0.84, 0.8, 0)]);
-  car.add(new THREE.Mesh(new THREE.TubeGeometry(front, 16, 0.03, 8), paint));
+  // to land on the airbox hump behind the cockpit (cars from 2018 on) ----
+  if (spec.halo) {
+    const front = new THREE.CatmullRomCurve3([new THREE.Vector3(0.98, 0.6, 0), new THREE.Vector3(0.93, 0.72, 0), new THREE.Vector3(0.84, 0.8, 0)]);
+    car.add(new THREE.Mesh(new THREE.TubeGeometry(front, 16, 0.03, 8), paint));
+    for (const side of [1, -1] as const) {
+      const haloArm = new THREE.CatmullRomCurve3([
+        new THREE.Vector3(0.84, 0.8, 0),
+        new THREE.Vector3(0.5, 0.83, 0.15 * side),
+        new THREE.Vector3(0.15, 0.8, 0.23 * side),
+        new THREE.Vector3(-0.2, 0.74, 0.19 * side),
+      ]);
+      car.add(new THREE.Mesh(new THREE.TubeGeometry(haloArm, 28, 0.029, 10), paint));
+      // a small fairing where the halo arm lands on the bodywork
+      const landing = new THREE.Mesh(new THREE.SphereGeometry(1, 16, 10), paint);
+      landing.scale.set(0.13, 0.07, 0.055);
+      landing.position.set(-0.17, 0.74, 0.185 * side);
+      car.add(landing);
+    }
+  }
+  // mirrors on short stalks beside the cockpit
+  const [mx, my, mz] = spec.details.mirror;
   for (const side of [1, -1] as const) {
-    const haloArm = new THREE.CatmullRomCurve3([
-      new THREE.Vector3(0.84, 0.8, 0),
-      new THREE.Vector3(0.5, 0.83, 0.15 * side),
-      new THREE.Vector3(0.15, 0.8, 0.23 * side),
-      new THREE.Vector3(-0.2, 0.74, 0.19 * side),
-    ]);
-    car.add(new THREE.Mesh(new THREE.TubeGeometry(haloArm, 28, 0.029, 10), paint));
-    // a small fairing where the halo arm lands on the bodywork
-    const landing = new THREE.Mesh(new THREE.SphereGeometry(1, 16, 10), paint);
-    landing.scale.set(0.13, 0.07, 0.055);
-    landing.position.set(-0.17, 0.74, 0.185 * side);
-    car.add(landing);
-    // mirrors on short stalks beside the halo
-    car.add(box(0.1, 0.05, 0.13, m.carbon, 0.7, 0.74, 0.4 * side));
-    car.add(rod(new THREE.Vector3(0.72, 0.64, 0.34 * side), new THREE.Vector3(0.7, 0.73, 0.4 * side), 0.012, m.carbon));
+    car.add(box(0.1, 0.05, 0.13, m.carbon, mx, my, mz * side));
+    car.add(rod(new THREE.Vector3(mx + 0.02, my - 0.1, (mz - 0.06) * side), new THREE.Vector3(mx, my - 0.01, mz * side), 0.012, m.carbon));
+  }
+
+  // ---- extras this generation has: shark fin, bargeboards, T-wing, exhaust pipes ----
+  for (const p of spec.extras.plates) for (const side of p.mirror ? ([1, -1] as const) : ([1] as const)) car.add(new THREE.Mesh(plateGeometry(p.outline, p.z * side, p.thickness), partMaterial(p.part)));
+  for (const w of spec.extras.wings) {
+    for (const side of [1, -1] as const) {
+      const zs = range(w.from, w.span, 10).map((z) => z * side);
+      car.add(new THREE.Mesh(wingGeometry(zs, () => ({ x: w.x, y: w.y, chord: w.chord, angle: w.angle * DEG }), w.camber, 0.04), partMaterial(w.part)));
+    }
+  }
+  for (const r of spec.extras.rods) {
+    for (const side of r.mirror ? ([1, -1] as const) : ([1] as const)) {
+      car.add(rod(new THREE.Vector3(r.from[0], r.from[1], r.from[2] * side), new THREE.Vector3(r.to[0], r.to[1], r.to[2] * side), r.radius, partMaterial(r.part)));
+    }
+  }
+  for (const b of spec.extras.boxes) {
+    for (const side of b.mirror ? ([1, -1] as const) : ([1] as const)) car.add(box(b.size[0], b.size[1], b.size[2], partMaterial(b.part), b.at[0], b.at[1], b.at[2] * side));
   }
 
   // ---- wheels and suspension ----
   for (const [axle, isFront] of [[spec.wheels.front, true], [spec.wheels.rear, false]] as const) {
     for (const side of [1, -1] as const) {
-      const wheel = buildWheel(axle.radius, axle.width, side, m);
+      const wheel = buildWheel(axle.radius, axle.width, side, m, spec.wheelLook);
       wheel.position.set(axle.x, axle.radius, axle.z * side);
       car.add(wheel);
 

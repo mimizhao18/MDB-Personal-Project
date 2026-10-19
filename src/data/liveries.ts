@@ -232,11 +232,257 @@ const REDBULL_2026: Livery = {
   side: [{ color: '#E4002B', points: [[0.85, 0.15], [0.85, 0.2], [-1.95, 0.2], [-1.95, 0.15]] }],
 };
 
+// ---------- helpers for the older generations' paint ----------
+
+/** A rectangle seen from above, along the car from x0 to x1 and across +/- hw from the middle. */
+const stripe = (x0: number, x1: number, hw: number): Point[] => [[x0, hw], [x0, -hw], [x1, -hw], [x1, hw]];
+/** A band seen from the side, along the car from x0 to x1 and in height from y0 to y1. */
+const flank = (x0: number, x1: number, y0: number, y1: number): Point[] => [[x0, y0], [x0, y1], [x1, y1], [x1, y0]];
+/** The same band on both sidepods, seen from above: across the car from z0 to z1. */
+const podBand = (color: string, x0: number, x1: number, z0: number, z1: number): LiveryLayer[] =>
+  both(color, [[x0, z0], [x0, z1], [x1, z1], [x1, z0]]);
+
+// ---------- 2014 (hybrid era, drawn as the 2018-20 cars) ----------
+
+const FERRARI_2014: Livery = {
+  id: 'ferrari-2014',
+  name: 'Ferrari',
+  era: 'gen2014',
+  team: 'Scuderia Ferrari',
+  price: 50,
+  primary: '#DC0000',
+  secondary: '#FFFFFF',
+  sidepod: 'hybrid',
+  finish: 'gloss',
+  parts: { wing: CARBON, flap: CARBON, endplate: CARBON, floor: CARBON },
+  top: [
+    { color: BLACK, points: stripe(-1.4, -2.4, 0.17) },
+    { color: '#F4F4F4', points: stripe(2.45, 2.85, 0.1) },
+    ...podBand('#F4F4F4', 0.9, -0.3, 0.64, 0.7),
+  ],
+  side: [{ color: BLACK, points: flank(1.0, -2.1, 0.06, 0.2) }],
+};
+
+const MERCEDES_2014: Livery = {
+  id: 'mercedes-2014',
+  name: 'Mercedes',
+  era: 'gen2014',
+  team: 'Mercedes-AMG Petronas',
+  price: 80,
+  primary: '#B8BCC2',
+  secondary: '#00D2BE',
+  sidepod: 'hybrid',
+  finish: 'gloss',
+  parts: { wing: '#0E0E10', flap: '#0E0E10', endplate: '#0E0E10', floor: CARBON },
+  top: [
+    { color: BLACK, points: stripe(-0.8, -2.4, 0.2) },
+    { color: '#00D2BE', points: stripe(2.3, 2.85, 0.08) },
+    ...podBand('#00D2BE', 0.8, -1.2, 0.6, 0.66),
+  ],
+  side: [{ color: BLACK, points: flank(1.0, -2.1, 0.06, 0.22) }, { color: '#00D2BE', points: flank(1.0, -1.9, 0.3, 0.33) }],
+};
+
+const MCLAREN_2014: Livery = {
+  id: 'mclaren-2014',
+  name: 'McLaren',
+  era: 'gen2014',
+  team: 'McLaren F1 Team',
+  price: 110,
+  primary: '#FF8000',
+  secondary: '#47C7FC',
+  sidepod: 'hybrid',
+  finish: 'gloss',
+  parts: { wing: '#FF8000', flap: '#FF8000', endplate: '#FF8000', floor: CARBON },
+  top: [
+    { color: '#47C7FC', points: stripe(-0.9, -2.4, 0.1) },
+    { color: '#47C7FC', points: stripe(2.4, 2.85, 0.1) },
+    ...podBand('#47C7FC', -0.4, -1.5, 0.12, 0.4),
+  ],
+  side: [{ color: '#47C7FC', points: flank(1.0, -2.1, 0.06, 0.26) }],
+};
+
+const REDBULL_2014: Livery = {
+  id: 'redbull-2014',
+  name: 'Red Bull',
+  era: 'gen2014',
+  team: 'Aston Martin Red Bull Racing',
+  price: 140,
+  primary: '#1C2B5E',
+  secondary: '#E4002B',
+  glow: '#E4002B',
+  sidepod: 'hybrid',
+  finish: 'matte',
+  parts: { wing: '#1C2B5E', flap: '#E4002B', endplate: '#1C2B5E', floor: CARBON },
+  top: [
+    { color: '#E4002B', points: stripe(2.2, 2.85, 0.1) },
+    ...podBand('#E4002B', 0.9, -0.9, 0.3, 0.7),
+    { color: '#E4002B', points: stripe(-1.0, -2.3, 0.05) },
+  ],
+  side: [{ color: '#E4002B', points: flank(1.0, -2.1, 0.08, 0.15) }],
+};
+
+// ---------- 2004 (V10 era) ----------
+
+const FERRARI_2004: Livery = {
+  id: 'ferrari-2004',
+  name: 'Ferrari',
+  era: 'gen2004',
+  team: 'Scuderia Ferrari',
+  price: 60,
+  primary: '#D80000',
+  secondary: '#FFFFFF',
+  sidepod: 'v10',
+  finish: 'gloss',
+  parts: { wing: '#D80000', flap: '#F4F4F4', endplate: '#D80000', floor: CARBON },
+  top: [
+    { color: '#F4F4F4', points: stripe(1.9, 2.6, 0.07) },
+    { color: BLACK, points: stripe(-1.3, -2.05, 0.14) },
+    ...podBand('#F4F4F4', 0.8, -0.2, 0.3, 0.36),
+  ],
+  side: [{ color: '#F4F4F4', points: flank(0.85, -1.5, 0.2, 0.26) }],
+};
+
+const MCLAREN_2004: Livery = {
+  id: 'mclaren-2004',
+  name: 'McLaren',
+  era: 'gen2004',
+  team: 'West McLaren Mercedes',
+  price: 90,
+  primary: '#B9BDC4',
+  secondary: '#0E0E10',
+  sidepod: 'v10',
+  finish: 'gloss',
+  parts: { wing: '#B9BDC4', flap: BLACK, endplate: BLACK, floor: CARBON },
+  top: [
+    { color: BLACK, points: stripe(2.2, 2.6, 0.09) },
+    { color: BLACK, points: stripe(-0.4, -2.05, 0.06) },
+    ...podBand('#E10600', 0.7, 0.1, 0.5, 0.54),
+  ],
+  side: [{ color: BLACK, points: flank(0.85, -1.9, 0.06, 0.18) }],
+};
+
+const WILLIAMS_2004: Livery = {
+  id: 'williams-2004',
+  name: 'Williams',
+  era: 'gen2004',
+  team: 'BMW Williams F1 Team',
+  price: 120,
+  primary: '#1E3C8A',
+  secondary: '#F2F2F2',
+  sidepod: 'v10',
+  finish: 'gloss',
+  parts: { wing: '#1E3C8A', flap: '#F2F2F2', endplate: '#1E3C8A', floor: CARBON },
+  top: [
+    { color: '#F2F2F2', points: stripe(1.6, 2.6, 0.08) },
+    ...podBand('#F2F2F2', 0.8, -0.4, 0.3, 0.42),
+    { color: '#F2F2F2', points: stripe(-0.5, -2.0, 0.05) },
+  ],
+  side: [{ color: '#F2F2F2', points: flank(0.85, -1.6, 0.14, 0.22) }],
+};
+
+const RENAULT_2004: Livery = {
+  id: 'renault-2004',
+  name: 'Renault',
+  era: 'gen2004',
+  team: 'Mild Seven Renault F1',
+  price: 150,
+  primary: '#0F3A9A',
+  secondary: '#FFD800',
+  sidepod: 'v10',
+  finish: 'gloss',
+  parts: { wing: '#FFD800', flap: '#0F3A9A', endplate: '#FFD800', floor: CARBON },
+  top: [
+    { color: '#FFD800', points: stripe(1.7, 2.6, 0.1) },
+    { color: '#FFD800', points: stripe(-0.5, -2.05, 0.1) },
+    ...podBand('#FFD800', 0.7, -0.2, 0.34, 0.5),
+  ],
+  side: [{ color: '#FFD800', points: flank(0.85, -1.8, 0.06, 0.16) }],
+};
+
+// ---------- 1980s (turbo era) ----------
+
+const FERRARI_1980S: Livery = {
+  id: 'ferrari-1980s',
+  name: 'Ferrari',
+  era: 'gen1980s',
+  team: 'Scuderia Ferrari',
+  price: 30,
+  primary: '#D40000',
+  secondary: '#FFFFFF',
+  sidepod: 'turbo',
+  finish: 'gloss',
+  parts: { wing: '#D40000', flap: '#D40000', endplate: '#D40000', floor: CARBON },
+  top: [
+    { color: '#F4F4F4', points: stripe(1.4, 2.45, 0.03) },
+    { color: '#F4F4F4', points: stripe(-0.2, -2.3, 0.025) },
+  ],
+  side: [{ color: '#F4F4F4', points: flank(0.7, -1.9, 0.24, 0.27) }],
+};
+
+const MCLAREN_1980S: Livery = {
+  id: 'mclaren-1980s',
+  name: 'McLaren',
+  era: 'gen1980s',
+  team: 'McLaren International',
+  price: 60,
+  primary: '#F2F2F2',
+  secondary: '#E10600',
+  sidepod: 'turbo',
+  finish: 'gloss',
+  parts: { wing: '#E10600', flap: '#F2F2F2', endplate: '#E10600', floor: CARBON },
+  top: [
+    { color: '#E10600', points: stripe(0.5, 1.3, 0.23) },
+    { color: '#E10600', points: stripe(-1.5, -2.3, 0.2) },
+    ...podBand('#E10600', -1.2, -2.0, 0.2, 0.5),
+  ],
+  side: [{ color: '#E10600', points: flank(0.7, -1.9, 0.06, 0.17) }],
+};
+
+const LOTUS_1980S: Livery = {
+  id: 'lotus-1980s',
+  name: 'Lotus',
+  era: 'gen1980s',
+  team: 'John Player Special Team Lotus',
+  price: 90,
+  primary: '#0E0E10',
+  secondary: '#D4AF37',
+  sidepod: 'turbo',
+  finish: 'gloss',
+  parts: { wing: BLACK, flap: BLACK, endplate: '#D4AF37', floor: CARBON },
+  top: [
+    { color: '#D4AF37', points: stripe(2.0, 2.5, 0.07) },
+    { color: '#D4AF37', points: stripe(2.4, -2.3, 0.012) },
+    ...podBand('#D4AF37', 0.6, -1.2, 0.34, 0.37),
+  ],
+  side: [{ color: '#D4AF37', points: flank(0.7, -1.9, 0.24, 0.26) }],
+};
+
+const WILLIAMS_1980S: Livery = {
+  id: 'williams-1980s',
+  name: 'Williams',
+  era: 'gen1980s',
+  team: 'Canon Williams Honda',
+  price: 120,
+  primary: '#1E3C8A',
+  secondary: '#F2F2F2',
+  sidepod: 'turbo',
+  finish: 'gloss',
+  parts: { wing: '#1E3C8A', flap: '#F2F2F2', endplate: '#F2F2F2', floor: CARBON },
+  top: [
+    { color: '#F2F2F2', points: stripe(1.3, 2.45, 0.04) },
+    ...podBand('#F2F2F2', 0.6, -0.8, 0.2, 0.34),
+  ],
+  side: [{ color: '#F2F2F2', points: flank(0.7, -1.9, 0.12, 0.2) }],
+};
+
+
+const NEUTRAL_PODS: Record<EraId, PodStyle> = { gen1980s: 'turbo', gen2004: 'v10', gen2014: 'hybrid', gen2022: 'downwash', gen2026: 'compact' };
+
 /**
  * Team-neutral paint for the side-by-side comparison of the generations (not for sale): the same light grey on every
  * car, so only the shape differs.
  */
-function neutral(era: 'gen2022' | 'gen2026'): Livery {
+function neutral(era: EraId): Livery {
   return {
     id: `neutral-${era}`,
     name: 'Neutral',
@@ -245,7 +491,7 @@ function neutral(era: 'gen2022' | 'gen2026'): Livery {
     price: 0,
     primary: '#B9BDC4',
     secondary: '#5B5F66',
-    sidepod: era === 'gen2026' ? 'compact' : 'downwash',
+    sidepod: NEUTRAL_PODS[era],
     finish: 'gloss',
     parts: { wing: '#3A3D42', flap: '#3A3D42', endplate: '#3A3D42', floor: CARBON },
     top: [{ color: '#8E939B', points: [[-0.6, 0.03], [-0.6, -0.03], [-2.0, -0.03], [-2.0, 0.03]] }],
@@ -253,13 +499,25 @@ function neutral(era: 'gen2022' | 'gen2026'): Livery {
   };
 }
 
-export const COMPARISON_LIVERIES = { gen2022: neutral('gen2022'), gen2026: neutral('gen2026') } as const;
+export const COMPARISON_LIVERIES: Record<EraId, Livery> = {
+  gen1980s: neutral('gen1980s'),
+  gen2004: neutral('gen2004'),
+  gen2014: neutral('gen2014'),
+  gen2022: neutral('gen2022'),
+  gen2026: neutral('gen2026'),
+};
 
 /**
  * Every livery, grouped by generation (oldest first). A livery is data: colors and flat shapes painted on one
  * generation's car model. Team names are the real ones; the paint is drawn from the best-known looks.
  */
-export const LIVERIES: readonly Livery[] = [FERRARI_2022, MERCEDES_2022, MCLAREN_2022, REDBULL_2022, FERRARI_2026, MERCEDES_2026, MCLAREN_2026, REDBULL_2026];
+export const LIVERIES: readonly Livery[] = [
+  FERRARI_1980S, MCLAREN_1980S, LOTUS_1980S, WILLIAMS_1980S,
+  FERRARI_2004, MCLAREN_2004, WILLIAMS_2004, RENAULT_2004,
+  FERRARI_2014, MERCEDES_2014, MCLAREN_2014, REDBULL_2014,
+  FERRARI_2022, MERCEDES_2022, MCLAREN_2022, REDBULL_2022,
+  FERRARI_2026, MERCEDES_2026, MCLAREN_2026, REDBULL_2026,
+];
 
 export const DEFAULT_LIVERY_ID = 'ferrari-2022';
 
@@ -279,5 +537,5 @@ export const MAX_CAR_NUMBER = 99;
 
 /** The livery with this id, or the default one if the id is unknown (for example after a livery is retired). */
 export function getLivery(id: string): Livery {
-  return LIVERIES.find((l) => l.id === id) ?? LIVERIES[0];
+  return LIVERIES.find((l) => l.id === id) ?? LIVERIES.find((l) => l.id === DEFAULT_LIVERY_ID) ?? LIVERIES[0];
 }

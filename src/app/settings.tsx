@@ -54,8 +54,8 @@ export default function SettingsScreen() {
   return (
     <View style={styles.container}>
       <SectionLabel>Cars</SectionLabel>
-      <Button label="Compare 2022 and 2026 cars" variant="secondary" onPress={() => router.push('/compare')} />
-      <Text style={styles.muted}>The two generations side by side: same scale, same angle, same light.</Text>
+      <Button label="Compare generations" variant="secondary" onPress={() => router.push('/compare')} />
+      <Text style={styles.muted}>Any two generations side by side: same scale, same angle, same light.</Text>
 
       <SectionLabel>Data</SectionLabel>
       <Button label="Reset all data" variant="secondary" onPress={confirmReset} />

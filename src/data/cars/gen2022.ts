@@ -7,6 +7,9 @@ import type { CarSpec } from './spec';
 
 export const GEN2022: CarSpec = {
   id: 'gen2022',
+  notes: { label: '2022', frontWing: '4 elements, fixed', rearWing: 'Fixed, DRS flap' },
+  halo: true,
+  wheelLook: { style: 'cover', coverRatio: 0.6, grooves: 0, rimColor: '#9A9DA3' },
   centreX: 0.15,
   paint: PAINT_BOX,
 
@@ -115,7 +118,11 @@ export const GEN2022: CarSpec = {
     ],
   },
 
+  extras: { plates: [], wings: [], rods: [], boxes: [] },
+
   details: {
+    cockpit: { x: 0.5, rx: 0.42, rz: 0.18, y: 0.625, rimRx: 0.46, rimRz: 0.2 },
+    mirror: [0.7, 0.74, 0.4],
     intake: [-0.03, 0.69],
     cameraPod: [-0.3, 1.03],
     exhaust: [-2.3, 0.42],
