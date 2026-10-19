@@ -176,6 +176,7 @@ const ALPINE: Livery = {
   finish: 'gloss',
   helmet: '#1F4DBF',
   parts: parts(BLACK, '#E9A3C8', BLACK),
+  frontParts: { wing: BLACK, flap: '#1F4DBF', endplate: BLACK },
   top: [
     ...podBand(BLACK, -0.45, -1.05, 0.17, 0.3),
     // black engine cover tail, a pink panel on the sidepods
