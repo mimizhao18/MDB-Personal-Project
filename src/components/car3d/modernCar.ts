@@ -4,7 +4,7 @@ import { spline } from '../../data/cars/spline';
 import { frontWingSection, rearWingSection } from '../../data/cars/spec';
 import type { AeroMode, CarSpec, ExtraPart, PodShape } from '../../data/cars/spec';
 import type { Livery } from '../../data/liveries';
-import { applyCarbonWeave, applyLiveryPaint, buildLiveryPictures, disposePictures } from './paint';
+import { applyCarbonWeave, applyLiveryPaint, buildLiveryPictures, buildPlateTexture, disposePictures } from './paint';
 import { arm, box, buildWheel, loftGeometry, plateGeometry, range, rod, wingGeometry } from './parts';
 
 // A modern ground-effect-era car (2022, 2026) built from its measurements (src/data/cars): one smooth surface for the
@@ -171,6 +171,21 @@ export function buildModernCar(spec: CarSpec, livery: Livery, options: CarOption
   });
   applyLiveryPaint(paint, pictures);
 
+  // the wings take their color and lettering from the livery pictures too (double sided, with carbon weave when dark)
+  const wingPaint = (carbon: boolean) => {
+    const material = new THREE.MeshPhysicalMaterial({
+      color: 0xffffff,
+      metalness: 0.2,
+      roughness: matte ? 0.55 : 0.35,
+      clearcoat: matte ? 0.1 : 0.8,
+      clearcoatRoughness: 0.15,
+      side: THREE.DoubleSide,
+    });
+    applyLiveryPaint(material, pictures, carbon);
+    return material;
+  };
+  const wingMaterials = { wing: wingPaint(lightness(livery.parts.wing) < 0.12), flap: wingPaint(lightness(livery.parts.flap) < 0.12) };
+
   const solid = (hex: string) =>
     new THREE.MeshPhysicalMaterial({
       color: hex,
@@ -199,6 +214,16 @@ export function buildModernCar(spec: CarSpec, livery: Livery, options: CarOption
   // carbon-fibre weave on the floor and on any wing that is carbon black
   applyCarbonWeave(m.floor);
   for (const key of ['wing', 'flap', 'endplate'] as const) if (lightness(livery.parts[key]) < 0.12) applyCarbonWeave(m[key]);
+
+  // end plates: plain, or with their lettering when the livery has some
+  const plateTextures: THREE.Texture[] = [];
+  const plateMaterial = (kind: 'front' | 'rear', outline: typeof spec.frontWing.endplate, side: 1 | -1): THREE.Material => {
+    const texts = livery.plateTexts?.[kind];
+    if (!texts || texts.length === 0) return m.endplate;
+    const texture = buildPlateTexture(outline, livery.parts.endplate, texts, side < 0);
+    plateTextures.push(texture);
+    return new THREE.MeshPhysicalMaterial({ map: texture, metalness: 0.2, roughness: matte ? 0.55 : 0.35, clearcoat: matte ? 0.1 : 0.8, clearcoatRoughness: 0.15, side: THREE.DoubleSide });
+  };
 
   // ---- bodywork: nose, cockpit, airbox and engine cover are one smooth surface ----
   car.add(new THREE.Mesh(loftGeometry(spec.spine, { rings: 110, sides: 36, squareness: 0.76 }), paint));
@@ -306,7 +331,7 @@ export function buildModernCar(spec: CarSpec, livery: Livery, options: CarOption
           e.camber,
           0.045,
         );
-        car.add(new THREE.Mesh(geometry, e.flap ? m.flap : m.wing));
+        car.add(new THREE.Mesh(geometry, e.flap ? wingMaterials.flap : wingMaterials.wing));
       }
     }
     if (fw.vanes) {
@@ -319,7 +344,7 @@ export function buildModernCar(spec: CarSpec, livery: Livery, options: CarOption
         }
       }
     }
-    car.add(new THREE.Mesh(plateGeometry(fw.endplate, fw.span * side, 0.014), m.endplate));
+    car.add(new THREE.Mesh(plateGeometry(fw.endplate, fw.span * side, 0.014), plateMaterial('front', fw.endplate, side)));
     if (fw.footplate) car.add(box(fw.footplate.length, 0.012, 0.08, m.endplate, fw.footplate.x, 0.055, (fw.span + 0.035) * side));
     if (fw.pylons) {
       // the raised nose is held clear of the wing on two pylons
@@ -342,12 +367,12 @@ export function buildModernCar(spec: CarSpec, livery: Livery, options: CarOption
         e.camber,
         0.05,
       );
-      car.add(new THREE.Mesh(geometry, e.flap ? m.flap : m.wing));
+      car.add(new THREE.Mesh(geometry, e.flap ? wingMaterials.flap : wingMaterials.wing));
     }
     for (const b of rw.beam) {
       car.add(new THREE.Mesh(wingGeometry(range(0, b.span, 12).map((z) => z * side), () => ({ x: b.x, y: b.y, chord: b.chord, angle: b.angle * DEG }), b.camber, 0.04), m.carbon));
     }
-    car.add(new THREE.Mesh(plateGeometry(rw.endplate, rw.span * side, 0.014), m.endplate));
+    car.add(new THREE.Mesh(plateGeometry(rw.endplate, rw.span * side, 0.014), plateMaterial('rear', rw.endplate, side)));
     for (const s of rw.supports) {
       if (s.mirror || side === 1) car.add(new THREE.Mesh(plateGeometry(s.outline, s.z * (s.mirror ? side : 1), s.thickness), m.carbon));
     }
@@ -426,6 +451,9 @@ export function buildModernCar(spec: CarSpec, livery: Livery, options: CarOption
       if (object instanceof THREE.Mesh) object.geometry.dispose();
     });
     paint.dispose();
+    wingMaterials.wing.dispose();
+    wingMaterials.flap.dispose();
+    plateTextures.forEach((t) => t.dispose());
     Object.values(m).forEach((material) => material.dispose());
   };
   return car;

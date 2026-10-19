@@ -59,6 +59,35 @@ export const topText = (text: string, x: number, z: number, height: number, colo
   spacing,
 });
 
+/** Lettering across a wing (top view), reading from the rear (`rear`) or from the front (`front`); z is its middle. */
+export const wingText = (text: string, x: number, z: number, height: number, color: string, from: 'rear' | 'front' = 'rear', spacing = 0): LiveryText => ({
+  view: 'top',
+  text,
+  x,
+  y: z,
+  height,
+  color,
+  align: 'center',
+  spacing,
+  orient: from === 'rear' ? 'across-rear' : 'across-front',
+});
+
+/** Lettering on an end plate (the plate's own x along the car and y up). */
+export const plateText = (text: string, x: number, y: number, height: number, color: string, align: LiveryText['align'] = 'center'): LiveryText => sideText(text, x, y, height, color, align);
+
+/** A checkerboard: squares of `size`, alternating, over a rectangle (for the checkered wings and flaps). */
+export function checker(color: string, x0: number, x1: number, z0: number, z1: number, size: number): LiveryLayer[] {
+  const layers: LiveryLayer[] = [];
+  let i = 0;
+  for (let x = x0; x < x1; x += size, i++) {
+    let j = 0;
+    for (let z = z0; z < z1; z += size, j++) {
+      if ((i + j) % 2 === 0) layers.push({ color, points: [[x, z], [x + size, z], [x + size, z + size], [x, z + size]] });
+    }
+  }
+  return layers;
+}
+
 /** Where the parts of a generation's car are, so paint can be placed in the same relative spots on every generation. */
 export function layout(era: EraId) {
   const spec = specFor(era);

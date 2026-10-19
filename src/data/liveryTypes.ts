@@ -22,6 +22,8 @@ export interface LiveryText {
   align?: 'left' | 'center' | 'right';
   /** Extra space between the letters, in metres. */
   spacing?: number;
+  /** Top view only: along the car (the default), or across it for the wings, reading from the rear or from the front. */
+  orient?: 'along' | 'across-rear' | 'across-front';
 }
 
 export interface Livery {
@@ -49,6 +51,10 @@ export interface Livery {
   top: readonly LiveryLayer[];
   /** The same seen from the side: [x, y]. Used on both sides of the car. */
   side: readonly LiveryLayer[];
-  /** Sponsor names and other lettering, painted over the shapes. */
+  /** Sponsor names and other lettering, painted over the shapes. On the wings, use the top view with the wing's own x and z. */
   texts?: readonly LiveryText[];
+  /** Shapes drawn on the wings from above (stripes, checks), on top of the wing colors. */
+  wingTop?: readonly LiveryLayer[];
+  /** Lettering on the front and rear wing end plates (side view, in the car's x and y). */
+  plateTexts?: { front?: readonly LiveryText[]; rear?: readonly LiveryText[] };
 }

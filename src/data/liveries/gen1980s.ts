@@ -1,4 +1,4 @@
-import { BLACK, CARBON, WHITE, flank, noseCapShape, podBand, sideText, stripe, topText, layout } from '../liveryHelpers';
+import { BLACK, CARBON, WHITE, flank, noseCapShape, plateText, podBand, sideText, stripe, topText, wingText, layout } from '../liveryHelpers';
 import type { Livery } from '../liveryTypes';
 
 // 1980s (turbo era): the most famous liveries. Shapes are in the car's own measurements (see src/data/cars/gen1980s.ts).
@@ -17,7 +17,7 @@ const FERRARI: Livery = {
   secondary: '#FFFFFF',
   sidepod: 'turbo',
   finish: 'gloss',
-  parts: { wing: CARBON, flap: CARBON, endplate: CARBON, floor: CARBON },
+  parts: solidParts('#D40000', '#D40000', '#D40000'),
   top: [
     { color: WHITE, points: stripe(1.4, 2.45, 0.03) },
     { color: WHITE, points: stripe(-0.2, -2.3, 0.025) },
@@ -30,7 +30,9 @@ const FERRARI: Livery = {
     sideText('LONGINES', 0.2, mid + 0.02, 0.06, WHITE),
     sideText('MARELLI', -1.1, mid + 0.02, 0.06, WHITE),
     sideText('AGIP', -1.4, 0.6, 0.06, '#FFD800'),
+    wingText('MARLBORO', -2.15, 0, 0.08, WHITE),
   ],
+  plateTexts: { rear: [plateText('AGIP', -2.15, 0.85, 0.1, '#FFD800')] },
 };
 
 const MCLAREN: Livery = {
@@ -58,7 +60,9 @@ const MCLAREN: Livery = {
     sideText('SHELL', 0.3, mid + 0.04, 0.07, '#E10600'),
     sideText('TAG', -1.2, mid + 0.02, 0.07, '#1B1B1B'),
     topText('11', 1.65, 0, 0.12, '#E10600'),
+    wingText('MARLBORO', -2.15, 0, 0.08, WHITE),
   ],
+  plateTexts: { rear: [plateText('HONDA', -2.15, 0.85, 0.1, WHITE)] },
 };
 
 const LOTUS: Livery = {
@@ -82,7 +86,9 @@ const LOTUS: Livery = {
     sideText('JOHN PLAYER SPECIAL', -0.45, mid + 0.14, 0.06, '#D4AF37'),
     sideText('LOTUS', 0.3, mid + 0.02, 0.08, '#D4AF37'),
     topText('JPS', 1.7, 0, 0.09, '#D4AF37'),
+    wingText('JPS', -2.15, 0, 0.1, '#D4AF37'),
   ],
+  plateTexts: { rear: [plateText('LOTUS', -2.15, 0.85, 0.1, BLACK)] },
 };
 
 const WILLIAMS: Livery = {
@@ -107,7 +113,9 @@ const WILLIAMS: Livery = {
     sideText('HONDA', 0.35, mid + 0.14, 0.07, WHITE),
     sideText('WILLIAMS', -1.2, 0.6, 0.06, WHITE),
     topText('CANON', 1.7, 0, 0.06, WHITE),
+    wingText('CANON', -2.15, 0, 0.1, WHITE),
   ],
+  plateTexts: { rear: [plateText('HONDA', -2.15, 0.85, 0.1, '#1E3C8A')] },
 };
 
 const BENETTON: Livery = {
@@ -135,7 +143,9 @@ const BENETTON: Livery = {
     sideText('BMW', 0.35, mid + 0.14, 0.08, WHITE),
     sideText('SKY', -1.3, 0.6, 0.06, WHITE),
     topText('BENETTON', 1.0, 0, 0.07, WHITE),
+    wingText('BENETTON', -2.15, 0, 0.08, WHITE),
   ],
+  plateTexts: { rear: [plateText('BMW', -2.15, 0.85, 0.1, WHITE)] },
 };
 
 const CAMEL: Livery = {
@@ -161,7 +171,9 @@ const CAMEL: Livery = {
     sideText('HONDA', 0.35, mid + 0.14, 0.07, '#0033A0'),
     sideText('LOTUS', -1.3, 0.6, 0.07, '#0033A0'),
     topText('CAMEL', 1.7, 0, 0.07, '#0033A0'),
+    wingText('CAMEL', -2.15, 0, 0.1, '#0033A0'),
   ],
+  plateTexts: { rear: [plateText('HONDA', -2.15, 0.85, 0.1, '#0033A0')] },
 };
 
 const BRABHAM: Livery = {
@@ -187,7 +199,9 @@ const BRABHAM: Livery = {
     sideText('BMW', 0.35, mid + 0.12, 0.09, '#0A58A8'),
     sideText('BRABHAM', -1.3, 0.62, 0.06, '#0A58A8'),
     topText('PARMALAT', 1.5, 0, 0.06, '#0A58A8'),
+    wingText('PARMALAT', -2.15, 0, 0.08, WHITE),
   ],
+  plateTexts: { rear: [plateText('BMW', -2.15, 0.85, 0.1, WHITE)] },
 };
 
 export const LIVERIES_GEN1980S: readonly Livery[] = [FERRARI, MCLAREN, LOTUS, WILLIAMS, BENETTON, CAMEL, BRABHAM];

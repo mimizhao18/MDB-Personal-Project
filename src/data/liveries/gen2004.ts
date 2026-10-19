@@ -1,4 +1,4 @@
-import { BLACK, CARBON, WHITE, ellipse, flank, noseCapShape, podBand, sideText, stripe, topText, layout } from '../liveryHelpers';
+import { BLACK, CARBON, WHITE, ellipse, flank, noseCapShape, plateText, podBand, sideText, stripe, topText, wingText, layout } from '../liveryHelpers';
 import type { Livery } from '../liveryTypes';
 
 // 2004 (V10 era): the best-known liveries. Shapes are in the car's own measurements (see src/data/cars/gen2004.ts).
@@ -35,7 +35,9 @@ const FERRARI: Livery = {
     topText('MARLBORO', 2.2, 0, 0.055, WHITE),
     sideText('BRIDGESTONE', -1.25, 0.62, 0.05, WHITE),
     sideText('FIAT', 0.5, 0.62, 0.05, WHITE),
+    wingText('VODAFONE', -1.92, 0, 0.07, WHITE),
   ],
+  plateTexts: { rear: [plateText('BRIDGESTONE', -1.9, 0.92, 0.04, WHITE)], front: [plateText('FIAT', 2.5, 0.2, 0.04, WHITE)] },
 };
 
 const MCLAREN: Livery = {
@@ -62,7 +64,9 @@ const MCLAREN: Livery = {
     sideText('SIEMENS', -1.3, 0.6, 0.055, '#F57F17'),
     sideText('MOBIL 1', -1.2, 0.38, 0.05, '#E10600'),
     topText('MERCEDES', 2.0, 0, 0.05, WHITE),
+    wingText('WEST', -1.92, 0, 0.08, '#E10600'),
   ],
+  plateTexts: { rear: [plateText('MERCEDES', -1.9, 0.92, 0.045, '#E10600')] },
 };
 
 const WILLIAMS: Livery = {
@@ -89,7 +93,9 @@ const WILLIAMS: Livery = {
     sideText('FEDEX', -1.2, 0.62, 0.06, WHITE),
     sideText('ALLIANZ', -1.2, 0.4, 0.045, '#1E3C8A'),
     topText('WILLIAMS', 2.0, 0, 0.055, WHITE),
+    wingText('BMW', -1.92, 0, 0.09, WHITE),
   ],
+  plateTexts: { rear: [plateText('FEDEX', -1.9, 0.92, 0.06, WHITE)] },
 };
 
 const RENAULT: Livery = {
@@ -115,7 +121,9 @@ const RENAULT: Livery = {
     sideText('RENAULT', -1.2, 0.6, 0.06, WHITE),
     sideText('ING', -1.3, 0.4, 0.06, '#F57F17'),
     topText('RENAULT', 2.0, 0, 0.055, '#0F3A9A'),
+    wingText('MILD SEVEN', -1.92, 0, 0.07, '#0F3A9A'),
   ],
+  plateTexts: { rear: [plateText('ELF', -1.9, 0.92, 0.07, '#0F3A9A')] },
 };
 
 const BAR: Livery = {
@@ -141,7 +149,9 @@ const BAR: Livery = {
     sideText('HONDA', 0.4, mid + 0.16, 0.09, '#E10600'),
     sideText('BAR', -1.3, 0.6, 0.07, '#1B1B1B'),
     topText('LUCKY STRIKE', 2.0, 0, 0.05, WHITE),
+    wingText('LUCKY STRIKE', -1.92, 0, 0.06, '#1B1B1B'),
   ],
+  plateTexts: { rear: [plateText('HONDA', -1.9, 0.92, 0.06, '#1B1B1B')] },
 };
 
 const JAGUAR: Livery = {
@@ -167,7 +177,9 @@ const JAGUAR: Livery = {
     sideText('HP', 0.45, mid + 0.14, 0.09, WHITE),
     sideText('COSWORTH', -1.2, 0.6, 0.05, WHITE),
     topText('JAGUAR', 2.0, 0, 0.06, WHITE),
+    wingText('JAGUAR', -1.92, 0, 0.08, '#C0C0C0'),
   ],
+  plateTexts: { rear: [plateText('HP', -1.9, 0.92, 0.07, WHITE)] },
 };
 
 const TOYOTA: Livery = {
@@ -192,7 +204,9 @@ const TOYOTA: Livery = {
     sideText('TOYOTA', 0.4, mid + 0.16, 0.08, '#E10600'),
     sideText('BRIDGESTONE', -1.2, 0.6, 0.045, '#1B1B1B'),
     topText('TOYOTA', 2.0, 0, 0.06, WHITE),
+    wingText('PANASONIC', -1.92, 0, 0.06, '#0B3D91'),
   ],
+  plateTexts: { rear: [plateText('TOYOTA', -1.9, 0.92, 0.06, '#E10600')] },
 };
 
 export const LIVERIES_GEN2004: readonly Livery[] = [FERRARI, MCLAREN, WILLIAMS, RENAULT, BAR, JAGUAR, TOYOTA];
