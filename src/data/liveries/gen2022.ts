@@ -161,7 +161,7 @@ const ALPINE: Livery = {
   glow: '#F5A0D0',
   sidepod: 'downwash',
   finish: 'gloss',
-  parts: parts(BLACK, BLACK, '#F5A0D0'),
+  parts: parts(BLACK, BLACK, BLACK),
   top: [
     // black engine cover tail, a pink panel on the sidepods
     { color: BLACK, points: stripe(-1.2, L.tail - 0.1, 0.19) },
@@ -171,7 +171,7 @@ const ALPINE: Livery = {
   side: [
     // the lower body is black, with the pink panel above it
     { color: BLACK, points: flank(0.95, -2.05, 0.06, 0.2) },
-    { color: '#F5A0D0', points: flank(0.7, -0.9, 0.2, 0.46) },
+    { color: '#F5A0D0', points: [[0.7, 0.2], [0.7, 0.46], [-0.3, 0.46], [-0.9, 0.3], [-0.9, 0.2]] },
   ],
   texts: [
     sideText('BWT', -0.1, mid - 0.0, 0.18, '#0A5ADB'),
