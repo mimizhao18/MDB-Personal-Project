@@ -32,7 +32,6 @@ const useStyles = makeStyles((t) => ({
     borderTopColor: t.colors.border,
     backgroundColor: t.colors.background,
   },
-  summary: { ...t.type.body, color: t.colors.textMuted, textAlign: 'center' },
 }));
 
 export default function CreateSessionScreen() {
@@ -103,9 +102,6 @@ export default function CreateSessionScreen() {
       </ScrollView>
 
       <View style={styles.footer}>
-        <Text style={styles.summary}>
-          {track.name} · {laps} {laps === 1 ? 'lap' : 'laps'} · {formatDurationWords(seconds)}
-        </Text>
         <Button label="Start Race" onPress={start} />
       </View>
     </SafeAreaView>

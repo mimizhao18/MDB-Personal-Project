@@ -6,8 +6,10 @@ export const colors = {
   surface: '#18181B',
   surfaceRaised: '#202024',
   border: '#2A2A2F',
-  text: '#F4F4F5',
-  textMuted: '#8F8F98',
+  /** A border that has to be seen (outlined buttons, the selected segment). */
+  borderStrong: '#3C3C43',
+  text: '#EDEDF0',
+  textMuted: '#9A9AA3',
   accent: '#E10600',
   accentText: '#FFFFFF',
   positive: '#3DDC84',

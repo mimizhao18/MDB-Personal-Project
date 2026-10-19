@@ -1,3 +1,4 @@
+import { Children } from 'react';
 import type { ReactNode } from 'react';
 import { Pressable, ScrollView, Text, View } from 'react-native';
 import type { StyleProp, ViewStyle } from 'react-native';
@@ -17,27 +18,26 @@ const useStyles = makeStyles((t) => ({
   button: {
     backgroundColor: t.colors.accent,
     borderRadius: t.radius.md,
-    paddingVertical: t.spacing.md - 2,
+    minHeight: 48,
     paddingHorizontal: t.spacing.lg,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  buttonSecondary: { backgroundColor: 'transparent', borderWidth: t.border.hairline, borderColor: t.colors.border },
+  buttonSecondary: { backgroundColor: 'transparent', borderWidth: t.border.hairline, borderColor: t.colors.borderStrong },
   buttonDisabled: { opacity: 0.45 },
   buttonText: { color: t.colors.accentText, fontSize: 16, fontWeight: '700', letterSpacing: 0.2 },
   buttonTextSecondary: { color: t.colors.text },
-  statTile: {
-    flex: 1,
+  strip: {
+    flexDirection: 'row',
     backgroundColor: t.colors.surface,
     borderRadius: t.radius.lg,
     borderWidth: t.border.hairline,
     borderColor: t.colors.border,
     paddingVertical: t.spacing.md,
-    paddingHorizontal: t.spacing.sm,
-    alignItems: 'center',
-    gap: 2,
   },
-  statValue: { ...t.type.stat, color: t.colors.text },
+  stripItem: { flex: 1, alignItems: 'center', gap: 2, paddingHorizontal: t.spacing.sm },
+  stripItemDivided: { borderLeftWidth: t.border.hairline, borderLeftColor: t.colors.border },
+  statValue: { fontSize: 20, fontWeight: '700', color: t.colors.text },
   statLabel: { ...t.type.caption, color: t.colors.textMuted },
   barTrack: { height: 4, borderRadius: t.radius.sm, backgroundColor: t.colors.border, overflow: 'hidden' },
   barFill: { height: '100%', backgroundColor: t.colors.accent },
@@ -49,10 +49,10 @@ const useStyles = makeStyles((t) => ({
     borderColor: t.colors.border,
     padding: 2,
   },
-  segment: { flex: 1, paddingVertical: t.spacing.sm, borderRadius: Math.max(0, t.radius.md - 2), alignItems: 'center' },
-  segmentActive: { backgroundColor: t.colors.accent },
+  segment: { flex: 1, minHeight: 40, justifyContent: 'center', borderWidth: t.border.hairline, borderColor: 'transparent', borderRadius: Math.max(0, t.radius.md - 2), alignItems: 'center' },
+  segmentActive: { backgroundColor: t.colors.surfaceRaised, borderWidth: t.border.hairline, borderColor: t.colors.borderStrong },
   segmentText: { color: t.colors.textMuted, fontSize: 14, fontWeight: '700' },
-  segmentTextActive: { color: t.colors.accentText },
+  segmentTextActive: { color: t.colors.text },
   chipRow: { flexDirection: 'row', gap: t.spacing.sm, paddingRight: t.spacing.md },
   chip: {
     flexDirection: 'row',
@@ -65,10 +65,18 @@ const useStyles = makeStyles((t) => ({
     borderWidth: t.border.hairline,
     borderColor: t.colors.border,
   },
-  chipActive: { backgroundColor: t.colors.surfaceRaised, borderColor: t.colors.accent },
+  chipActive: { backgroundColor: t.colors.surfaceRaised, borderColor: t.colors.borderStrong },
   chipText: { color: t.colors.textMuted, fontSize: 14, fontWeight: '700' },
   chipTextActive: { color: t.colors.text },
   chipCount: { color: t.colors.textMuted, fontSize: 12, fontWeight: '600' },
+  group: { backgroundColor: t.colors.surface, borderRadius: t.radius.lg, borderWidth: t.border.hairline, borderColor: t.colors.border, overflow: 'hidden' },
+  divider: { height: t.border.hairline, backgroundColor: t.colors.border, marginLeft: t.spacing.md },
+  row: { flexDirection: 'row', alignItems: 'center', gap: t.spacing.md, minHeight: 56, paddingVertical: t.spacing.sm + 2, paddingHorizontal: t.spacing.md },
+  rowText: { flex: 1, gap: 2 },
+  rowTitle: { fontSize: 16, fontWeight: '600', color: t.colors.text },
+  rowTitleDestructive: { color: '#FF6B63' },
+  rowSubtitle: { ...t.type.caption, color: t.colors.textMuted },
+  rowChevron: { fontSize: 22, color: t.colors.textMuted },
 }));
 
 /** Small uppercase heading above a group of content. */
@@ -110,12 +118,19 @@ export function Button({
   );
 }
 
-export function StatTile({ label, value }: { label: string; value: string }) {
+/** Several figures in one panel, each a number over a small label, split by hairlines. */
+export function StatStrip({ items }: { items: readonly { label: string; value: string }[] }) {
   const styles = useStyles();
   return (
-    <View style={styles.statTile}>
-      <Text style={styles.statValue}>{value}</Text>
-      <Text style={styles.statLabel}>{label}</Text>
+    <View style={styles.strip}>
+      {items.map((item, i) => (
+        <View key={item.label} style={[styles.stripItem, i > 0 && styles.stripItemDivided]} accessible accessibilityLabel={`${item.label}: ${item.value}`}>
+          <Text style={styles.statValue} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.75}>
+            {item.value}
+          </Text>
+          <Text style={styles.statLabel}>{item.label}</Text>
+        </View>
+      ))}
     </View>
   );
 }
@@ -195,5 +210,47 @@ export function Chips<T extends string>({
         );
       })}
     </ScrollView>
+  );
+}
+
+/** Rows stacked in one rounded panel with a hairline between them (like a settings list). */
+export function ListGroup({ children }: { children: ReactNode }) {
+  const styles = useStyles();
+  const rows = Children.toArray(children);
+  return (
+    <View style={styles.group}>
+      {rows.map((row, i) => (
+        <View key={i}>
+          {i > 0 && <View style={styles.divider} />}
+          {row}
+        </View>
+      ))}
+    </View>
+  );
+}
+
+/** One row of a ListGroup: a title, an optional line of explanation underneath, and a chevron when it opens something. */
+export function ListRow({
+  title,
+  subtitle,
+  onPress,
+  destructive,
+  chevron,
+}: {
+  title: string;
+  subtitle?: string;
+  onPress: () => void;
+  destructive?: boolean;
+  chevron?: boolean;
+}) {
+  const styles = useStyles();
+  return (
+    <Pressable style={styles.row} onPress={onPress} accessibilityRole="button" accessibilityLabel={title}>
+      <View style={styles.rowText}>
+        <Text style={[styles.rowTitle, destructive && styles.rowTitleDestructive]}>{title}</Text>
+        {subtitle ? <Text style={styles.rowSubtitle}>{subtitle}</Text> : null}
+      </View>
+      {chevron && <Text style={styles.rowChevron}>›</Text>}
+    </Pressable>
   );
 }

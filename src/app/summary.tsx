@@ -11,8 +11,7 @@ import { dayKey, displayedStreak } from '../logic/streak';
 import type { PlayerProfile, Session } from '../models/types';
 import { getProfile } from '../storage/profile';
 import { getSessions } from '../storage/sessions';
-import { Credits } from '../ui/Credits';
-import { Button, Card, ProgressBar, StatTile } from '../ui/kit';
+import { Button, Card, ProgressBar, StatStrip } from '../ui/kit';
 
 export default function SummaryScreen() {
   const styles = useStyles();
@@ -58,19 +57,20 @@ export default function SummaryScreen() {
         <Text style={styles.title}>{session.finished ? 'Chequered flag!' : 'Race ended early'}</Text>
         <Text style={styles.muted}>{track?.name ?? 'Race'}</Text>
 
-        <View style={styles.statRow}>
-          <StatTile label="Laps" value={`${session.completedLaps} / ${session.plannedLaps}`} />
-          <StatTile label="Focused" value={formatDurationWords(session.focusedSeconds)} />
-          <StatTile label="Distance" value={`${session.distanceKm.toFixed(1)} km`} />
-        </View>
+        <StatStrip
+          items={[
+            { label: 'Laps', value: `${session.completedLaps} / ${session.plannedLaps}` },
+            { label: 'Focused', value: formatDurationWords(session.focusedSeconds) },
+            { label: 'Distance', value: `${session.distanceKm.toFixed(1)} km` },
+          ]}
+        />
 
-        <Card style={styles.cardGap}>
-          <Text style={styles.cardLabel}>Rewards</Text>
-          <View style={styles.rewardRow}>
-            <Text style={styles.reward}>+{session.xpEarned} XP</Text>
-            <Credits amount={session.creditsEarned} prefix="+" size={22} textStyle={styles.reward} />
-          </View>
-        </Card>
+        <StatStrip
+          items={[
+            { label: 'XP earned', value: `+${session.xpEarned}` },
+            { label: 'Credits earned', value: `+${session.creditsEarned}` },
+          ]}
+        />
 
         <Card style={styles.cardGap}>
           <Text style={styles.cardLabel}>
@@ -81,12 +81,11 @@ export default function SummaryScreen() {
           <Text style={styles.muted}>
             {progress.xpIntoLevel} / {progress.xpForNextLevel} XP to level {progress.level + 1}
           </Text>
+          <Text style={styles.muted}>
+            {profile.credits} credits · {streak} day streak
+          </Text>
         </Card>
 
-        <View style={styles.statRow}>
-          <StatTile label="Total credits" value={String(profile.credits)} />
-          <StatTile label="Day streak" value={String(streak)} />
-        </View>
       </ScrollView>
 
       <View style={styles.footer}>
@@ -103,11 +102,8 @@ const useStyles = makeStyles((t) => ({
   content: { padding: t.spacing.md, gap: t.spacing.md },
   title: { ...t.type.title, fontSize: 28, color: t.colors.text, textAlign: 'center' },
   muted: { ...t.type.caption, color: t.colors.textMuted, textAlign: 'center' },
-  statRow: { flexDirection: 'row', gap: t.spacing.sm },
   cardGap: { gap: t.spacing.sm },
   cardLabel: { ...t.type.label, color: t.colors.textMuted },
-  rewardRow: { flexDirection: 'row', justifyContent: 'space-around' },
-  reward: { fontSize: 24, fontWeight: '800', color: t.colors.accent },
   footer: {
     padding: t.spacing.md,
     gap: t.spacing.sm,

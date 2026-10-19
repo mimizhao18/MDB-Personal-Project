@@ -14,7 +14,7 @@ import type { PlayerProfile } from '../models/types';
 import { DEFAULT_PROFILE, getProfile } from '../storage/profile';
 import { getSessions } from '../storage/sessions';
 import { Credits } from '../ui/Credits';
-import { Button, ProgressBar, StatTile } from '../ui/kit';
+import { Button, ProgressBar, StatStrip } from '../ui/kit';
 
 const EMPTY_STATS: LifetimeStats = { races: 0, laps: 0, distanceKm: 0, focusedSeconds: 0 };
 
@@ -26,7 +26,6 @@ const useStyles = makeStyles((t) => ({
   caption: { ...t.type.caption, color: t.colors.textMuted },
   // the 3D car runs edge to edge (past the screen padding) so its floor glow has room to fade out before the edge
   carArea: { flex: 1, marginHorizontal: -t.spacing.md },
-  statRow: { flexDirection: 'row', gap: t.spacing.sm },
   focusTotal: { ...t.type.caption, color: t.colors.textMuted, textAlign: 'center' },
 }));
 
@@ -71,12 +70,14 @@ export default function HomeScreen() {
         <HeroCar car={profile.car} autoSpin={false} />
       </View>
 
-      <View style={styles.statRow}>
-        <StatTile label="Day streak" value={String(streak)} />
-        <StatTile label="Races" value={String(stats.races)} />
-        <StatTile label="Laps" value={String(stats.laps)} />
-        <StatTile label="Km" value={stats.distanceKm.toFixed(0)} />
-      </View>
+      <StatStrip
+        items={[
+          { label: 'Day streak', value: String(streak) },
+          { label: 'Races', value: String(stats.races) },
+          { label: 'Laps', value: String(stats.laps) },
+          { label: 'Km', value: stats.distanceKm.toFixed(0) },
+        ]}
+      />
       <Text style={styles.focusTotal}>{focusLine}</Text>
       <Button label="Start Race" onPress={() => router.push('/create-session')} />
     </SafeAreaView>

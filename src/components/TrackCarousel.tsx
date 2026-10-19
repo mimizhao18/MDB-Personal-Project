@@ -15,64 +15,35 @@ interface Props {
   onSelect: (id: TrackId) => void;
 }
 
-const FLAG_WIDTH = 46;
+const FLAG_WIDTH = 40;
 
 const useStyles = makeStyles((t) => ({
   container: { gap: t.spacing.sm },
   card: { gap: t.spacing.md },
-  // a red bracket that wraps around the top right corner: a longer line along the top edge and a shorter one down the
-  // right edge, like the red bracket on the F1 circuit graphics. They sit on top of the card's own border.
-  accentTop: {
-    position: 'absolute',
-    top: -t.border.hairline,
-    right: -t.border.hairline,
-    width: 96,
-    height: 3,
-    backgroundColor: t.colors.accent,
-  },
-  accentRight: {
-    position: 'absolute',
-    top: -t.border.hairline,
-    right: -t.border.hairline,
-    width: 3,
-    height: 36,
-    backgroundColor: t.colors.accent,
-  },
   header: { flexDirection: 'row', alignItems: 'center', gap: t.spacing.md, marginTop: t.spacing.xs },
   headerText: { flex: 1 },
-  name: { fontSize: 28, fontWeight: '800', letterSpacing: -0.4, color: t.colors.text },
+  name: { fontSize: 24, fontWeight: '800', letterSpacing: -0.3, color: t.colors.text },
   country: { ...t.type.body, color: t.colors.textMuted, marginTop: 1 },
-  stats: { flexDirection: 'row', flexWrap: 'wrap', gap: t.spacing.sm },
-  statBlock: {
-    flexBasis: '47%',
-    flexGrow: 1,
-    borderWidth: t.border.hairline,
-    borderColor: t.colors.border,
-    borderRadius: t.radius.lg,
-    paddingVertical: t.spacing.sm + 2,
-    paddingHorizontal: t.spacing.md - 2,
-    gap: 2,
-  },
-  statLabel: { ...t.type.caption, color: t.colors.textMuted },
-  statValueRow: { flexDirection: 'row', alignItems: 'baseline', gap: 4 },
-  statValue: { fontSize: 22, fontWeight: '800', letterSpacing: -0.3, color: t.colors.text },
-  statUnit: { fontSize: 12, fontWeight: '700', color: t.colors.textMuted, textTransform: 'uppercase' },
+  // the four numbers in one row, split by hairlines
+  stats: { flexDirection: 'row', borderTopWidth: t.border.hairline, borderTopColor: t.colors.border, paddingTop: t.spacing.md },
+  statBlock: { flex: 1, gap: 2, paddingHorizontal: t.spacing.sm, borderLeftWidth: t.border.hairline, borderLeftColor: t.colors.border },
+  statBlockFirst: { borderLeftWidth: 0, paddingLeft: 0 },
+  statLabel: { fontSize: 11, color: t.colors.textMuted },
+  statValueRow: { flexDirection: 'row', alignItems: 'baseline', gap: 3 },
+  statValue: { fontSize: 17, fontWeight: '700', color: t.colors.text },
+  statUnit: { fontSize: 11, fontWeight: '600', color: t.colors.textMuted },
   controls: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
   dots: { flexDirection: 'row', gap: t.spacing.sm, alignItems: 'center' },
   dot: { width: 14, height: 3, borderRadius: t.radius.sm, backgroundColor: t.colors.border },
-  dotActive: { backgroundColor: t.colors.accent, width: 28 },
+  dotActive: { backgroundColor: t.colors.text, width: 24 },
   arrow: {
     width: 44,
-    height: 34,
-    borderRadius: t.radius.md,
-    backgroundColor: t.colors.surface,
-    borderWidth: t.border.hairline,
-    borderColor: t.colors.border,
+    height: 36,
     alignItems: 'center',
     justifyContent: 'center',
   },
   arrowDisabled: { opacity: 0.3 },
-  arrowText: { color: t.colors.text, fontSize: 22, fontWeight: '700', lineHeight: 26 },
+  arrowText: { color: t.colors.textMuted, fontSize: 26, fontWeight: '600', lineHeight: 30 },
 }));
 
 /** Tracks side by side: swipe sideways (or use the arrows) and the track in view is the selected one. */
@@ -105,10 +76,10 @@ export function TrackCarousel({ tracks, selectedId, onSelect }: Props) {
     if (track.id !== selectedId) onSelect(track.id);
   };
 
-  const previewHeight = Math.round((width - cardPadding * 2) * 0.52);
+  const previewHeight = Math.round((width - cardPadding * 2) * 0.42);
   // Room for the name: the card's inner width minus the flag and the gap beside it. Long names are sized down to fit.
   const nameRoom = width - cardPadding * 2 - FLAG_WIDTH - theme.spacing.md;
-  const nameSize = (name: string) => Math.max(18, Math.min(28, Math.floor(nameRoom / (name.length * 0.64))));
+  const nameSize = (name: string) => Math.max(18, Math.min(24, Math.floor(nameRoom / (name.length * 0.64))));
 
   return (
     <View style={styles.container}>
@@ -127,9 +98,6 @@ export function TrackCarousel({ tracks, selectedId, onSelect }: Props) {
           ItemSeparatorComponent={() => <View style={{ width: gap }} />}
           renderItem={({ item }) => (
             <Card style={[styles.card, { width }]}>
-              <View style={[styles.accentTop, { pointerEvents: 'none' }]} />
-              <View style={[styles.accentRight, { pointerEvents: 'none' }]} />
-
               <View style={styles.header}>
                 <Flag code={item.countryCode} width={FLAG_WIDTH} />
                 <View style={styles.headerText}>
@@ -145,9 +113,9 @@ export function TrackCarousel({ tracks, selectedId, onSelect }: Props) {
               </View>
 
               <View style={styles.stats}>
-                <StatBlock label="Circuit length" value={item.lapLengthKm.toFixed(2)} unit="km" />
-                <StatBlock label="Race laps" value={String(item.raceLaps)} />
-                <StatBlock label="Race distance" value={item.raceDistanceKm.toFixed(2)} unit="km" />
+                <StatBlock first label="Lap length" value={item.lapLengthKm.toFixed(2)} unit="km" />
+                <StatBlock label="Laps" value={String(item.raceLaps)} />
+                <StatBlock label="Distance" value={item.raceDistanceKm.toFixed(0)} unit="km" />
                 <StatBlock label="Lap time" value={formatClock(item.lapTimeSeconds)} />
               </View>
             </Card>
@@ -170,11 +138,11 @@ export function TrackCarousel({ tracks, selectedId, onSelect }: Props) {
   );
 }
 
-/** A bordered block with a small label over a big bold number, like the stat panels on the F1 circuit graphics. */
-function StatBlock({ label, value, unit }: { label: string; value: string; unit?: string }) {
+/** A small label over a number (with its unit), one of the four figures in a track card. */
+function StatBlock({ label, value, unit, first }: { label: string; value: string; unit?: string; first?: boolean }) {
   const styles = useStyles();
   return (
-    <View style={styles.statBlock} accessible accessibilityLabel={`${label}: ${value}${unit ? ` ${unit}` : ''}`}>
+    <View style={[styles.statBlock, first && styles.statBlockFirst]} accessible accessibilityLabel={`${label}: ${value}${unit ? ` ${unit}` : ''}`}>
       <Text style={styles.statLabel}>{label}</Text>
       <View style={styles.statValueRow}>
         <Text style={styles.statValue}>{value}</Text>

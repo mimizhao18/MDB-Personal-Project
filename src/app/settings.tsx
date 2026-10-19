@@ -1,11 +1,11 @@
 import { router } from 'expo-router';
-import { Text, View } from 'react-native';
+import { View } from 'react-native';
 
 import { makeStyles } from '../design/styles';
 import { loadDemoData } from '../storage/demo';
 import { resetAllData } from '../storage/reset';
 import { showAlert } from '../ui/alert';
-import { Button, SectionLabel } from '../ui/kit';
+import { ListGroup, ListRow, SectionLabel } from '../ui/kit';
 
 /** Back to the previous screen, or Home if the page was opened directly (for example after a browser refresh). */
 function goBack() {
@@ -53,26 +53,33 @@ export default function SettingsScreen() {
 
   return (
     <View style={styles.container}>
-      <SectionLabel>Cars</SectionLabel>
-      <Button label="Compare generations" variant="secondary" onPress={() => router.push('/compare')} />
-      <Text style={styles.muted}>Any two generations side by side: same scale, same angle, same light.</Text>
+      <View style={styles.section}>
+        <SectionLabel>Cars</SectionLabel>
+        <ListGroup>
+          <ListRow title="Compare generations" subtitle="Any two generations side by side, at the same scale and angle." chevron onPress={() => router.push('/compare')} />
+        </ListGroup>
+      </View>
 
-      <SectionLabel>Data</SectionLabel>
-      <Button label="Reset all data" variant="secondary" onPress={confirmReset} />
-      <Text style={styles.muted}>Your races and progress are saved only on this phone.</Text>
+      <View style={styles.section}>
+        <SectionLabel>Data</SectionLabel>
+        <ListGroup>
+          <ListRow title="Reset all data" subtitle="Your races and progress are saved only on this phone." destructive onPress={confirmReset} />
+        </ListGroup>
+      </View>
 
       {__DEV__ && (
-        <>
-          <SectionLabel>Demo (development only)</SectionLabel>
-          <Button label="Load demo data" variant="secondary" onPress={confirmDemo} />
-          <Text style={styles.muted}>Fills the app with a week of example races, a 5-day streak and credits to spend. Use Reset all data to clear it.</Text>
-        </>
+        <View style={styles.section}>
+          <SectionLabel>Development only</SectionLabel>
+          <ListGroup>
+            <ListRow title="Load demo data" subtitle="A week of example races, a 5-day streak and credits to spend. Reset all data clears it." onPress={confirmDemo} />
+          </ListGroup>
+        </View>
       )}
     </View>
   );
 }
 
 const useStyles = makeStyles((t) => ({
-  container: { flex: 1, padding: t.spacing.md, gap: t.spacing.md },
-  muted: { ...t.type.caption, color: t.colors.textMuted },
+  container: { flex: 1, padding: t.spacing.md, gap: t.spacing.lg },
+  section: { gap: t.spacing.sm },
 }));
