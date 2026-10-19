@@ -199,6 +199,7 @@ export function buildModernCar(spec: CarSpec, livery: Livery, options: CarOption
     wing: solid(livery.parts.wing),
     flap: solid(livery.parts.flap),
     endplate: solid(livery.parts.endplate),
+    frontEndplate: solid((livery.frontParts ?? livery.parts).endplate),
     floor: new THREE.MeshStandardMaterial({ color: livery.parts.floor, metalness: 0.1, roughness: 0.85, side: THREE.DoubleSide }),
     carbon: new THREE.MeshStandardMaterial({ color: 0x131316, metalness: 0.45, roughness: 0.5, side: THREE.DoubleSide }),
     rubber: new THREE.MeshStandardMaterial({ color: 0x0f0f11, metalness: 0, roughness: 0.92 }),
@@ -219,8 +220,8 @@ export function buildModernCar(spec: CarSpec, livery: Livery, options: CarOption
   const plateTextures: THREE.Texture[] = [];
   const plateMaterial = (kind: 'front' | 'rear', outline: typeof spec.frontWing.endplate, side: 1 | -1): THREE.Material => {
     const texts = livery.plateTexts?.[kind];
-    if (!texts || texts.length === 0) return m.endplate;
-    const texture = buildPlateTexture(outline, livery.parts.endplate, texts, side < 0);
+    if (!texts || texts.length === 0) return kind === 'front' ? m.frontEndplate : m.endplate;
+    const texture = buildPlateTexture(outline, (kind === 'front' ? livery.frontParts ?? livery.parts : livery.parts).endplate, texts, side < 0);
     plateTextures.push(texture);
     return new THREE.MeshPhysicalMaterial({ map: texture, metalness: 0.2, roughness: matte ? 0.55 : 0.35, clearcoat: matte ? 0.1 : 0.8, clearcoatRoughness: 0.15, side: THREE.DoubleSide });
   };

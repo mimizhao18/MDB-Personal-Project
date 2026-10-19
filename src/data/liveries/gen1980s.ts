@@ -47,13 +47,18 @@ const MCLAREN: Livery = {
   sidepod: 'turbo',
   finish: 'gloss',
   parts: solidParts('#E10600', '#F2F2F2', '#E10600'),
+  frontParts: { wing: '#F2F2F2', flap: '#F2F2F2', endplate: '#F2F2F2' },
   top: [
     // the red cowl in front of the cockpit and the red of the rear body
     { color: '#E10600', points: stripe(0.5, 1.3, 0.23) },
     { color: '#E10600', points: stripe(-1.4, -1.85, 0.2) },
     ...podBand('#E10600', -1.1, -1.7, 0.2, 0.5),
   ],
-  side: [{ color: '#E10600', points: flank(0.7, -1.75, 0.06, 0.17) }],
+  side: [
+    // the red wedge ahead of the cockpit and the red lower rear body with its diagonal edge, as on the MP4/4
+    { color: '#E10600', points: [[0.44, 0.72], [1.12, 0.66], [1.12, 0.54], [0.44, 0.6]] },
+    { color: '#E10600', points: [[-1.75, 0.62], [-1.3, 0.72], [-0.28, 0.22], [-0.28, 0.06], [-1.75, 0.06]] },
+  ],
   texts: [
     topText('HONDA', 1.0, 0, 0.07, WHITE),
     sideText('MARLBORO', -0.35, mid + 0.14, 0.09, '#E10600'),
@@ -62,7 +67,7 @@ const MCLAREN: Livery = {
     topText('11', 1.65, 0, 0.12, '#E10600'),
     wingText('MARLBORO', -1.62, 0, 0.08, WHITE),
   ],
-  plateTexts: { rear: [plateText('HONDA', -1.62, 0.8, 0.1, WHITE)] },
+  plateTexts: { rear: [plateText('HONDA', -1.62, 0.8, 0.1, WHITE)], front: [plateText('GOODYEAR', 2.27, 0.25, 0.05, BLACK)] },
 };
 
 const LOTUS: Livery = {

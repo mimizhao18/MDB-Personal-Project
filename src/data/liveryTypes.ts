@@ -47,6 +47,8 @@ export interface Livery {
   finish: 'gloss' | 'matte';
   /** Solid colors for the wings and floor. */
   parts: { wing: string; flap: string; endplate: string; floor: string };
+  /** The front wing's colors, when it differs from the rear wing's (the 1980s McLarens ran a white front wing and a red rear one). */
+  frontParts?: { wing: string; flap: string; endplate: string };
   /** Shapes laid over the base paint seen from above: [x, z] in the car's own measurements (see src/data/cars). */
   top: readonly LiveryLayer[];
   /** The same seen from the side: [x, y]. Used on both sides of the car. */

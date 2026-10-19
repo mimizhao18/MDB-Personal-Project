@@ -78,8 +78,9 @@ function wingLayers(livery: Livery): LiveryLayer[] {
   const spec = specFor(livery.era);
   const layers: LiveryLayer[] = [];
   const fw = spec.frontWing;
+  const front = livery.frontParts ?? livery.parts;
   for (const e of fw.elements) {
-    const color = e.flap ? livery.parts.flap : livery.parts.wing;
+    const color = e.flap ? front.flap : front.wing;
     const z0 = Math.max(e.from, 0.12); // leave the middle to the nose, which runs into the wing
     const zs = Array.from({ length: 24 }, (_, i) => z0 + ((fw.span - 0.01 - z0) * i) / 23);
     for (const side of [1, -1]) {
