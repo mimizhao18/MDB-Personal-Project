@@ -23,13 +23,14 @@ const FERRARI: Livery = {
   parts: parts(CARBON),
   top: [
     // white airbox and top of the engine cover, black tail, white nose cap
-    { color: WHITE, points: stripe(0.1, -1.0, 0.16) },
+    { color: WHITE, points: stripe(0.1, -1.0, 0.2) },
     { color: BLACK, points: stripe(-1.35, L.tail - 0.05, 0.17) },
     { color: WHITE, points: noseCapShape(2.45, 2.85, 0.08) },
+    { color: '#FFD800', points: ellipse(1.55, 0, 0.13, 0.07) },
   ],
   side: [
     // the white airbox side, the black lower sidepod and the yellow Shell scallop
-    { color: WHITE, points: flank(AIRBOX[0], AIRBOX[1], ABOX_Y[0], ABOX_Y[1]) },
+    { color: WHITE, points: [[0.1, 0.7], [0.1, 1.12], [-0.95, 1.12], [-1.0, 0.82], [-0.5, 0.62], [-0.1, 0.64]] },
     { color: BLACK, points: flank(L.podFront, L.podRear, 0.06, 0.2) },
     { color: '#FFD800', points: ellipse(0.3, mid + 0.02, 0.15, 0.1) },
   ],
@@ -44,6 +45,7 @@ const FERRARI: Livery = {
     topText('ZYN', 2.0, 0, 0.06, WHITE),
     wingText('SHELL V-POWER', -2.17, 0, 0.07, WHITE),
   ],
+  wingTop: [{ color: '#00B3A4', points: [[-2.3, -0.42], [-2.3, 0.42], [-2.42, 0.42], [-2.42, -0.42]] }],
   plateTexts: { rear: [plateText('V-POWER', -2.2, 0.72, 0.07, WHITE)] },
 };
 
