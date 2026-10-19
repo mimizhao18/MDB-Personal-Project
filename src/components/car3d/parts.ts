@@ -16,6 +16,8 @@ export interface LoftSpec {
   hw: readonly number[];
   bottom: readonly number[];
   top: readonly number[];
+  /** Boxiness at each station (overrides the option): 1 is a diamond, 0.5 a boxy section with flat sides. */
+  squareness?: readonly number[];
 }
 
 interface LoftOptions {
@@ -44,9 +46,10 @@ export function loftGeometry(spec: LoftSpec, { rings = 80, sides = 32, squarenes
     const yt = Math.max(yb + 0.004, spline(spec.top, t));
     const yc = (yb + yt) / 2;
     const h = (yt - yb) / 2;
+    const e = spec.squareness ? spline(spec.squareness, t) : squareness;
     for (let j = 0; j <= sides; j++) {
       const phi = (j / sides) * Math.PI * 2;
-      positions.push(x, yc + h * signedPow(Math.cos(phi), squareness), side * (zc + hw * signedPow(Math.sin(phi), squareness)));
+      positions.push(x, yc + h * signedPow(Math.cos(phi), e), side * (zc + hw * signedPow(Math.sin(phi), e)));
     }
   }
   const row = sides + 1;

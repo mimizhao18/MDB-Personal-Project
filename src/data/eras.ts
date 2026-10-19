@@ -16,7 +16,7 @@ export const ERAS: readonly Era[] = [
   { id: 'gen2004', name: '2004', years: '2004', available: false },
   { id: 'gen2014', name: '2014', years: '2014-2021', available: false },
   { id: 'gen2022', name: '2022', years: 'Ground effect, 2022-2025', available: true },
-  { id: 'gen2026', name: '2026', years: 'Current generation', available: false },
+  { id: 'gen2026', name: '2026', years: 'Current generation, active aero', available: true },
 ];
 
 export function getEra(id: EraId): Era {

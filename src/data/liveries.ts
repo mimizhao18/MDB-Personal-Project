@@ -1,4 +1,4 @@
-import type { PodStyle } from './cars/gen2022';
+import type { PodStyle } from './cars/spec';
 import type { EraId } from './eras';
 
 /** A flat colored shape drawn on the car's paint: a list of [along the car, across/up] points in metres. */
@@ -144,11 +144,122 @@ const REDBULL_2022: Livery = {
   ],
 };
 
+// ---------- 2026: four teams ----------
+// Same teams, new cars: slimmer, with compact sidepods, so the paint shapes follow the 2026 bodywork.
+
+const FERRARI_2026: Livery = {
+  id: 'ferrari-2026',
+  name: 'Ferrari',
+  era: 'gen2026',
+  team: 'Scuderia Ferrari HP',
+  price: 100,
+  primary: '#DC0000',
+  secondary: '#FFFFFF',
+  sidepod: 'compact',
+  finish: 'gloss',
+  parts: { wing: CARBON, flap: CARBON, endplate: CARBON, floor: CARBON },
+  top: [
+    // black tail of the engine cover
+    { color: BLACK, points: [[-1.3, 0.17], [-1.3, -0.17], [-2.2, -0.17], [-2.2, 0.17]] },
+    // white line down the engine cover, and a white nose cap
+    { color: '#F4F4F4', points: [[-0.5, 0.025], [-0.5, -0.025], [-1.3, -0.025], [-1.3, 0.025]] },
+    { color: '#F4F4F4', points: [[2.5, 0.07], [2.5, -0.07], [2.85, -0.04], [2.85, 0.04]] },
+  ],
+  side: [
+    // black lower half of the sidepod
+    { color: BLACK, points: [[0.85, 0.06], [0.85, 0.2], [0.25, 0.22], [-0.5, 0.2], [-1.3, 0.18], [-1.95, 0.18], [-1.95, 0.06]] },
+  ],
+};
+
+const MERCEDES_2026: Livery = {
+  id: 'mercedes-2026',
+  name: 'Mercedes',
+  era: 'gen2026',
+  team: 'Mercedes-AMG Petronas',
+  price: 150,
+  primary: '#0E0E10',
+  secondary: '#00D2BE',
+  sidepod: 'compact',
+  finish: 'matte',
+  parts: { wing: '#0E0E10', flap: '#0E0E10', endplate: '#0E0E10', floor: CARBON },
+  top: [
+    // teal nose tip and a thin teal line down the engine cover
+    { color: '#00D2BE', points: [[2.4, 0.1], [2.4, -0.1], [2.85, -0.04], [2.85, 0.04]] },
+    { color: '#00D2BE', points: [[-0.75, 0.025], [-0.75, -0.025], [-2.1, -0.025], [-2.1, 0.025]] },
+    // teal edge along the outside of the sidepods
+    ...both('#00D2BE', [[0.85, 0.37], [0.62, 0.48], [0.25, 0.55], [-0.2, 0.55], [-0.65, 0.48], [-1.1, 0.36], [-1.55, 0.23], [-1.55, 0.18], [-1.1, 0.31], [-0.65, 0.43], [-0.2, 0.5], [0.25, 0.5], [0.62, 0.43], [0.85, 0.32]]),
+  ],
+  side: [{ color: '#00D2BE', points: [[0.85, 0.27], [0.85, 0.3], [-1.9, 0.25], [-1.9, 0.22]] }],
+};
+
+const MCLAREN_2026: Livery = {
+  id: 'mclaren-2026',
+  name: 'McLaren',
+  era: 'gen2026',
+  team: 'McLaren F1 Team',
+  price: 200,
+  primary: '#FF8000',
+  secondary: '#47C7FC',
+  sidepod: 'compact',
+  finish: 'gloss',
+  parts: { wing: '#FF8000', flap: '#47C7FC', endplate: '#FF8000', floor: CARBON },
+  top: [
+    // blue engine cover tail and a sweep on the back half of the sidepods
+    { color: '#47C7FC', points: [[-0.8, 0.09], [-0.8, -0.09], [-2.2, -0.09], [-2.2, 0.09]] },
+    ...both('#47C7FC', [[-0.4, 0.5], [-1.0, 0.38], [-1.6, 0.2], [-1.6, 0.12], [-0.9, 0.22], [-0.35, 0.3]]),
+  ],
+  side: [{ color: '#47C7FC', points: [[0.85, 0.06], [0.85, 0.26], [0.2, 0.3], [-0.6, 0.24], [-1.3, 0.2], [-1.95, 0.2], [-1.95, 0.06]] }],
+};
+
+const REDBULL_2026: Livery = {
+  id: 'redbull-2026',
+  name: 'Red Bull',
+  era: 'gen2026',
+  team: 'Oracle Red Bull Racing',
+  price: 250,
+  primary: '#1C2B5E',
+  secondary: '#E4002B',
+  glow: '#E4002B',
+  sidepod: 'compact',
+  finish: 'matte',
+  parts: { wing: '#1C2B5E', flap: '#E4002B', endplate: '#1C2B5E', floor: CARBON },
+  top: [
+    // yellow nose cap, red sweep over the sidepods and a red stripe on the engine cover
+    { color: '#FFD100', points: [[2.5, 0.07], [2.5, -0.07], [2.85, -0.03], [2.85, 0.03]] },
+    ...both('#E4002B', [[0.8, 0.28], [0.62, 0.46], [0.25, 0.55], [-0.3, 0.55], [-0.8, 0.44], [-0.3, 0.4], [0.25, 0.42], [0.62, 0.34]]),
+    { color: '#E4002B', points: [[-0.9, 0.04], [-0.9, -0.04], [-2.1, -0.04], [-2.1, 0.04]] },
+  ],
+  side: [{ color: '#E4002B', points: [[0.85, 0.15], [0.85, 0.2], [-1.95, 0.2], [-1.95, 0.15]] }],
+};
+
+/**
+ * Team-neutral paint for the side-by-side comparison of the generations (not for sale): the same light grey on every
+ * car, so only the shape differs.
+ */
+function neutral(era: 'gen2022' | 'gen2026'): Livery {
+  return {
+    id: `neutral-${era}`,
+    name: 'Neutral',
+    era,
+    team: 'Comparison',
+    price: 0,
+    primary: '#B9BDC4',
+    secondary: '#5B5F66',
+    sidepod: era === 'gen2026' ? 'compact' : 'downwash',
+    finish: 'gloss',
+    parts: { wing: '#3A3D42', flap: '#3A3D42', endplate: '#3A3D42', floor: CARBON },
+    top: [{ color: '#8E939B', points: [[-0.6, 0.03], [-0.6, -0.03], [-2.0, -0.03], [-2.0, 0.03]] }],
+    side: [{ color: '#8E939B', points: [[0.8, 0.08], [0.8, 0.16], [-1.8, 0.16], [-1.8, 0.08]] }],
+  };
+}
+
+export const COMPARISON_LIVERIES = { gen2022: neutral('gen2022'), gen2026: neutral('gen2026') } as const;
+
 /**
  * Every livery, grouped by generation (oldest first). A livery is data: colors and flat shapes painted on one
  * generation's car model. Team names are the real ones; the paint is drawn from the best-known looks.
  */
-export const LIVERIES: readonly Livery[] = [FERRARI_2022, MERCEDES_2022, MCLAREN_2022, REDBULL_2022];
+export const LIVERIES: readonly Livery[] = [FERRARI_2022, MERCEDES_2022, MCLAREN_2022, REDBULL_2022, FERRARI_2026, MERCEDES_2026, MCLAREN_2026, REDBULL_2026];
 
 export const DEFAULT_LIVERY_ID = 'ferrari-2022';
 

@@ -1,13 +1,13 @@
 import * as THREE from 'three';
 
-import { GEN2022 } from '../../data/cars/gen2022';
+import { PAINT_BOX } from '../../data/cars/spec';
 import type { Livery, LiveryLayer } from '../../data/liveries';
 
 // A livery is a pair of flat pictures: one of the car seen from above, one seen from the side. The paint material looks
 // each surface point up in them by its position on the car (top picture for surfaces facing up, side picture for the
 // rest), so one set of flat shapes colors the whole body no matter how it is curved.
 
-const { xMin, xMax, zHalf, yMax } = GEN2022.paint;
+const { xMin, xMax, zHalf, yMax } = PAINT_BOX;
 const TOP_W = 1024;
 const TOP_H = 384;
 const SIDE_W = 1024;

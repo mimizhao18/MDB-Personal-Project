@@ -20,7 +20,8 @@ import { buyLivery, equipLivery, ownsLivery, setCarNumber } from '../src/logic/g
 import { normalizeProfile } from '../src/logic/profileMigration.ts';
 import { DEFAULT_LIVERY_ID, FREE_LIVERY_IDS, LIVERIES, MAX_CAR_NUMBER, MIN_CAR_NUMBER, RENAMED_LIVERY_IDS, getLivery } from '../src/data/liveries.ts';
 import { ERAS } from '../src/data/eras.ts';
-import { GEN2022 } from '../src/data/cars/gen2022.ts';
+import { specFor, GEN2022, GEN2026 } from '../src/data/cars/index.ts';
+import { specFacts } from '../src/data/cars/spec.ts';
 import { recentDays } from '../src/logic/history.ts';
 import { buildDemoData } from '../src/logic/demo.ts';
 import { colors, theme } from '../src/design/tokens.ts';
@@ -208,13 +209,13 @@ assert.equal(setCarNumber(gp, 100, 1, 99).ok, false);
 assert.equal(setCarNumber(gp, 4.5, 1, 99).ok, false);
 
 // the livery catalog
-assert.equal(LIVERIES.length, 4);
+assert.equal(LIVERIES.length, 8);
 assert.equal(new Set(LIVERIES.map((l) => l.id)).size, LIVERIES.length); // ids are unique
 assert.ok(LIVERIES.every((l) => /^#[0-9A-Fa-f]{6}$/.test(l.primary) && /^#[0-9A-Fa-f]{6}$/.test(l.secondary))); // the car shades #RRGGBB colors
 assert.ok(LIVERIES.every((l) => ERAS.some((e) => e.id === l.era && e.available))); // every livery belongs to a built generation
 assert.ok(LIVERIES.every((l) => l.top.length > 0 && l.side.length > 0)); // and has paint shapes to draw
 assert.ok(LIVERIES.every((l) => [...l.top, ...l.side].every((layer) => /^#[0-9A-Fa-f]{6}$/.test(layer.color) && layer.points.length >= 3)));
-assert.ok(LIVERIES.every((l) => l.sidepod in GEN2022.pods)); // each team's sidepod design exists
+assert.ok(LIVERIES.every((l) => l.sidepod in specFor(l.era).pods)); // each team's sidepod design exists on its generation's car
 assert.ok(LIVERIES.every((l) => Object.values(l.parts).every((c) => /^#[0-9A-Fa-f]{6}$/.test(c))));
 assert.ok(LIVERIES.every((l) => l.price >= 0 && Number.isInteger(l.price)));
 assert.ok(LIVERIES.every((l) => l.primary.toLowerCase() !== l.secondary.toLowerCase())); // the accent must show
@@ -323,3 +324,23 @@ assert.deepEqual(TRACK_LIST.map((t) => t.countryCode), ['GB', 'MC', 'BE']);
 assert.deepEqual(TRACK_LIST.map((t) => t.lapTimeSeconds), [90, 70, 100]);
 
 console.log('all rule checks passed');
+
+// the 2022 and 2026 cars differ in the ways the 2026 rules say they should
+const f22 = specFacts(GEN2022, 'downwash');
+const f26 = specFacts(GEN2026, 'compact');
+const close = (a, b) => Math.abs(a - b) < 0.0005;
+assert.ok(close(f22.wheelbase, 3.6) && close(f26.wheelbase, 3.4)); // 3600 mm vs 3400 mm
+assert.ok(close(f22.width, 2.0, ) || Math.abs(f22.width - 2.005) < 0.006); // about 2000 mm
+assert.ok(Math.abs(f26.width - 1.9) < 0.006); // about 1900 mm
+assert.ok(close(f22.frontWingWidth - f26.frontWingWidth, 0.1)); // the 2026 front wing is 100 mm narrower
+assert.ok(close(f22.frontTire - f26.frontTire, 0.025)); // front tires 25 mm narrower
+assert.ok(close(f22.rearTire - f26.rearTire, 0.03)); // rear tires 30 mm narrower
+assert.equal(GEN2022.wheels.front.radius, GEN2026.wheels.front.radius); // both on 18-inch wheels
+assert.equal(GEN2022.wheels.rear.radius, GEN2026.wheels.rear.radius);
+assert.ok(f26.podWidth < f22.podWidth); // slimmer sidepods
+assert.ok(Math.max(...GEN2026.floor.hw) < Math.max(...GEN2022.floor.hw)); // narrower floor
+assert.equal(GEN2026.rearWing.beam.length, 0); // no beam wing on the 2026 car
+assert.ok(GEN2022.rearWing.beam.length > 0); // the 2022 car keeps its
+assert.equal(GEN2026.frontWing.elements.length, 2); // a two-element front wing
+assert.ok(GEN2026.frontWing.elements.some((e) => e.active) && GEN2026.rearWing.elements.every((e) => e.active)); // active wings front and rear
+assert.ok(GEN2022.frontWing.elements.every((e) => !e.active) && GEN2022.rearWing.elements.every((e) => !e.active)); // the 2022 wings are fixed
