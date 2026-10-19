@@ -9,7 +9,7 @@ export const GEN1980S: CarSpec = {
   id: 'gen1980s',
   notes: { label: '1980s', frontWing: '2 elements, on the nose', rearWing: 'Tall single wing, big end plates' },
   halo: false,
-  wheelLook: { style: 'dish', coverRatio: 0.5, grooves: 0, rimColor: '#D4AF37' },
+  wheelLook: { style: 'dish', coverRatio: 0.5, grooves: 0, rimColor: '#34343A' },
   centreX: 0.3,
   paint: PAINT_BOX,
 

@@ -20,6 +20,7 @@ const FERRARI: Livery = {
   sidepod: 'hybrid',
   finish: 'gloss',
   parts: parts(CARBON, CARBON, CARBON),
+  frontParts: { wing: CARBON, flap: '#DC0000', endplate: '#DC0000' },
   top: [
     { color: BLACK, points: stripe(-1.4, L.tail - 0.05, 0.17) },
     { color: '#FFD800', points: ellipse(2.05, 0, 0.13, 0.09) },
