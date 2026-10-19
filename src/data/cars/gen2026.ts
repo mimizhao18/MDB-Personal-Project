@@ -104,7 +104,7 @@ export const GEN2026: CarSpec = {
     ],
   },
 
-  extras: { plates: [], wings: [], rods: [], boxes: [] },
+  extras: { plates: [], wings: [], rods: [], boxes: [{ size: [0.42, 0.18, 0.2], at: [-1.8, 0.33, 0], mirror: false, part: 'carbon' }] },
 
   details: {
     cockpit: { x: 0.5, rx: 0.42, rz: 0.18, y: 0.625, rimRx: 0.46, rimRz: 0.2 },

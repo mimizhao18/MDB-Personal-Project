@@ -192,6 +192,7 @@ export function buildModernCar(spec: CarSpec, livery: Livery, options: CarOption
     dark: new THREE.MeshStandardMaterial({ color: 0x050507, metalness: 0.1, roughness: 0.8 }),
     light: new THREE.MeshStandardMaterial({ color: 0xff2a2a, emissive: 0xff0000, emissiveIntensity: 1.2 }),
     rim: new THREE.MeshStandardMaterial({ color: spec.wheelLook.rimColor, metalness: 0.9, roughness: 0.35 }),
+    mark: new THREE.MeshStandardMaterial({ color: 0xe6e6e6, metalness: 0, roughness: 0.7 }),
   };
   const partMaterial = (part: ExtraPart): THREE.Material => (part === 'paint' ? paint : m[part]);
 
@@ -231,6 +232,11 @@ export function buildModernCar(spec: CarSpec, livery: Livery, options: CarOption
   cockpit.scale.set(ck.rx, 0.045, ck.rz);
   cockpit.position.set(ck.x, ck.y, 0);
   car.add(cockpit);
+  // the steering wheel and the dark seat back, so the cockpit is not an empty hole
+  const wheelRim = box(0.03, 0.09, 0.2, m.dark, ck.x + ck.rx * 0.55, ck.y + 0.07, 0);
+  wheelRim.rotation.z = -0.5;
+  car.add(wheelRim);
+  car.add(box(0.05, 0.12, ck.rz * 1.5, m.dark, ck.x - ck.rx * 0.65, ck.y + 0.08, 0));
   // the raised rim around the cockpit opening, in body paint
   const rimPoints = Array.from({ length: 28 }, (_, i) => {
     const a = (i / 28) * Math.PI * 2;

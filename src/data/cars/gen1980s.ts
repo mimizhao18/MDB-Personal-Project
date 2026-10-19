@@ -64,7 +64,7 @@ export const GEN1980S: CarSpec = {
 
   // a small wing on the nose
   frontWing: {
-    span: 0.9,
+    span: 0.95,
     sweep: 0.03,
     sweepPower: 1.4,
     concave: 0.01,
@@ -72,7 +72,7 @@ export const GEN1980S: CarSpec = {
       { x: 2.7, chord: 0.44, y: 0.08, rise: 0.02, angle: 5, dAngle: 2, camber: 0.04, from: 0, flap: false },
       { x: 2.46, chord: 0.3, y: 0.14, rise: 0.05, angle: 16, dAngle: 4, camber: 0.07, from: 0.1, flap: true },
     ],
-    endplate: [[2.7, 0.06], [2.7, 0.3], [2.45, 0.36], [2.0, 0.38], [1.98, 0.22], [2.1, 0.08]],
+    endplate: [[2.72, 0.06], [2.72, 0.34], [2.45, 0.42], [1.98, 0.44], [1.96, 0.24], [2.1, 0.08]],
     footplate: null,
     vanes: false,
     pylons: false,

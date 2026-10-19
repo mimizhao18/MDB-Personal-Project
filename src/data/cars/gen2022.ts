@@ -118,7 +118,16 @@ export const GEN2022: CarSpec = {
     ],
   },
 
-  extras: { plates: [], wings: [], rods: [], boxes: [] },
+  // small cascade winglets on top of the front wing end plates
+  extras: {
+    plates: [],
+    wings: [
+      { x: 2.5, y: 0.34, chord: 0.12, angle: 12, camber: 0.05, span: 0.97, from: 0.78, part: 'carbon' },
+      { x: 2.42, y: 0.42, chord: 0.1, angle: 16, camber: 0.05, span: 0.97, from: 0.84, part: 'carbon' },
+    ],
+    rods: [],
+    boxes: [{ size: [0.5, 0.2, 0.22], at: [-1.95, 0.33, 0], mirror: false, part: 'carbon' }],
+  },
 
   details: {
     cockpit: { x: 0.5, rx: 0.42, rz: 0.18, y: 0.625, rimRx: 0.46, rimRz: 0.2 },

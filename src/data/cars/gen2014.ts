@@ -106,11 +106,14 @@ export const GEN2014: CarSpec = {
     ],
     // the T-wing on top of the shark fin
     wings: [
+      { x: 2.5, y: 0.42, chord: 0.13, angle: 12, camber: 0.05, span: 0.97, from: 0.7, part: 'carbon' },
+      { x: 2.4, y: 0.5, chord: 0.11, angle: 16, camber: 0.05, span: 0.97, from: 0.78, part: 'carbon' },
+      { x: 2.3, y: 0.56, chord: 0.09, angle: 20, camber: 0.05, span: 0.96, from: 0.84, part: 'carbon' },
       { x: -1.88, y: 0.94, chord: 0.13, angle: 6, camber: 0.05, span: 0.27, from: 0, part: 'carbon' },
       { x: -1.9, y: 1.02, chord: 0.1, angle: 10, camber: 0.05, span: 0.22, from: 0, part: 'carbon' },
     ],
     rods: [],
-    boxes: [],
+    boxes: [{ size: [0.5, 0.2, 0.22], at: [-2.0, 0.33, 0], mirror: false, part: 'carbon' }],
   },
 
   details: {

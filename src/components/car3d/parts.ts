@@ -211,6 +211,7 @@ export interface WheelMaterials {
   band: THREE.Material;
   rim: THREE.Material;
   dark: THREE.Material;
+  mark: THREE.Material;
 }
 
 export interface WheelLook {
@@ -280,8 +281,15 @@ export function buildWheel(radius: number, width: number, side: 1 | -1, m: Wheel
   // a colored ring around the wheel nut
   faceRing(0.05, 0.078, m.band, 0.005);
 
-  // the tire-compound band on the sidewall
+  // the tire-compound band on the sidewall, and the tire maker's lettering (short white dashes) around part of it
   faceRing(radius * 0.74, radius * 0.81, m.band, 0.002);
+  const textR = Math.max(0.64, look.coverRatio + 0.07) * radius;
+  for (let i = 0; i < 14; i++) {
+    const dash = new THREE.Mesh(new THREE.RingGeometry(textR, textR + radius * 0.035, 4, 1, 0.5 + i * 0.115, 0.07), m.mark);
+    dash.position.z = face + side * 0.003;
+    if (side < 0) dash.rotation.y = Math.PI;
+    wheel.add(dash);
+  }
 
   // brake duct fairing on the inside of the wheel
   const duct = new THREE.Mesh(new THREE.CylinderGeometry(radius * 0.46, radius * 0.46, 0.11, 24), m.carbon);
