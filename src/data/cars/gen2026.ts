@@ -71,17 +71,18 @@ export const GEN2026: CarSpec = {
   },
 
   // Two elements: a fixed main plane and an active flap in three sections. A less swept, flatter, narrower wing
-  // (1.9 m instead of 2.0) with small plain end plates.
+  // (1.76 m instead of 2.0, about as wide as the front tires' outer edges, its tips swept back and curved up) with
+  // small plain end plates.
   frontWing: {
-    span: 0.95,
-    sweep: 0.14,
-    sweepPower: 1.4,
-    concave: 0.04,
+    span: 0.88,
+    sweep: 0.3,
+    sweepPower: 2.1,
+    concave: 0.07,
     elements: [
-      { x: 2.8, chord: 0.3, y: 0.06, rise: 0.03, angle: 2, dAngle: 2, camber: 0.03, from: 0, flap: false },
-      { x: 2.6, chord: 0.26, y: 0.115, rise: 0.05, angle: 24, dAngle: 6, camber: 0.08, from: 0.08, flap: true, active: true, straightAngle: 3, sections: 3 },
+      { x: 2.8, chord: 0.3, y: 0.055, rise: 0.065, angle: 2, dAngle: 3, camber: 0.03, from: 0, flap: false },
+      { x: 2.6, chord: 0.26, y: 0.115, rise: 0.105, angle: 22, dAngle: 9, camber: 0.09, from: 0.08, flap: true, active: true, straightAngle: 3, sections: 3 },
     ],
-    endplate: [[2.66, 0.05], [2.67, 0.12], [2.55, 0.19], [2.35, 0.24], [2.2, 0.25], [2.19, 0.19], [2.26, 0.1], [2.4, 0.06]],
+    endplate: [[2.58, 0.05], [2.59, 0.14], [2.48, 0.23], [2.3, 0.3], [2.12, 0.32], [2.08, 0.23], [2.14, 0.11], [2.3, 0.06]],
     footplate: null,
     vanes: false,
     pylons: true, // the raised nose is held clear of the wing on two pylons

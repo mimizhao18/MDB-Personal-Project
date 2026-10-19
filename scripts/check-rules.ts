@@ -332,7 +332,7 @@ const close = (a, b) => Math.abs(a - b) < 0.0005;
 assert.ok(close(f22.wheelbase, 3.6) && close(f26.wheelbase, 3.4)); // 3600 mm vs 3400 mm
 assert.ok(close(f22.width, 2.0, ) || Math.abs(f22.width - 2.005) < 0.006); // about 2000 mm
 assert.ok(Math.abs(f26.width - 1.9) < 0.006); // about 1900 mm
-assert.ok(close(f22.frontWingWidth - f26.frontWingWidth, 0.1)); // the 2026 front wing is 100 mm narrower
+assert.ok(close(f22.frontWingWidth - f26.frontWingWidth, 0.24)); // the 2026 front wing is narrower, about as wide as the front tires
 assert.ok(close(f22.frontTire - f26.frontTire, 0.025)); // front tires 25 mm narrower
 assert.ok(close(f22.rearTire - f26.rearTire, 0.03)); // rear tires 30 mm narrower
 assert.equal(GEN2022.wheels.front.radius, GEN2026.wheels.front.radius); // both on 18-inch wheels
