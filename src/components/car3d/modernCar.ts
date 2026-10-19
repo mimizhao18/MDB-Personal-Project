@@ -14,18 +14,31 @@ import { arm, box, buildWheel, loftGeometry, plateGeometry, range, rod, wingGeom
 
 const DEG = Math.PI / 180;
 
+/** What a generation's own body builder gets: the car to add parts to, and the materials to make them from. */
+export interface BodyContext {
+  car: THREE.Group;
+  spec: CarSpec;
+  livery: Livery;
+  /** The body paint (colored by the livery pictures, by position). */
+  paint: THREE.Material;
+  /** The plain materials: carbon, dark, metal, floor, light, mark and so on. */
+  m: Record<string, THREE.Material>;
+}
+
 export interface CarOptions {
   /** Cornering (the default, high downforce) or straight (low drag): only cars with active wings change. */
   aero?: AeroMode;
+  /** Builds the body (monocoque, sidepods, floor, cockpit) in place of the generic ground-effect body. The wings, wheels and extras are still added from the spec. */
+  body?: (context: BodyContext) => void;
 }
 
 /** The floor outline on the right side, as [x, half width], front to back. */
-function floorEdge(spec: CarSpec, steps = 44): [number, number][] {
+export function floorEdge(spec: CarSpec, steps = 44): [number, number][] {
   return Array.from({ length: steps + 1 }, (_, i) => [spline(spec.floor.x, i / steps), spline(spec.floor.hw, i / steps)] as [number, number]);
 }
 
 /** The flat floor plank: widest beside the sidepods, tapering to the front and back, inside the wheels. */
-function floorGeometry(spec: CarSpec): THREE.BufferGeometry {
+export function floorGeometry(spec: CarSpec): THREE.BufferGeometry {
   const right = floorEdge(spec).map(([x, hw]) => new THREE.Vector2(x, hw));
   const left = right.map((p) => new THREE.Vector2(p.x, -p.y)).reverse();
   const geometry = new THREE.ExtrudeGeometry(new THREE.Shape([...right, ...left]), { depth: spec.floor.thickness, bevelEnabled: false });
@@ -35,7 +48,7 @@ function floorGeometry(spec: CarSpec): THREE.BufferGeometry {
 }
 
 /** The curled-up edge along the side of the floor (the "edge wing"), for one side. */
-function floorEdgeWingGeometry(spec: CarSpec, side: 1 | -1): THREE.BufferGeometry {
+export function floorEdgeWingGeometry(spec: CarSpec, side: 1 | -1): THREE.BufferGeometry {
   const w = spec.edgeWing;
   const points = floorEdge(spec).filter(([x]) => x < w.xFront && x > w.xBack);
   const positions: number[] = [];
@@ -57,10 +70,10 @@ function floorEdgeWingGeometry(spec: CarSpec, side: 1 | -1): THREE.BufferGeometr
 }
 
 /** Height of the diffuser's upper surface at `s` (0 at the front of it, 1 at the very back). */
-const diffuserY = (spec: CarSpec, s: number) => spec.floor.y + spec.floor.thickness + spec.diffuser.rise * Math.pow(s, 1.7);
+export const diffuserY = (spec: CarSpec, s: number) => spec.floor.y + spec.floor.thickness + spec.diffuser.rise * Math.pow(s, 1.7);
 
 /** The diffuser: the floor sweeping up and back into the air between the rear wheels. */
-function diffuserGeometry(spec: CarSpec): THREE.BufferGeometry {
+export function diffuserGeometry(spec: CarSpec): THREE.BufferGeometry {
   const { xStart, xEnd, hw } = spec.diffuser;
   const columns = 14;
   const rows = 10;
@@ -86,7 +99,7 @@ function diffuserGeometry(spec: CarSpec): THREE.BufferGeometry {
 }
 
 /** A thin vertical fin in the diffuser, following its curve. */
-function diffuserStrake(spec: CarSpec, z: number): THREE.BufferGeometry {
+export function diffuserStrake(spec: CarSpec, z: number): THREE.BufferGeometry {
   const { xStart, xEnd } = spec.diffuser;
   const steps = 10;
   const lower: [number, number][] = [];
@@ -101,13 +114,13 @@ function diffuserStrake(spec: CarSpec, z: number): THREE.BufferGeometry {
 }
 
 /** How dark a #RRGGBB color is, 0 (black) to 1. */
-function lightness(hex: string): number {
+export function lightness(hex: string): number {
   const n = parseInt(hex.slice(1), 16);
   return (0.2126 * ((n >> 16) & 255) + 0.7152 * ((n >> 8) & 255) + 0.0722 * (n & 255)) / 255;
 }
 
 /** Where the side of the spine is at height `y` and distance `x` along the car (to sit small details on its surface). */
-function spineSurfaceZ(spec: CarSpec, x: number, y: number): number {
+export function spineSurfaceZ(spec: CarSpec, x: number, y: number): number {
   const S = spec.spine;
   let best = 0;
   let bestDistance = Infinity;
@@ -127,7 +140,7 @@ function spineSurfaceZ(spec: CarSpec, x: number, y: number): number {
 }
 
 /** A thin dark strip along the outside of a sidepod at height `y`, from its inlet back a short way. */
-function flankLine(sp: PodShape, y: number, side: 1 | -1): THREE.BufferGeometry {
+export function flankLine(sp: PodShape, y: number, side: 1 | -1): THREE.BufferGeometry {
   const samples: [number, number][] = [];
   for (let i = 0; i <= 120; i++) {
     const x = spline(sp.x, i / 120);
@@ -226,6 +239,9 @@ export function buildModernCar(spec: CarSpec, livery: Livery, options: CarOption
     return new THREE.MeshPhysicalMaterial({ map: texture, metalness: 0.2, roughness: matte ? 0.55 : 0.35, clearcoat: matte ? 0.1 : 0.8, clearcoatRoughness: 0.15, side: THREE.DoubleSide });
   };
 
+  if (options.body) {
+    options.body({ car, spec, livery, paint, m });
+  } else {
   // ---- bodywork: nose, cockpit, airbox and engine cover are one smooth surface ----
   car.add(new THREE.Mesh(loftGeometry(spec.spine, { rings: 110, sides: 36, squareness: 0.76 }), paint));
   // the shoulder that fills in the space between the airbox and the sidepods
@@ -315,6 +331,7 @@ export function buildModernCar(spec: CarSpec, livery: Livery, options: CarOption
   exhaust.rotation.z = Math.PI / 2;
   exhaust.position.set(spec.details.exhaust[0], spec.details.exhaust[1], 0);
   car.add(exhaust);
+  }
 
   // ---- front wing ----
   const fw = spec.frontWing;
@@ -382,7 +399,7 @@ export function buildModernCar(spec: CarSpec, livery: Livery, options: CarOption
 
   // ---- halo: a short pillar up from the nose cowl, then two arms running almost straight back over the driver
   // to land on the airbox hump behind the cockpit (cars from 2018 on) ----
-  if (spec.halo) {
+  if (spec.halo && !options.body) {
     const front = new THREE.CatmullRomCurve3([new THREE.Vector3(0.98, 0.6, 0), new THREE.Vector3(0.93, 0.72, 0), new THREE.Vector3(0.84, 0.8, 0)]);
     car.add(new THREE.Mesh(new THREE.TubeGeometry(front, 16, 0.03, 8), paint));
     for (const side of [1, -1] as const) {
