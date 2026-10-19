@@ -11,13 +11,13 @@ import type { Livery } from '../data/liveries';
 import { makeStyles } from '../design/styles';
 import { ownsLivery } from '../logic/garage';
 import { Credits } from '../ui/Credits';
-import { Button, Card, Chips, Segmented } from '../ui/kit';
+import { Button, Card, Chips, SortRow } from '../ui/kit';
 import { useGarage } from '../ui/useGarage';
 
 type Filter = 'all' | 'affordable' | EraId;
 type Sort = 'era' | 'low' | 'high';
 const SORTS: readonly Sort[] = ['era', 'low', 'high'];
-const SORT_LABELS: Record<Sort, string> = { era: 'By generation', low: 'Price: low', high: 'Price: high' };
+const SORT_LABELS: Record<Sort, string> = { era: 'Generation', low: 'Price ↑', high: 'Price ↓' };
 
 const useStyles = makeStyles((t) => ({
   container: { flex: 1 },
@@ -78,7 +78,7 @@ export default function StoreScreen() {
         ) : (
           <>
             <Chips options={filterOptions} value={filter} onChange={setFilter} labelFor={labelFor} countFor={countFor} />
-            <Segmented options={SORTS} value={sort} onChange={setSort} labelFor={(s) => SORT_LABELS[s]} />
+            <SortRow options={SORTS} value={sort} onChange={setSort} labelFor={(s) => SORT_LABELS[s]} />
 
             {shown.length === 0 ? (
               <View style={styles.empty}>
