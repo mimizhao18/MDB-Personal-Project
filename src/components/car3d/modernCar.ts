@@ -4,7 +4,7 @@ import { spline } from '../../data/cars/spline';
 import { frontWingSection, rearWingSection } from '../../data/cars/spec';
 import type { AeroMode, CarSpec, ExtraPart, PodShape } from '../../data/cars/spec';
 import type { Livery } from '../../data/liveries';
-import { applyCarbonWeave, applyLiveryPaint, buildLiveryPictures } from './paint';
+import { applyCarbonWeave, applyLiveryPaint, buildLiveryPictures, disposePictures } from './paint';
 import { arm, box, buildWheel, loftGeometry, plateGeometry, range, rod, wingGeometry } from './parts';
 
 // A modern ground-effect-era car (2022, 2026) built from its measurements (src/data/cars): one smooth surface for the
@@ -421,8 +421,7 @@ export function buildModernCar(spec: CarSpec, livery: Livery, options: CarOption
   }
 
   car.userData.dispose = () => {
-    pictures.top.dispose();
-    pictures.side.dispose();
+    disposePictures(pictures);
     car.traverse((object) => {
       if (object instanceof THREE.Mesh) object.geometry.dispose();
     });

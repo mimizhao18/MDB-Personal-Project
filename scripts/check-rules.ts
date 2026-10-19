@@ -209,7 +209,7 @@ assert.equal(setCarNumber(gp, 100, 1, 99).ok, false);
 assert.equal(setCarNumber(gp, 4.5, 1, 99).ok, false);
 
 // the livery catalog
-assert.equal(LIVERIES.length, 20);
+assert.equal(LIVERIES.length, 42);
 assert.equal(new Set(LIVERIES.map((l) => l.id)).size, LIVERIES.length); // ids are unique
 assert.ok(LIVERIES.every((l) => /^#[0-9A-Fa-f]{6}$/.test(l.primary) && /^#[0-9A-Fa-f]{6}$/.test(l.secondary))); // the car shades #RRGGBB colors
 assert.ok(LIVERIES.every((l) => ERAS.some((e) => e.id === l.era && e.available))); // every livery belongs to a built generation

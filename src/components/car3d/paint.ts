@@ -1,17 +1,18 @@
 import * as THREE from 'three';
 
 import { PAINT_BOX } from '../../data/cars/spec';
-import type { Livery, LiveryLayer } from '../../data/liveries';
+import type { Livery, LiveryLayer, LiveryText } from '../../data/liveries';
+import { GLYPH_HEIGHT, GLYPH_WIDTH, glyphRows } from './font';
 
 // A livery is a pair of flat pictures: one of the car seen from above, one seen from the side. The paint material looks
 // each surface point up in them by its position on the car (top picture for surfaces facing up, side picture for the
 // rest), so one set of flat shapes colors the whole body no matter how it is curved.
 
 const { xMin, xMax, zHalf, yMax } = PAINT_BOX;
-const TOP_W = 1024;
-const TOP_H = 384;
-const SIDE_W = 1024;
-const SIDE_H = 224;
+const TOP_W = 1536;
+const TOP_H = 576;
+const SIDE_W = 1536;
+const SIDE_H = 336;
 const SUBSAMPLES = 4;
 
 type Rgb = [number, number, number];
@@ -68,7 +69,10 @@ function fillPolygon(data: Uint8Array, width: number, height: number, points: re
   }
 }
 
-function paintPicture(width: number, height: number, base: Rgb, layers: readonly LiveryLayer[], toPixel: (a: number, b: number) => [number, number]): THREE.DataTexture {
+type ToPixel = (a: number, b: number) => [number, number];
+
+/** A flat picture: the base color with the livery's shapes filled in (no lettering yet). */
+function paintShapes(width: number, height: number, base: Rgb, layers: readonly LiveryLayer[], toPixel: ToPixel): Uint8Array {
   const data = new Uint8Array(width * height * 4);
   for (let i = 0; i < width * height; i++) {
     data[i * 4] = base[0];
@@ -79,6 +83,38 @@ function paintPicture(width: number, height: number, base: Rgb, layers: readonly
   for (const layer of layers) {
     fillPolygon(data, width, height, layer.points.map(([a, b]) => toPixel(a, b)), hexToRgb(layer.color));
   }
+  return data;
+}
+
+/**
+ * Letters one piece of text onto a picture. `view` says which way is up for the letters: in the top picture the car's
+ * right side is down; in the side picture up is up. `mirror` draws it back to front, for the picture seen from the
+ * other side of the car, so the letters read the right way round from both sides.
+ */
+function drawText(data: Uint8Array, width: number, height: number, toPixel: ToPixel, t: LiveryText, mirror: boolean): void {
+  const text = t.text;
+  const p = t.height / GLYPH_HEIGHT; // the size of one font pixel, in metres
+  const advance = (GLYPH_WIDTH + 1) * p + (t.spacing ?? 0);
+  const length = text.length * advance - p;
+  const start = t.align === 'center' ? t.x - length / 2 : t.align === 'right' ? t.x - length : t.x;
+  const rgb = hexToRgb(t.color);
+  for (let i = 0; i < text.length; i++) {
+    const slot = mirror ? text.length - 1 - i : i;
+    const rows = glyphRows(text[i]);
+    for (let r = 0; r < GLYPH_HEIGHT; r++) {
+      for (let c = 0; c < GLYPH_WIDTH; c++) {
+        const col = mirror ? GLYPH_WIDTH - 1 - c : c;
+        if (!((rows[r] >> (GLYPH_WIDTH - 1 - col)) & 1)) continue;
+        const x0 = start + slot * advance + c * p;
+        // top view: the glyph's top row is toward -z; side view: toward +y
+        const lo = t.view === 'top' ? t.y - t.height / 2 + r * p : t.y + t.height / 2 - (r + 1) * p;
+        fillPolygon(data, width, height, [toPixel(x0, lo), toPixel(x0 + p, lo), toPixel(x0 + p, lo + p), toPixel(x0, lo + p)], rgb);
+      }
+    }
+  }
+}
+
+function toTexture(data: Uint8Array, width: number, height: number): THREE.DataTexture {
   const texture = new THREE.DataTexture(data, width, height, THREE.RGBAFormat);
   texture.colorSpace = THREE.SRGBColorSpace;
   texture.wrapS = THREE.ClampToEdgeWrapping;
@@ -92,15 +128,33 @@ function paintPicture(width: number, height: number, base: Rgb, layers: readonly
 
 export interface LiveryPictures {
   top: THREE.DataTexture;
+  /** The picture for the right side of the car, and the same for the left with its lettering turned round. */
   side: THREE.DataTexture;
+  sideLeft: THREE.DataTexture;
 }
 
-/** Draws the livery's top and side pictures. Free them with `.dispose()` when the car is no longer needed. */
+/** Draws the livery's pictures. Free them with `disposePictures` when the car is no longer needed. */
 export function buildLiveryPictures(livery: Livery): LiveryPictures {
   const base = hexToRgb(livery.primary);
-  const top = paintPicture(TOP_W, TOP_H, base, livery.top, (x, z) => [((x - xMin) / (xMax - xMin)) * TOP_W, ((z + zHalf) / (2 * zHalf)) * TOP_H]);
-  const side = paintPicture(SIDE_W, SIDE_H, base, livery.side, (x, y) => [((x - xMin) / (xMax - xMin)) * SIDE_W, (y / yMax) * SIDE_H]);
-  return { top, side };
+  const topPixel: ToPixel = (x, z) => [((x - xMin) / (xMax - xMin)) * TOP_W, ((z + zHalf) / (2 * zHalf)) * TOP_H];
+  const sidePixel: ToPixel = (x, y) => [((x - xMin) / (xMax - xMin)) * SIDE_W, (y / yMax) * SIDE_H];
+  const topData = paintShapes(TOP_W, TOP_H, base, livery.top, topPixel);
+  const sideData = paintShapes(SIDE_W, SIDE_H, base, livery.side, sidePixel);
+  const sideLeftData = sideData.slice();
+  for (const t of livery.texts ?? []) {
+    if (t.view === 'top') drawText(topData, TOP_W, TOP_H, topPixel, t, false);
+    else {
+      drawText(sideData, SIDE_W, SIDE_H, sidePixel, t, false);
+      drawText(sideLeftData, SIDE_W, SIDE_H, sidePixel, t, true);
+    }
+  }
+  return { top: toTexture(topData, TOP_W, TOP_H), side: toTexture(sideData, SIDE_W, SIDE_H), sideLeft: toTexture(sideLeftData, SIDE_W, SIDE_H) };
+}
+
+export function disposePictures(pictures: LiveryPictures): void {
+  pictures.top.dispose();
+  pictures.side.dispose();
+  pictures.sideLeft.dispose();
 }
 
 /**
@@ -111,6 +165,7 @@ export function applyLiveryPaint(material: THREE.MeshPhysicalMaterial, pictures:
   material.onBeforeCompile = (shader) => {
     shader.uniforms.uPaintTop = { value: pictures.top };
     shader.uniforms.uPaintSide = { value: pictures.side };
+    shader.uniforms.uPaintSideLeft = { value: pictures.sideLeft };
     shader.uniforms.uPaintBox = { value: new THREE.Vector4(xMin, xMax - xMin, zHalf, yMax) };
     shader.vertexShader = shader.vertexShader
       .replace('#include <common>', '#include <common>\nvarying vec3 vPaintPos;\nvarying vec3 vPaintNormal;')
@@ -118,17 +173,18 @@ export function applyLiveryPaint(material: THREE.MeshPhysicalMaterial, pictures:
     shader.fragmentShader = shader.fragmentShader
       .replace(
         '#include <common>',
-        '#include <common>\nvarying vec3 vPaintPos;\nvarying vec3 vPaintNormal;\nuniform sampler2D uPaintTop;\nuniform sampler2D uPaintSide;\nuniform vec4 uPaintBox;',
+        '#include <common>\nvarying vec3 vPaintPos;\nvarying vec3 vPaintNormal;\nuniform sampler2D uPaintTop;\nuniform sampler2D uPaintSide;\nuniform sampler2D uPaintSideLeft;\nuniform vec4 uPaintBox;',
       )
       .replace(
         '#include <map_fragment>',
         `float paintTopWeight = smoothstep(0.5, 0.85, abs(normalize(vPaintNormal).y));
 vec2 paintUvTop = vec2((vPaintPos.x - uPaintBox.x) / uPaintBox.y, (vPaintPos.z + uPaintBox.z) / (2.0 * uPaintBox.z));
 vec2 paintUvSide = vec2((vPaintPos.x - uPaintBox.x) / uPaintBox.y, vPaintPos.y / uPaintBox.w);
-diffuseColor.rgb *= mix(texture2D(uPaintSide, paintUvSide).rgb, texture2D(uPaintTop, paintUvTop).rgb, paintTopWeight);`,
+vec3 paintSide = vPaintPos.z >= 0.0 ? texture2D(uPaintSide, paintUvSide).rgb : texture2D(uPaintSideLeft, paintUvSide).rgb;
+diffuseColor.rgb *= mix(paintSide, texture2D(uPaintTop, paintUvTop).rgb, paintTopWeight);`,
       );
   };
-  material.customProgramCacheKey = () => 'livery-paint-v1';
+  material.customProgramCacheKey = () => 'livery-paint-v2';
 }
 
 /**
