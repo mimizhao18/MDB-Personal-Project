@@ -13,13 +13,13 @@ const FERRARI: Livery = {
   id: 'ferrari-2014',
   name: 'Ferrari',
   era: 'gen2014',
-  team: 'Scuderia Ferrari Mission Winnow',
+  team: 'Scuderia Ferrari',
   price: 50,
   primary: '#DC0000',
   secondary: '#FFFFFF',
   sidepod: 'hybrid',
   finish: 'gloss',
-  parts: parts(CARBON, CARBON, '#DC0000'),
+  parts: parts(CARBON, CARBON, CARBON),
   top: [
     { color: BLACK, points: stripe(-1.4, L.tail - 0.05, 0.17) },
     { color: '#FFD800', points: ellipse(2.05, 0, 0.13, 0.09) },
@@ -27,19 +27,20 @@ const FERRARI: Livery = {
   ],
   side: [
     { color: BLACK, points: flank(1.0, -2.1, 0.06, 0.2) },
-    { color: '#FFD800', points: ellipse(0.15, mid + 0.05, 0.16, 0.12) },
+    { color: '#FFD800', points: ellipse(0.45, mid + 0.05, 0.15, 0.12) },
   ],
   texts: [
     topText('SHELL', 2.05, 0, 0.05, '#DC0000'),
-    topText('MAHLE', 1.55, 0, 0.05, WHITE),
-    sideText('SHELL', 0.15, mid + 0.05, 0.055, '#DC0000'),
-    sideText('SANTANDER', -0.55, mid + 0.14, 0.09, WHITE),
-    sideText('RICHARD MILLE', -1.35, 0.6, 0.045, WHITE),
-    sideText('PIRELLI', 0.55, mid + 0.18, 0.05, WHITE),
-    sideText('MISSION WINNOW', -0.55, mid - 0.04, 0.04, WHITE),
-    wingText('MISSION WINNOW', -2.3, 0, 0.06, WHITE),
+    topText('MAHLE', 1.6, 0, 0.05, WHITE),
+    topText('PALANTIR', 1.3, 0, 0.04, WHITE),
+    sideText('SHELL', 0.45, mid + 0.05, 0.055, '#DC0000'),
+    sideText('CEVA', 0.05, mid + 0.14, 0.07, WHITE),
+    sideText('RAY-BAN', -0.55, mid + 0.04, 0.12, WHITE),
+    sideText('SANTANDER', -1.15, mid + 0.2, 0.075, WHITE),
+    sideText('RICHARD MILLE', 1.25, 0.34, 0.045, WHITE),
+    sideText('PIRELLI', 0.8, mid + 0.18, 0.05, WHITE),
   ],
-  plateTexts: { rear: [plateText('SHELL V-POWER', -2.35, 0.78, 0.05, WHITE)] },
+  plateTexts: { rear: [plateText('V-POWER', -2.35, 0.82, 0.08, WHITE), plateText('VELAS', -2.35, 0.66, 0.08, WHITE)] },
 };
 
 const MERCEDES: Livery = {
@@ -118,7 +119,7 @@ const REDBULL: Livery = {
   parts: parts('#16192E', '#E4002B', '#16192E'),
   top: [
     // yellow nose, a yellow airbox with a red flame, red flames across the sidepods and engine cover
-    { color: '#FFC400', points: noseCapShape(2.0, 2.85, 0.1) },
+    { color: '#FFC400', points: noseCapShape(1.5, 2.85, 0.12) },
     { color: '#FFC400', points: stripe(0.06, -0.8, 0.14) },
     ...both('#E4002B', [[0.9, 0.3], [0.5, 0.45], [0.0, 0.7], [-0.6, 0.6], [-1.2, 0.3], [-0.6, 0.45], [0.0, 0.5], [0.5, 0.3]]),
     { color: '#E4002B', points: stripe(-0.9, -2.3, 0.07) },
@@ -127,16 +128,20 @@ const REDBULL: Livery = {
     { color: '#FFC400', points: flank(0.06, -0.8, 0.9, ABOX_Y[1]) },
     { color: '#FF7A00', points: ellipse(-0.35, 0.86, 0.25, 0.09) },
     { color: '#E4002B', points: flank(1.0, -2.1, 0.08, 0.16) },
+    // the nose side is yellow-orange with the red bull across it
+    { color: '#FFB000', points: flank(1.0, 2.5, 0.18, 0.4) },
+    { color: '#E4002B', points: ellipse(1.75, 0.3, 0.3, 0.09) },
   ],
   texts: [
     sideText('ASTON MARTIN', -0.45, mid + 0.1, 0.075, WHITE),
     sideText('TAG HEUER', 0.5, mid + 0.04, 0.055, '#FFD100'),
     sideText('INFINITI', -1.35, 0.58, 0.05, WHITE),
     sideText('PIRELLI', 0.7, 0.55, 0.045, WHITE),
+    sideText('RAUCH', 0.75, mid + 0.12, 0.06, '#FF7A00'),
     topText('RED BULL', 1.6, 0, 0.06, '#E4002B'),
     wingText('ASTON MARTIN', -2.3, 0, 0.07, WHITE),
   ],
-  plateTexts: { front: [plateText('MOBIL 1', 2.35, 0.3, 0.07, WHITE)], rear: [plateText('RED BULL', -2.35, 0.78, 0.07, WHITE)] },
+  plateTexts: { front: [plateText('CLARO', 2.35, 0.3, 0.07, WHITE)], rear: [plateText('RED BULL', -2.35, 0.78, 0.07, WHITE)] },
 };
 
 const FORCEINDIA: Livery = {

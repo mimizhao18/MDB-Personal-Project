@@ -126,18 +126,25 @@ const REDBULL: Livery = {
   parts: parts('#1C2B5E', '#E4002B', '#1C2B5E'),
   top: [
     // yellow nose and airbox, red sweep across the top of the sidepods, red stripe on the engine cover
-    { color: '#FFC400', points: noseCapShape(2.3, 2.92, 0.09) },
-    { color: '#FFC400', points: stripe(0.06, -0.8, 0.14) },
+    { color: '#FFB000', points: noseCapShape(1.7, 2.92, 0.12) },
+    { color: '#FF8A00', points: stripe(0.1, -1.1, 0.19) },
+    { color: '#E4002B', points: stripe(-0.2, -0.9, 0.05) },
     ...both('#E4002B', [[0.9, 0.3], [0.7, 0.58], [0.3, 0.7], [-0.3, 0.7], [-0.9, 0.54], [-0.3, 0.5], [0.3, 0.54], [0.7, 0.4]]),
     { color: '#E4002B', points: stripe(-1.0, L.tail - 0.05, 0.04) },
   ],
   side: [
-    { color: '#FFC400', points: flank(AIRBOX[0], -0.8, 0.9, ABOX_Y[1]) },
-    { color: '#FF7A00', points: ellipse(-0.35, 0.86, 0.25, 0.09) },
+    { color: '#FF8A00', points: [[0.1, 0.72], [0.1, 1.06], [-1.2, 0.96], [-1.2, 0.62], [-0.6, 0.66]] },
+    { color: '#E4002B', points: [[0.0, 0.86], [-0.5, 0.9], [-0.95, 0.78], [-0.6, 0.72], [-0.2, 0.74]] },
+    { color: '#FFB000', points: [[1.0, 0.2], [1.0, 0.4], [2.6, 0.3], [2.6, 0.16]] },
+    { color: '#FFC400', points: ellipse(0.85, 0.2, 0.12, 0.05) },
     { color: '#E4002B', points: flank(0.95, -2.05, 0.07, 0.13) },
   ],
   texts: [
-    sideText('RED BULL', -0.35, 0.86, 0.055, '#E4002B'),
+    sideText('RED BULL', -1.0, 0.5, 0.07, '#E4002B'),
+    sideText('BYBIT', 0.6, 0.6, 0.045, WHITE),
+    sideText('CITRIX', 0.05, 0.72, 0.035, WHITE),
+    sideText('ESSO', 1.75, 0.22, 0.05, WHITE),
+    sideText('RAUCH', 0.85, 0.2, 0.04, '#1C2B5E'),
     sideText('ORACLE', -0.35, mid + 0.04, 0.15, WHITE),
     sideText('MOBIL 1', -1.45, 0.6, 0.05, WHITE),
     sideText('TAG HEUER', 0.55, mid + 0.18, 0.045, '#FFD100'),
@@ -156,12 +163,12 @@ const ALPINE: Livery = {
   era: 'gen2022',
   team: 'BWT Alpine F1 Team',
   price: 120,
-  primary: '#2293D1',
+  primary: '#1F4DBF',
   secondary: '#F5A0D0',
   glow: '#F5A0D0',
   sidepod: 'downwash',
   finish: 'gloss',
-  parts: parts(BLACK, BLACK, BLACK),
+  parts: parts(BLACK, '#E9A3C8', BLACK),
   top: [
     // black engine cover tail, a pink panel on the sidepods
     { color: BLACK, points: stripe(-1.2, L.tail - 0.1, 0.19) },
@@ -172,13 +179,16 @@ const ALPINE: Livery = {
     // the lower body is black, with the pink panel above it
     { color: BLACK, points: flank(0.95, -2.05, 0.06, 0.2) },
     { color: '#F5A0D0', points: [[0.7, 0.2], [0.7, 0.46], [-0.3, 0.46], [-0.9, 0.3], [-0.9, 0.2]] },
+    // the red MAPFRE box on the front of the sidepod and the Castrol badge on the airbox
+    { color: '#D81E2B', points: [[1.15, 0.32], [1.15, 0.42], [0.65, 0.42], [0.65, 0.32]] },
+    { color: WHITE, points: [[-0.1, 0.86], [-0.1, 0.94], [-0.6, 0.94], [-0.6, 0.86]] },
   ],
   texts: [
     sideText('BWT', -0.1, mid - 0.0, 0.18, '#0A5ADB'),
-    sideText('CASTROL', -0.35, 0.9, 0.05, WHITE),
-    sideText('MAPFRE', 0.85, 0.35, 0.04, WHITE),
+    sideText('CASTROL', -0.35, 0.9, 0.05, '#00A651'),
+    sideText('MAPFRE', 0.9, 0.37, 0.05, WHITE),
     sideText('ALPINE', -1.3, 0.55, 0.06, WHITE),
-    wingText('ALPINE', -2.3, 0, 0.07, WHITE),
+    wingText('BWT', -2.3, 0, 0.09, '#1D4ED8'),
   ],
   plateTexts: { rear: [plateText('CASTROL', -2.35, 0.72, 0.06, BLACK)] },
 };
@@ -189,7 +199,7 @@ const ASTONMARTIN: Livery = {
   era: 'gen2022',
   team: 'Aston Martin Aramco Cognizant F1 Team',
   price: 130,
-  primary: '#0F7F73',
+  primary: '#0D6A5E',
   secondary: '#CFE600',
   sidepod: 'slim',
   finish: 'gloss',
@@ -202,7 +212,8 @@ const ASTONMARTIN: Livery = {
   ],
   side: [
     { color: BLACK, points: flank(0.95, -2.0, 0.06, 0.2) },
-    { color: '#CFE600', points: flank(0.95, -2.0, 0.205, 0.23) },
+    // the lime line sweeping from the front of the sidepod up to the rear of the engine cover
+    { color: '#CFE600', points: [[0.95, 0.15], [0.95, 0.2], [-1.9, 0.72], [-1.9, 0.67]] },
   ],
   texts: [
     sideText('COGNIZANT', -0.45, mid + 0.0, 0.12, WHITE),
@@ -228,13 +239,16 @@ const ALPHATAURI: Livery = {
   parts: parts('#11203A', '#11203A', '#11203A'),
   top: [
     // the white airbox and engine cover with its navy bull splash, white nose
-    { color: WHITE, points: stripe(0.06, -1.5, 0.17) },
+    { color: WHITE, points: stripe(0.06, -1.5, 0.3) },
     { color: '#11203A', points: [[-0.1, 0.1], [-0.4, 0.15], [-0.7, 0.0], [-0.5, -0.12], [-0.2, -0.05]] },
     { color: WHITE, points: noseCapShape(2.3, 2.92, 0.1) },
     ...podBand(WHITE, 0.7, -0.4, 0.4, 0.46),
   ],
   side: [
-    { color: WHITE, points: flank(AIRBOX[0], -1.4, ABOX_Y[0], ABOX_Y[1]) },
+    // the big white upper body with the navy bull's-head circle on it
+    { color: WHITE, points: [[0.1, 0.62], [0.1, 1.06], [-1.5, 0.85], [-1.55, 0.62]] },
+    { color: '#11203A', points: ellipse(-0.55, 0.82, 0.3, 0.2) },
+    { color: WHITE, points: ellipse(-0.95, 0.85, 0.1, 0.1) },
     { color: WHITE, points: flank(0.95, -2.05, 0.2, 0.23) },
   ],
   texts: [
@@ -272,7 +286,7 @@ const ALFAROMEO: Livery = {
   ],
   texts: [
     sideText('ORLEN', 0.25, mid + 0.0, 0.11, '#9C1527'),
-    sideText('ALFA ROMEO', -1.15, 0.6, 0.075, WHITE),
+    sideText('ALFA ROMEO', -1.1, 0.62, 0.1, WHITE),
     sideText('ADLER', 0.9, 0.5, 0.04, '#9C1527'),
     wingText('ORLEN', -2.3, 0, 0.08, WHITE),
   ],
@@ -301,7 +315,7 @@ const HAAS: Livery = {
     { color: '#E10600', points: [[0.95, 0.4], [0.95, 0.46], [-0.6, 0.22], [-2.0, 0.5], [-2.0, 0.56], [-0.6, 0.3]] },
   ],
   texts: [
-    sideText('HAAS', -0.4, 0.17, 0.15, '#E10600'),
+    sideText('HAAS', -0.3, 0.3, 0.2, '#E10600'),
     sideText('1&1', -1.7, 0.5, 0.07, '#0B3D91'),
     sideText('HAAS F1 TEAM', 0.5, mid + 0.14, 0.04, '#E10600'),
     wingText('HAAS', -2.3, 0, 0.08, '#E10600'),
@@ -324,17 +338,21 @@ const WILLIAMS: Livery = {
   top: [
     // bright blue edges and nose, black tail
     { color: '#2B7DFF', points: noseCapShape(2.0, 2.92, 0.1) },
-    { color: BLACK, points: stripe(-1.2, L.tail - 0.1, 0.19) },
+    { color: BLACK, points: stripe(-1.5, L.tail - 0.1, 0.19) },
+    { color: '#2A6BF0', points: stripe(-0.2, -1.5, 0.16) },
     ...podBand('#2B7DFF', 0.9, -1.0, 0.6, 0.66),
   ],
   side: [
     { color: BLACK, points: flank(0.95, -2.05, 0.06, 0.2) },
     { color: '#2B7DFF', points: flank(0.95, -0.5, 0.2, 0.24) },
     { color: '#52B7FF', points: flank(AIRBOX[0], -0.7, 0.96, ABOX_Y[1]) },
+    // the big angular bright-blue panel over the engine cover
+    { color: '#2A6BF0', points: [[-0.1, 0.62], [-0.1, 0.95], [-0.9, 0.88], [-1.7, 0.55], [-1.7, 0.42], [-1.0, 0.48]] },
   ],
   texts: [
     sideText('DORILTON', -0.4, mid + 0.02, 0.08, WHITE),
-    sideText('W', -0.35, 0.9, 0.09, '#52B7FF'),
+    sideText('W', -0.5, 0.82, 0.1, WHITE),
+    sideText('LAVAZZA', -0.2, 0.98, 0.035, WHITE),
     sideText('BANG & OLUFSEN', 0.0, 0.5, 0.04, WHITE),
     sideText('DURACELL', -1.3, 0.4, 0.045, WHITE),
     wingText('WILLIAMS RACING', -2.3, 0, 0.07, '#52B7FF'),
