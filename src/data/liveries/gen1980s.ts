@@ -1,4 +1,4 @@
-import { BLACK, CARBON, WHITE, flank, noseCapShape, plateText, podBand, sideText, stripe, topText, wingText, layout } from '../liveryHelpers';
+import { BLACK, CARBON, WHITE, ellipse, flank, noseCapShape, plateText, podBand, sideText, stripe, topText, wingText, layout } from '../liveryHelpers';
 import type { Livery } from '../liveryTypes';
 
 // 1980s (turbo era): the most famous liveries. Shapes are in the car's own measurements (see src/data/cars/gen1980s.ts).
@@ -17,22 +17,27 @@ const FERRARI: Livery = {
   secondary: '#FFFFFF',
   sidepod: 'turbo',
   finish: 'gloss',
-  parts: solidParts('#D40000', '#D40000', '#D40000'),
+  parts: { wing: CARBON, flap: CARBON, endplate: CARBON, floor: CARBON },
   top: [
     { color: WHITE, points: stripe(1.4, 2.45, 0.03) },
-    { color: WHITE, points: stripe(-0.2, -1.85, 0.025) },
     { color: '#FFD800', points: noseCapShape(2.2, 2.45, 0.05) },
   ],
-  side: [{ color: WHITE, points: flank(0.7, -1.75, 0.24, 0.27) }],
+  side: [
+    // the yellow Ferrari shield on the nose, the white Marlboro and light-blue Fiat labels, the yellow Agip label
+    { color: '#FFD800', points: ellipse(1.15, 0.45, 0.07, 0.085) },
+    { color: WHITE, points: flank(0.95, 0.4, 0.58, 0.67) },
+    { color: '#58A6E8', points: flank(0.3, -0.25, 0.6, 0.69) },
+    { color: '#FFD800', points: flank(-0.95, -1.35, 0.2, 0.42) },
+  ],
   texts: [
     topText('AGIP', 1.75, 0, 0.06, '#FFD800'),
-    sideText('FIAT', -0.3, mid + 0.14, 0.09, WHITE),
-    sideText('LONGINES', 0.2, mid + 0.02, 0.06, WHITE),
-    sideText('MARELLI', -1.1, mid + 0.02, 0.06, WHITE),
-    sideText('AGIP', -1.4, 0.6, 0.06, '#FFD800'),
-    wingText('MARLBORO', -1.62, 0, 0.08, WHITE),
+    sideText('MARLBORO', 0.68, 0.625, 0.05, '#D40000'),
+    sideText('FIAT', 0.03, 0.645, 0.06, WHITE),
+    sideText('LONGINES', 0.1, mid - 0.04, 0.06, WHITE),
+    sideText('AGIP', -1.15, 0.31, 0.07, BLACK),
+    sideText('MARELLI', -0.7, mid + 0.02, 0.05, WHITE),
   ],
-  plateTexts: { rear: [plateText('AGIP', -1.62, 0.8, 0.1, '#FFD800')] },
+  plateTexts: { rear: [plateText('MARLBORO', -1.62, 0.8, 0.08, WHITE)], front: [plateText('GOODYEAR', 2.27, 0.25, 0.05, WHITE)] },
 };
 
 const MCLAREN: Livery = {
@@ -102,25 +107,34 @@ const WILLIAMS: Livery = {
   era: 'gen1980s',
   team: 'Canon Williams Honda',
   price: 120,
-  primary: '#1E3C8A',
-  secondary: '#F2F2F2',
+  primary: '#F2F2F2',
+  secondary: '#1B2F7A',
   glow: '#2F5BD6',
   sidepod: 'turbo',
   finish: 'gloss',
-  parts: solidParts('#1E3C8A', '#F2F2F2', '#F2F2F2'),
+  parts: solidParts('#F2F2F2', '#F2F2F2', '#F2F2F2'),
+  frontParts: { wing: '#17171A', flap: '#17171A', endplate: '#FFD800' },
   top: [
-    { color: '#F2F2F2', points: stripe(1.3, 2.45, 0.04) },
-    ...podBand('#F2F2F2', 0.6, -0.8, 0.2, 0.34),
+    // white car, a navy nose, the yellow Tactel cowl around the cockpit
+    { color: '#1B2F7A', points: noseCapShape(1.0, 2.45, 0.17) },
+    { color: '#1B2F7A', points: stripe(0.8, 1.3, 0.2) },
+    { color: '#FFD800', points: stripe(0.3, 1.0, 0.2) },
+    { color: '#1B2F7A', points: stripe(0.8, -0.7, 0.03) },
   ],
-  side: [{ color: '#F2F2F2', points: flank(0.7, -1.75, 0.12, 0.2) }],
+  side: [
+    { color: '#1B2F7A', points: [[0.5, 0.1], [0.5, 0.58], [2.1, 0.42], [2.1, 0.16]] },
+    { color: '#FFD800', points: [[0.25, 0.45], [0.25, 0.72], [1.0, 0.64], [1.0, 0.45]] },
+  ],
   texts: [
-    sideText('CANON', -0.3, mid + 0.18, 0.13, '#1E3C8A'),
-    sideText('HONDA', 0.35, mid + 0.14, 0.07, WHITE),
-    sideText('WILLIAMS', -1.2, 0.6, 0.06, WHITE),
-    topText('CANON', 1.7, 0, 0.06, WHITE),
-    wingText('CANON', -1.62, 0, 0.1, WHITE),
+    sideText('MOBIL 1', 1.55, 0.3, 0.07, WHITE),
+    sideText('HONDA', 1.0, 0.25, 0.05, WHITE),
+    sideText('TACTEL', 0.65, 0.56, 0.05, '#1B2F7A'),
+    sideText('CANON', -0.5, mid + 0.14, 0.1, '#E10600'),
+    sideText('CALMA', -0.1, mid + 0.02, 0.04, '#1B2F7A'),
+    topText('CANON', 1.9, 0, 0.06, WHITE),
+    wingText('CANON', -1.62, 0, 0.13, '#E10600'),
   ],
-  plateTexts: { rear: [plateText('HONDA', -1.62, 0.8, 0.1, '#1E3C8A')] },
+  plateTexts: { rear: [plateText('HONDA', -1.62, 0.8, 0.1, '#1B2F7A')], front: [plateText('TACTEL', 2.27, 0.25, 0.06, '#1B2F7A')] },
 };
 
 const BENETTON: Livery = {
@@ -164,21 +178,25 @@ const CAMEL: Livery = {
   glow: '#FFD500',
   sidepod: 'turbo',
   finish: 'gloss',
-  parts: solidParts('#FFD500', '#0033A0', '#FFD500'),
+  parts: solidParts('#FFD500', '#FFD500', '#FFD500'),
   top: [
-    { color: '#0033A0', points: noseCapShape(2.1, 2.45, 0.08) },
-    { color: '#0033A0', points: stripe(-0.4, -1.85, 0.04) },
-    ...podBand('#0033A0', 0.6, -1.0, 0.2, 0.26),
+    // all yellow with blue lettering and the blue camel on the nose
+    { color: '#0033A0', points: ellipse(1.6, 0, 0.12, 0.08) },
   ],
-  side: [{ color: '#0033A0', points: flank(0.7, -1.75, 0.06, 0.12) }],
+  side: [
+    { color: '#0033A0', points: ellipse(0.15, 0.78, 0.07, 0.06) },
+    { color: '#0033A0', points: [[0.2, 0.2], [0.2, 0.23], [-1.5, 0.23], [-1.5, 0.2]] },
+  ],
   texts: [
-    sideText('CAMEL', -0.35, mid + 0.18, 0.13, '#0033A0'),
-    sideText('HONDA', 0.35, mid + 0.14, 0.07, '#0033A0'),
-    sideText('LOTUS', -1.3, 0.6, 0.07, '#0033A0'),
-    topText('CAMEL', 1.7, 0, 0.07, '#0033A0'),
-    wingText('CAMEL', -1.62, 0, 0.1, '#0033A0'),
+    topText('LOTUS', 2.0, 0, 0.09, '#0033A0'),
+    topText('ELF', 1.3, 0, 0.07, '#0033A0'),
+    topText('LOTUS', 0.4, 0.0, 0.1, '#0033A0'),
+    sideText('LOTUS', -0.15, mid + 0.14, 0.13, '#0033A0'),
+    sideText('HONDA', 0.55, mid + 0.14, 0.07, '#0033A0'),
+    sideText('CAMEL', -1.1, 0.6, 0.06, '#0033A0'),
+    wingText('LOTUS', -1.62, 0, 0.13, '#0033A0'),
   ],
-  plateTexts: { rear: [plateText('HONDA', -1.62, 0.8, 0.1, '#0033A0')] },
+  plateTexts: { rear: [plateText('12', -1.62, 0.8, 0.14, '#0033A0')], front: [plateText('LOTUS', 2.28, 0.2, 0.06, '#0033A0')] },
 };
 
 const BRABHAM: Livery = {
@@ -188,25 +206,25 @@ const BRABHAM: Livery = {
   team: 'Parmalat Brabham BMW',
   price: 210,
   primary: '#F2F2F2',
-  secondary: '#0A58A8',
+  secondary: '#1A2A6E',
   glow: '#2F6BE0',
   sidepod: 'turbo',
   finish: 'gloss',
-  parts: solidParts('#0A58A8', '#F2F2F2', '#0A58A8'),
+  parts: solidParts('#1A2A6E', '#F2F2F2', '#1A2A6E'),
   top: [
-    { color: '#0A58A8', points: noseCapShape(1.9, 2.45, 0.11) },
-    { color: '#0A58A8', points: stripe(0.4, -1.85, 0.1) },
-    ...podBand('#0A58A8', 0.6, -1.4, 0.2, 0.46),
+    { color: '#1A2A6E', points: noseCapShape(1.9, 2.45, 0.11) },
+    { color: '#1A2A6E', points: stripe(0.4, -1.85, 0.1) },
+    ...podBand('#1A2A6E', 0.6, -1.4, 0.2, 0.46),
   ],
-  side: [{ color: '#0A58A8', points: flank(0.7, -1.75, 0.06, 0.2) }],
+  side: [{ color: '#1A2A6E', points: flank(0.7, -1.75, 0.06, 0.2) }],
   texts: [
     sideText('PARMALAT', -0.4, mid + 0.14, 0.09, WHITE),
-    sideText('BMW', 0.35, mid + 0.12, 0.09, '#0A58A8'),
-    sideText('BRABHAM', -1.3, 0.62, 0.06, '#0A58A8'),
-    topText('PARMALAT', 1.5, 0, 0.06, '#0A58A8'),
-    wingText('PARMALAT', -1.62, 0, 0.08, WHITE),
+    sideText('BMW', 0.35, mid + 0.12, 0.09, '#1A2A6E'),
+    sideText('BRABHAM', -1.3, 0.62, 0.06, '#1A2A6E'),
+    topText('PARMALAT', 1.5, 0, 0.06, '#1A2A6E'),
+    wingText('OLIVETTI', -1.62, 0, 0.09, WHITE),
   ],
-  plateTexts: { rear: [plateText('BMW', -1.62, 0.8, 0.1, WHITE)] },
+  plateTexts: { rear: [plateText('BMW', -1.62, 0.8, 0.1, WHITE)], front: [plateText('PIRELLI', 2.27, 0.25, 0.05, WHITE)] },
 };
 
 export const LIVERIES_GEN1980S: readonly Livery[] = [FERRARI, MCLAREN, LOTUS, WILLIAMS, BENETTON, CAMEL, BRABHAM];

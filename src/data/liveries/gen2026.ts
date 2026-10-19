@@ -106,6 +106,8 @@ const MCLAREN: Livery = {
     { color: BLACK, points: flank(AIRBOX[0], -1.2, ABOX_Y[0], ABOX_Y[1]) },
     { color: BLACK, points: flank(-0.6, L.podRear, 0.06, 0.4) },
     { color: '#47C7FC', points: flank(L.podFront, -0.6, 0.06, 0.1) },
+    // the papaya diagonal on the rear of the engine cover
+    { color: '#FF8000', points: [[-0.85, 0.45], [-0.8, 0.98], [-1.5, 0.8], [-1.7, 0.42]] },
   ],
   texts: [
     sideText('GEMINI', -0.4, 0.92, 0.06, WHITE),
@@ -136,13 +138,16 @@ const REDBULL: Livery = {
   top: [
     // yellow airbox top, yellow nose tip, red accents
     { color: '#FFC400', points: stripe(0.1, -0.7, 0.13) },
-    { color: '#FFC400', points: noseCapShape(2.5, 2.85, 0.07) },
+    { color: '#FFB000', points: noseCapShape(1.9, 2.85, 0.1) },
     ...podBand('#E4002B', 0.8, 0.3, 0.3, 0.34),
   ],
   side: [
     { color: '#FFC400', points: flank(AIRBOX[0], -0.7, 0.96, ABOX_Y[1]) },
     { color: '#FF7A00', points: ellipse(-0.35, 0.9, 0.25, 0.1) },
     { color: '#E4002B', points: flank(L.podFront, L.podRear, 0.06, 0.1) },
+    // the yellow-orange nose with the red bull on its side
+    { color: '#FFB000', points: [[1.3, 0.2], [1.3, 0.4], [2.6, 0.32], [2.6, 0.2]] },
+    { color: '#E4002B', points: ellipse(1.95, 0.3, 0.22, 0.07) },
   ],
   texts: [
     sideText('RED BULL', -0.35, 0.9, 0.06, '#E4002B'),
@@ -161,32 +166,36 @@ const RACINGBULLS: Livery = {
   era: 'gen2026',
   team: 'Visa Cash App Racing Bulls F1 Team',
   price: 180,
-  primary: '#1F2F7A',
+  primary: '#EEF0F6',
   secondary: '#F2F2F2',
   sidepod: 'compact',
   finish: 'gloss',
-  parts: parts('#1F2F7A', WHITE, '#1F2F7A'),
+  parts: parts('#14172B', '#14172B', '#14172B'),
+  frontParts: { wing: '#14172B', flap: WHITE, endplate: WHITE },
   top: [
-    // white front half, orange nose tip, yellow airbox
-    { color: WHITE, points: stripe(0.35, 2.5, 0.19) },
-    { color: '#FF9A1F', points: noseCapShape(2.45, 2.85, 0.09) },
-    { color: '#FFC400', points: stripe(0.1, -0.7, 0.13) },
-    ...podBand(WHITE, 0.85, 0.1, 0.17, 0.5),
+    // white body, an orange-yellow nose and airbox with the red bull, a navy tail
+    { color: '#FF9A1F', points: noseCapShape(2.0, 2.85, 0.1) },
+    { color: '#FFB000', points: stripe(0.1, -1.0, 0.2) },
+    { color: '#E4002B', points: stripe(-0.3, -0.9, 0.05) },
+    { color: '#1F2F7A', points: stripe(-1.3, L.tail - 0.05, 0.2) },
+    ...podBand('#1F2F7A', 0.5, -1.4, 0.42, 0.5),
   ],
   side: [
-    { color: '#FFC400', points: flank(AIRBOX[0], -0.7, 0.96, ABOX_Y[1]) },
-    { color: '#FF7A00', points: ellipse(-0.35, 0.9, 0.25, 0.1) },
-    { color: WHITE, points: flank(L.podFront, -0.55, 0.06, 0.36) },
+    { color: '#FFB000', points: [[0.1, 0.72], [0.1, 1.1], [-1.0, 1.0], [-1.0, 0.66], [-0.5, 0.7]] },
+    { color: '#E4002B', points: [[0.0, 0.88], [-0.4, 0.92], [-0.8, 0.8], [-0.5, 0.74], [-0.2, 0.76]] },
+    { color: '#1F2F7A', points: flank(L.podFront, L.podRear, 0.06, 0.2) },
+    // the navy swoosh under VISA
+    { color: '#1F2F7A', points: [[0.85, 0.1], [0.85, 0.3], [-0.2, 0.4], [-0.9, 0.3], [-0.9, 0.1]] },
   ],
   texts: [
-    sideText('VISA', -0.1, 0.2, 0.13, '#1F2F7A'),
+    sideText('VISA', -0.05, 0.22, 0.13, WHITE),
     sideText('CASH APP', 0.45, mid + 0.14, 0.05, '#00B341'),
     sideText('HUGO', 0.3, mid + 0.02, 0.05, BLACK),
-    sideText('RED BULL', -0.35, 0.9, 0.055, '#E4002B'),
+    sideText('RED BULL', -0.5, 0.58, 0.06, '#E4002B'),
     sideText('FORD', -1.2, 0.4, 0.05, WHITE),
     wingText('VISA', -2.17, 0, 0.09, WHITE),
   ],
-  plateTexts: { rear: [plateText('VISA', -2.2, 0.72, 0.08, WHITE)] },
+  plateTexts: { rear: [plateText('VISA', -2.2, 0.72, 0.08, WHITE)], front: [plateText('CASH APP', 2.3, 0.2, 0.05, BLACK)] },
 };
 
 const ALPINE: Livery = {
@@ -195,12 +204,13 @@ const ALPINE: Livery = {
   era: 'gen2026',
   team: 'BWT Alpine F1 Team',
   price: 200,
-  primary: '#1C3A9A',
+  primary: '#14288A',
   secondary: '#F06BAE',
   glow: '#F06BAE',
   sidepod: 'compact',
   finish: 'gloss',
-  parts: parts('#12206A', '#F06BAE', '#12206A'),
+  parts: parts('#12206A', '#12206A', '#F06BAE'),
+  frontParts: { wing: '#12206A', flap: '#F06BAE', endplate: '#F06BAE' },
   top: [
     // pink front half of the car, around the cockpit and halo, and a pink stripe on the engine cover
     { color: '#F06BAE', points: stripe(0.0, 2.85, 0.14) },
@@ -216,7 +226,7 @@ const ALPINE: Livery = {
     sideText('ALPINE', -1.2, 0.5, 0.05, WHITE),
     wingText('BWT', -2.17, 0, 0.09, WHITE),
   ],
-  plateTexts: { rear: [plateText('ENI', -2.2, 0.72, 0.1, WHITE)] },
+  plateTexts: { rear: [plateText('ENI', -2.2, 0.72, 0.1, BLACK)] },
 };
 
 const ASTONMARTIN: Livery = {
@@ -235,10 +245,18 @@ const ASTONMARTIN: Livery = {
     { color: '#C9E200', points: stripe(-0.7, L.tail - 0.05, 0.025) },
     ...podBand('#C9E200', 0.8, -0.6, 0.3, 0.34),
   ],
-  side: [{ color: '#C9E200', points: flank(L.podFront, L.podRear, 0.07, 0.11) }],
+  side: [
+    { color: '#C9E200', points: flank(L.podFront, L.podRear, 0.07, 0.11) },
+    // the lime line rising from the front of the sidepod toward the engine cover
+    { color: '#C9E200', points: [[0.85, 0.13], [0.85, 0.18], [-1.0, 0.52], [-1.0, 0.47]] },
+    { color: '#C9E200', points: flank(0.1, -0.35, 0.56, 0.6) },
+  ],
   texts: [
     sideText('ARAMCO', -0.4, mid + 0.04, 0.12, WHITE),
     sideText('HONDA', -1.3, 0.5, 0.06, WHITE),
+    sideText('MAADEN', -0.45, 0.72, 0.06, WHITE),
+    sideText('COHERE', 0.1, 0.62, 0.04, WHITE),
+    sideText('VALVOLINE', -1.0, 0.38, 0.04, WHITE),
     sideText('NEXGEN', 0.35, mid + 0.16, 0.045, WHITE),
     sideText('XEROX', 0.0, mid + 0.17, 0.045, WHITE),
     topText('ARAMCO', 2.0, 0, 0.06, '#C9E200'),
@@ -271,7 +289,7 @@ const WILLIAMS: Livery = {
     { color: WHITE, points: flank(0.5, -0.6, 0.12, 0.28) },
   ],
   texts: [
-    sideText('ATLASSIAN', -0.3, 0.92, 0.065, WHITE),
+    sideText('ATLASSIAN', -0.5, 0.66, 0.085, WHITE),
     sideText('KOMATSU', -0.05, 0.2, 0.08, '#0B2B6A'),
     sideText('BARCLAYS', 0.2, 0.36, 0.05, WHITE),
     sideText('KRAKEN', -1.0, 0.45, 0.045, WHITE),
@@ -294,16 +312,18 @@ const HAAS: Livery = {
   parts: parts(BLACK, '#E10600', BLACK),
   top: [
     { color: '#E10600', points: noseCapShape(2.4, 2.85, 0.1) },
+    { color: '#E10600', points: stripe(0.1, -0.7, 0.13) },
     { color: BLACK, points: stripe(-0.9, L.tail - 0.05, 0.17) },
     ...podBand('#E10600', 0.8, -0.4, 0.4, 0.46),
   ],
   side: [
     { color: BLACK, points: flank(L.podFront, L.podRear, 0.06, 0.16) },
     { color: '#E10600', points: flank(L.podFront, -0.6, 0.34, 0.37) },
+    { color: '#E10600', points: flank(AIRBOX[0], -0.7, ABOX_Y[0], ABOX_Y[1]) },
   ],
   texts: [
     sideText('HAAS', -0.3, 0.24, 0.13, BLACK),
-    sideText('GR', -0.35, 0.92, 0.14, '#E10600'),
+    sideText('GR', -0.35, 0.92, 0.14, WHITE),
     sideText('FIX', 0.55, mid + 0.14, 0.05, BLACK),
     sideText('MPHASIS', 0.4, mid + 0.02, 0.04, WHITE),
     topText('GR', 1.9, 0, 0.08, WHITE),
@@ -318,7 +338,7 @@ const AUDI: Livery = {
   era: 'gen2026',
   team: 'Audi Revolut F1 Team',
   price: 280,
-  primary: '#5E6168',
+  primary: '#7C8087',
   secondary: '#E5383B',
   glow: '#E5383B',
   sidepod: 'compact',
@@ -339,7 +359,7 @@ const AUDI: Livery = {
     sideText('REVOLUT', -0.2, mid + 0.06, 0.08, WHITE),
     sideText('CASTROL', 0.4, mid + 0.14, 0.045, WHITE),
     sideText('SPOTIFY', -1.2, 0.3, 0.04, WHITE),
-    wingText('REVOLUT', -2.17, 0, 0.08, WHITE),
+    wingText('OOOO', -2.17, 0, 0.09, '#E5383B', 'rear', 0.02),
   ],
   plateTexts: { rear: [plateText('AUDI', -2.2, 0.72, 0.09, WHITE)] },
 };
