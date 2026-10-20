@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { AppState } from 'react-native';
 
-import { NO_AWAY, RULES, addAway, advanceProgress, classifyAway, pauseSecondsLeft } from '../logic/distraction';
+import { NO_AWAY, RULES, addAway, classifyAway, pauseSecondsLeft } from '../logic/distraction';
 import type { AwayTotals, Distraction } from '../logic/distraction';
 import { lapProgress } from '../logic/lapProgress';
 import type { LapProgress } from '../logic/lapProgress';
@@ -29,8 +29,6 @@ export interface SessionTimer {
   /** The flag or crash from your last absence, until it is dismissed. */
   warning: RaceWarning | null;
   dismissWarning: () => void;
-  /** True while the safety car is out and the car runs at reduced speed. */
-  slowed: boolean;
   /** Seconds of the excused break left while paused, otherwise null. */
   pauseSecondsLeft: number | null;
   /** Time spent away from the race so far, and the flags it earned. */
@@ -44,7 +42,7 @@ export interface SessionTimer {
  * if the app is throttled. `timeScale` speeds time up for testing, e.g. 30 makes a 90 s lap take 3 s.
  *
  * Time away from the app never counts: leaving freezes the race, and coming back applies the rules in logic/distraction.ts
- * (yellow flag, safety car, crash). Pausing first excuses a break of up to 5 minutes.
+ * (track limits warning, yellow flag, crash). Pausing first excuses a break of up to 5 minutes.
  */
 export function useSessionTimer(track: Track, plannedLaps: number, timeScale = 1): SessionTimer {
   const plannedSeconds = plannedLaps * track.lapTimeSeconds;
@@ -53,7 +51,6 @@ export function useSessionTimer(track: Track, plannedLaps: number, timeScale = 1
   const [startedAt, setStartedAt] = useState<Date | null>(null);
   const [endedAt, setEndedAt] = useState<Date | null>(null);
   const [warning, setWarning] = useState<RaceWarning | null>(null);
-  const [slowed, setSlowed] = useState(false);
   const [pauseLeft, setPauseLeft] = useState<number | null>(null);
   const [away, setAway] = useState<AwayTotals>(NO_AWAY);
   const [crashed, setCrashed] = useState(false);
@@ -61,7 +58,6 @@ export function useSessionTimer(track: Track, plannedLaps: number, timeScale = 1
   const statusRef = useRef<TimerStatus>('idle'); // the same as `status`, for callbacks that outlive a render
   const bankedMs = useRef(0); // progress from earlier running stretches
   const resumedAtMs = useRef<number | null>(null); // wall-clock start of the current stretch
-  const slowRemainingMs = useRef(0); // safety car time left, as of the start of the current stretch
   const pausedAtMs = useRef<number | null>(null);
   const leftAtMs = useRef<number | null>(null); // when you left the app, if you are away
 
@@ -71,18 +67,15 @@ export function useSessionTimer(track: Track, plannedLaps: number, timeScale = 1
   }, []);
 
   const readElapsed = useCallback(() => {
-    const live = resumedAtMs.current === null ? 0 : Date.now() - resumedAtMs.current;
-    const { gainedMs } = advanceProgress(live, slowRemainingMs.current);
-    return Math.min((bankedMs.current + gainedMs * timeScale) / 1000, plannedSeconds);
+    const live = resumedAtMs.current === null ? 0 : (Date.now() - resumedAtMs.current) * timeScale;
+    return Math.min((bankedMs.current + live) / 1000, plannedSeconds);
   }, [plannedSeconds, timeScale]);
 
   /** Bank the progress made so far and stop the clock. */
   const freeze = useCallback(() => {
-    const live = resumedAtMs.current === null ? 0 : Date.now() - resumedAtMs.current;
-    const { gainedMs, slowRemainingMs: left } = advanceProgress(live, slowRemainingMs.current);
-    const banked = Math.min(bankedMs.current + gainedMs * timeScale, plannedSeconds * 1000);
+    const live = resumedAtMs.current === null ? 0 : (Date.now() - resumedAtMs.current) * timeScale;
+    const banked = Math.min(bankedMs.current + live, plannedSeconds * 1000);
     bankedMs.current = banked;
-    slowRemainingMs.current = left;
     resumedAtMs.current = null;
     setElapsedSeconds(banked / 1000);
     return banked / 1000;
@@ -91,14 +84,12 @@ export function useSessionTimer(track: Track, plannedLaps: number, timeScale = 1
   const start = useCallback(() => {
     bankedMs.current = 0;
     resumedAtMs.current = Date.now();
-    slowRemainingMs.current = 0;
     pausedAtMs.current = null;
     leftAtMs.current = null;
     setElapsedSeconds(0);
     setStartedAt(new Date());
     setEndedAt(null);
     setWarning(null);
-    setSlowed(false);
     setPauseLeft(null);
     setAway(NO_AWAY);
     setCrashed(false);
@@ -132,14 +123,12 @@ export function useSessionTimer(track: Track, plannedLaps: number, timeScale = 1
   const reset = useCallback(() => {
     bankedMs.current = 0;
     resumedAtMs.current = null;
-    slowRemainingMs.current = 0;
     pausedAtMs.current = null;
     leftAtMs.current = null;
     setElapsedSeconds(0);
     setStartedAt(null);
     setEndedAt(null);
     setWarning(null);
-    setSlowed(false);
     setPauseLeft(null);
     setAway(NO_AWAY);
     setCrashed(false);
@@ -185,10 +174,6 @@ export function useSessionTimer(track: Track, plannedLaps: number, timeScale = 1
         changeStatus('ended');
         return;
       }
-      if (kind === 'safety-car') {
-        slowRemainingMs.current = RULES.safetyCarSeconds * 1000;
-        setSlowed(true);
-      }
       if (kind !== 'none') setWarning({ kind, awaySeconds });
       resumedAtMs.current = now;
     });
@@ -213,8 +198,6 @@ export function useSessionTimer(track: Track, plannedLaps: number, timeScale = 1
     let frame = requestAnimationFrame(function tick() {
       const elapsed = readElapsed();
       setElapsedSeconds(elapsed);
-      const live = resumedAtMs.current === null ? 0 : Date.now() - resumedAtMs.current;
-      setSlowed(slowRemainingMs.current - live > 0);
       if (elapsed >= plannedSeconds) {
         bankedMs.current = plannedSeconds * 1000;
         resumedAtMs.current = null;
@@ -239,7 +222,6 @@ export function useSessionTimer(track: Track, plannedLaps: number, timeScale = 1
     reset,
     warning,
     dismissWarning,
-    slowed,
     pauseSecondsLeft: pauseLeft,
     away,
     crashed,

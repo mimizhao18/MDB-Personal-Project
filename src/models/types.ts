@@ -47,9 +47,10 @@ export interface Session {
   creditsEarned: number;
   /** Seconds spent out of the app during the race (never counted as focus). Missing on races saved before this existed. */
   awaySeconds?: number;
+  /** Absences of 5 to 30 seconds (track limits warnings) and of 30 seconds to 3 minutes (yellow flags). */
+  trackLimits?: number;
   yellowFlags?: number;
-  safetyCars?: number;
-  /** Percent taken off the XP and credits because of the flags (only saved when it is more than 0). */
+  /** Percent taken off the XP and credits because of the warnings (only saved when it is more than 0). */
   rewardPenaltyPercent?: number;
   /** True if the race ended in a crash because you were away for too long (a DNF). */
   crashed?: boolean;

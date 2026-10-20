@@ -90,7 +90,7 @@ export function buildSession(input: SessionInput): Session {
     distanceKm: distanceKm(track, laps),
     xpEarned: afterPenalty(xpForSeconds(focusedSeconds), penalty),
     creditsEarned: afterPenalty(creditsForSeconds(focusedSeconds), penalty),
-    ...(input.away && input.away.seconds > 0 ? { awaySeconds: Math.round(input.away.seconds), yellowFlags: input.away.yellowFlags, safetyCars: input.away.safetyCars } : {}),
+    ...(input.away && input.away.seconds > 0 ? { awaySeconds: Math.round(input.away.seconds), trackLimits: input.away.trackLimits, yellowFlags: input.away.yellowFlags } : {}),
     ...(penalty > 0 ? { rewardPenaltyPercent: penalty } : {}),
     ...(input.crashed ? { crashed: true } : {}),
   };

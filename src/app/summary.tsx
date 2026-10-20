@@ -16,11 +16,11 @@ import type { PlayerProfile, Session } from '../models/types';
 import { getProfile } from '../storage/profile';
 import { getSessions } from '../storage/sessions';
 
-/** "Away 42 s · 1 yellow flag · 1 safety car", leaving out the counts that are zero. */
+/** "Away 42 s · 1 track limits warning · 1 yellow flag", leaving out the counts that are zero. */
 function awayLine(session: Session): string {
   const parts = [`Away ${formatDurationWords(Math.round(session.awaySeconds ?? 0))}`];
+  if (session.trackLimits) parts.push(`${session.trackLimits} track limits ${session.trackLimits === 1 ? 'warning' : 'warnings'}`);
   if (session.yellowFlags) parts.push(`${session.yellowFlags} yellow ${session.yellowFlags === 1 ? 'flag' : 'flags'}`);
-  if (session.safetyCars) parts.push(`${session.safetyCars} safety ${session.safetyCars === 1 ? 'car' : 'cars'}`);
   return parts.join(' · ');
 }
 
@@ -102,7 +102,7 @@ export default function SummaryScreen() {
         {session.awaySeconds ? <Text style={styles.away}>{awayLine(session)}</Text> : null}
         {session.rewardPenaltyPercent ? (
           <Text style={styles.penalty}>
-            Rewards reduced by {session.rewardPenaltyPercent}% for {(session.yellowFlags ?? 0) + (session.safetyCars ?? 0)} flags
+            Rewards reduced by {session.rewardPenaltyPercent}% for {(session.trackLimits ?? 0) + (session.yellowFlags ?? 0)} warnings
           </Text>
         ) : null}
 

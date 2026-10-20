@@ -22,8 +22,8 @@ import { showAlert } from '../ui/alert';
 /** Marks a crash that left no race to save (it happened before the first minute of focus). */
 const NOTHING_SAVED = 'none';
 
-/** How long a yellow flag stays on screen. */
-const YELLOW_FLAG_SHOWN_MS = 6000;
+/** How long a warning stays on screen. */
+const WARNING_SHOWN_MS = 6000;
 
 export default function SessionScreen() {
   const styles = useStyles();
@@ -48,7 +48,7 @@ function Race({ track, laps, speed }: { track: Track; laps: number; speed: numbe
   const styles = useStyles();
   const t = useTheme();
   const timer = useSessionTimer(track, laps, speed);
-  const { status, progress: p, startedAt, endedAt, start, pause, resume, end, warning, dismissWarning, slowed, pauseSecondsLeft, away, crashed } = timer;
+  const { status, progress: p, startedAt, endedAt, start, pause, resume, end, warning, dismissWarning, pauseSecondsLeft, away, crashed } = timer;
   const [crashSessionId, setCrashSessionId] = useState<string | null>(null);
   const saved = useRef(false);
   // On short windows (a laptop browser, a small phone) everything is sized down so the buttons stay on screen.
@@ -106,10 +106,10 @@ function Race({ track, laps, speed }: { track: Track; laps: number; speed: numbe
     );
   }, [status, track, laps, p.elapsedSeconds, startedAt, endedAt, away, crashed]);
 
-  // a yellow flag is a quick warning: it clears itself
+  // a warning is quick: it clears itself
   useEffect(() => {
-    if (warning?.kind !== 'yellow') return;
-    const timer = setTimeout(dismissWarning, YELLOW_FLAG_SHOWN_MS);
+    if (!warning || warning.kind === 'crash') return;
+    const timer = setTimeout(dismissWarning, WARNING_SHOWN_MS);
     return () => clearTimeout(timer);
   }, [warning, dismissWarning]);
 
@@ -153,7 +153,7 @@ function Race({ track, laps, speed }: { track: Track; laps: number; speed: numbe
 
   const livery = car ? getLivery(car.liveryId) : undefined;
   const paused = status === 'paused';
-  // from the second flag on, the banner also says that the rewards are being cut
+  // from the second warning on, the banner also says that the rewards are being cut
   const penalty = penaltyPercent(away);
   const penaltyNote = penalty > 0 ? ` Rewards -${penalty}%.` : '';
 
@@ -175,13 +175,13 @@ function Race({ track, laps, speed }: { track: Track; laps: number; speed: numbe
 
         <View style={{ height: trackHeight }}>
           <TrackView track={track} lapFraction={p.lapFraction} car={car} fill />
-          {(slowed || warning?.kind === 'yellow') && (
+          {warning && warning.kind !== 'crash' && (
             <View style={styles.banner}>
-              {slowed ? (
-                <RaceBanner title="Safety car" detail={`${warning ? `You were away for ${Math.round(warning.awaySeconds)} s. ` : ''}The car runs at half speed for a minute.${penaltyNote}`} />
-              ) : (
-                <RaceBanner title="Yellow flag" detail={`You left the race for ${Math.round(warning?.awaySeconds ?? 0)} s. Stay on track.${penaltyNote}`} />
-              )}
+              <RaceBanner
+                kind={warning.kind}
+                title={warning.kind === 'yellow' ? 'Yellow flag' : 'Track limits'}
+                detail={`You left the race for ${Math.round(warning.awaySeconds)} s. Stay on track.${penaltyNote}`}
+              />
             </View>
           )}
         </View>
@@ -190,8 +190,8 @@ function Race({ track, laps, speed }: { track: Track; laps: number; speed: numbe
           <Text style={compact ? styles.clockCompact : styles.clock} numberOfLines={1} adjustsFontSizeToFit accessibilityLabel={`${formatClock(p.remainingSeconds)} remaining`}>
             {formatClock(p.remainingSeconds)}
           </Text>
-          <Text style={[styles.status, paused && styles.statusPaused, slowed && !paused && styles.statusSlowed]}>
-            {paused ? `Paused · ${formatClock(pauseSecondsLeft ?? 0)} break left` : slowed ? 'Safety car' : 'Remaining'}
+          <Text style={[styles.status, paused && styles.statusPaused]}>
+            {paused ? `Paused · ${formatClock(pauseSecondsLeft ?? 0)} break left` : 'Remaining'}
           </Text>
           <View style={styles.progress}>
             <SegmentedProgress fraction={p.totalFraction} accessibilityLabel="Race progress" />
@@ -223,7 +223,6 @@ const useStyles = makeStyles((t) => ({
   clockCompact: { ...t.typography.display, color: t.colors.text, alignSelf: 'stretch', textAlign: 'center' },
   status: { ...t.typography.metaLabel, color: t.colors.textMuted },
   statusPaused: { color: t.colors.accentOnDark },
-  statusSlowed: { color: t.colors.flag },
   banner: { position: 'absolute', top: 0, left: 0, right: 0 },
   crash: { flex: 1, padding: t.spacing.screen, gap: t.spacing.lg, justifyContent: 'space-between' },
   crashTrack: { flex: 1 },
