@@ -15,7 +15,7 @@ const KEY = 'settings.homeStats.v1';
 
 export const isHomeStatsId = (v: unknown): v is HomeStatsId => typeof v === 'string' && HOME_STATS.some((d) => d.id === v);
 
-export const DEFAULT_HOME_STATS: HomeStatsId = 'strip';
+export const DEFAULT_HOME_STATS: HomeStatsId = 'line';
 
 export function getHomeStats(): Promise<HomeStatsId> {
   return readJson<HomeStatsId>(KEY, DEFAULT_HOME_STATS, isHomeStatsId);
