@@ -1,38 +1,70 @@
 import { router, useFocusEffect, useLocalSearchParams } from 'expo-router';
 import { useCallback, useState } from 'react';
+import { Text, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { HomeCards } from '../components/home/HomeCards';
-import { HomeClassic } from '../components/home/HomeClassic';
-import { HomePoster } from '../components/home/HomePoster';
-import { HomeRing } from '../components/home/HomeRing';
-import { HomeTelemetry } from '../components/home/HomeTelemetry';
+import { HeroCar } from '../components/HeroCar';
+import { HomeStatsView } from '../components/home/HomeStatsView';
 import { useHomeData } from '../components/home/useHomeData';
-import { DEFAULT_HOME_DESIGN, getHomeDesign, isHomeDesignId } from '../storage/homeDesign';
-import type { HomeDesignId } from '../storage/homeDesign';
+import { makeStyles } from '../design/styles';
+import { DEFAULT_HOME_STATS, getHomeStats, isHomeStatsId } from '../storage/homeStats';
+import type { HomeStatsId } from '../storage/homeStats';
+import { Credits } from '../ui/Credits';
+import { Button, ProgressBar } from '../ui/kit';
 
-/** Home: the layout is the one chosen in Settings > Home design (add ?design=ring and so on to try one without saving it). */
+const useStyles = makeStyles((t) => ({
+  safe: { flex: 1, padding: t.spacing.md, gap: t.spacing.md },
+  top: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
+  badgeRow: { flexDirection: 'row', alignItems: 'center', gap: t.spacing.sm },
+  badge: { borderWidth: t.border.hairline, borderColor: t.colors.borderStrong, paddingHorizontal: t.spacing.sm, paddingVertical: 4 },
+  badgeText: { fontSize: 15, fontWeight: '800', color: t.colors.text, letterSpacing: 0.5 },
+  label: { ...t.type.label, fontSize: 11, color: t.colors.textMuted },
+  gauge: { gap: 6 },
+  xpRow: { flexDirection: 'row', justifyContent: 'space-between' },
+  xp: { ...t.type.caption, color: t.colors.textMuted },
+  carArea: { flex: 1, marginHorizontal: -t.spacing.md },
+}));
+
+/** Home: level and XP on top, the car, a compact row of stats and the Start button. */
 export default function HomeScreen() {
+  const styles = useStyles();
   const data = useHomeData();
-  const params = useLocalSearchParams<{ design?: string }>();
-  const [saved, setSaved] = useState<HomeDesignId>(DEFAULT_HOME_DESIGN);
+  const params = useLocalSearchParams<{ stats?: string }>();
+  const [saved, setSaved] = useState<HomeStatsId>(DEFAULT_HOME_STATS);
   useFocusEffect(
     useCallback(() => {
-      getHomeDesign().then(setSaved);
+      getHomeStats().then(setSaved);
     }, []),
   );
-  const design: HomeDesignId = isHomeDesignId(params.design) ? params.design : saved;
-  const start = () => router.push('/create-session');
+  // add ?stats=pills (and so on) to try a style without saving it
+  const statsStyle: HomeStatsId = isHomeStatsId(params.stats) ? params.stats : saved;
+  const { profile, level } = data;
 
-  switch (design) {
-    case 'ring':
-      return <HomeRing data={data} onStart={start} />;
-    case 'cards':
-      return <HomeCards data={data} onStart={start} />;
-    case 'poster':
-      return <HomePoster data={data} onStart={start} />;
-    case 'telemetry':
-      return <HomeTelemetry data={data} onStart={start} />;
-    default:
-      return <HomeClassic data={data} onStart={start} />;
-  }
+  return (
+    <SafeAreaView style={styles.safe}>
+      <View style={styles.top}>
+        <View style={styles.badgeRow}>
+          <View style={styles.badge}>
+            <Text style={styles.badgeText}>LV {level.level}</Text>
+          </View>
+          <Text style={styles.label}>Driver</Text>
+        </View>
+        <Credits amount={profile.credits} size={18} />
+      </View>
+      <View style={styles.gauge}>
+        <ProgressBar fraction={level.fraction} />
+        <View style={styles.xpRow}>
+          <Text style={styles.xp}>XP</Text>
+          <Text style={styles.xp}>
+            {level.xpIntoLevel} / {level.xpForNextLevel}
+          </Text>
+        </View>
+      </View>
+      <View style={styles.carArea}>
+        <HeroCar car={profile.car} autoSpin={false} />
+      </View>
+      <HomeStatsView data={data} style={statsStyle} />
+      <Button label="Start Race" onPress={() => router.push('/create-session')} />
+    </SafeAreaView>
+  );
 }

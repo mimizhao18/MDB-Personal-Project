@@ -166,3 +166,6 @@ Three circuits: **Silverstone**, **Monaco** and **Spa-Francorchamps**. Each trac
 See [BACKLOG.md](BACKLOG.md): UI design pass, XP and credit balance, car design, keeping the screen awake during a race, and the longer-term multiplayer and distraction-blocking ideas.
 
 Expo projects change quickly between releases, so `AGENTS.md` tells coding assistants to check the current Expo docs for the installed SDK before using any Expo API.
+
+- Home is one layout (level and XP on top with a single continuous progress bar, the car, a compact stats row, Start Race). Settings > Home stats lets you pick how the stats look: Strip, Line, Pills, Table or Highlight. In the web preview you can try one with `/?stats=pills`.
+- The Home tab in the bottom bar is a trapezoid that is wider at the bottom (dark red when idle, solid red on Home).

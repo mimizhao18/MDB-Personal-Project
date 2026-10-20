@@ -56,7 +56,7 @@ export default function SettingsScreen() {
       <View style={styles.section}>
         <SectionLabel>Appearance</SectionLabel>
         <ListGroup>
-          <ListRow title="Home design" subtitle="Choose how the Home screen is laid out." chevron onPress={() => router.push('/home-design')} />
+          <ListRow title="Home stats" subtitle="Choose how your stats look on the Home screen." chevron onPress={() => router.push('/home-stats')} />
         </ListGroup>
       </View>
 
