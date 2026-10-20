@@ -30,7 +30,7 @@ const useStyles = makeStyles((t) => ({
   label: { ...t.typography.label, fontSize: 10, letterSpacing: 0.6, color: t.colors.textMuted },
   labelActive: { color: t.colors.accentOnDark },
   homeShape: { position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 },
-  homeLabel: { ...t.typography.label, fontFamily: t.typography.button.fontFamily, fontSize: 12, letterSpacing: 0.6, color: t.colors.accentOnDark },
+  homeLabel: { ...t.typography.label, fontFamily: t.typography.button.fontFamily, fontSize: 15, lineHeight: 20, letterSpacing: 0.8, color: t.colors.accentOnDark },
   homeLabelActive: { color: t.colors.accentText },
 }));
 
@@ -70,7 +70,7 @@ export function TabBar({ activePath }: { activePath?: string } = {}) {
   const pathname = activePath ?? routerPath;
   const insets = useSafeAreaInsets();
   // the labels may sit over the top of the home-indicator area, so only part of the bottom inset is added under them
-  const below = Math.max(0, insets.bottom - t.spacing.lg - t.spacing.sm);
+  const below = Math.max(0, insets.bottom - t.spacing.lg);
 
   return (
     <View accessibilityRole="tablist">

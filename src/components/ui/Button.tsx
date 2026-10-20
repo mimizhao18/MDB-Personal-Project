@@ -20,6 +20,7 @@ const useStyles = makeStyles((t) => ({
   primary: { backgroundColor: t.colors.accent, borderColor: t.colors.accent },
   secondary: { backgroundColor: 'transparent', borderColor: t.colors.border },
   ghost: { backgroundColor: 'transparent', borderColor: 'transparent' },
+  soft: { backgroundColor: t.colors.accentTint, borderColor: t.colors.accent },
   secondaryPressed: { backgroundColor: t.colors.raised },
   ghostPressed: { backgroundColor: t.colors.surface },
   pressed: { opacity: t.opacity.pressed },
@@ -28,9 +29,10 @@ const useStyles = makeStyles((t) => ({
   textPrimary: { color: t.colors.accentText },
   textSecondary: { color: t.colors.text },
   textGhost: { color: t.colors.textSecondary },
+  textSoft: { color: t.colors.accentOnDark },
 }));
 
-/** A 48 px button. `primary` (red) is for the one main action on a screen; use `secondary` and `ghost` for everything else. */
+/** A 48 px button. `primary` (solid red) is for the one main action on a screen; `soft` is a dark red tint with a thin red outline for a quieter action (Equip); use `secondary` and `ghost` for everything else. */
 export function Button({
   label,
   onPress,
@@ -41,15 +43,15 @@ export function Button({
 }: {
   label: string;
   onPress: () => void;
-  variant?: 'primary' | 'secondary' | 'ghost';
+  variant?: 'primary' | 'secondary' | 'ghost' | 'soft';
   icon?: IconName;
   disabled?: boolean;
   accessibilityLabel?: string;
 }) {
   const styles = useStyles();
   const t = useTheme();
-  const textStyle = variant === 'primary' ? styles.textPrimary : variant === 'secondary' ? styles.textSecondary : styles.textGhost;
-  const iconColor = variant === 'primary' ? t.colors.accentText : variant === 'secondary' ? t.colors.text : t.colors.textSecondary;
+  const textStyle = { primary: styles.textPrimary, secondary: styles.textSecondary, ghost: styles.textGhost, soft: styles.textSoft }[variant];
+  const iconColor = { primary: t.colors.accentText, secondary: t.colors.text, ghost: t.colors.textSecondary, soft: t.colors.accentOnDark }[variant];
   return (
     <Pressable
       onPress={onPress}
@@ -60,7 +62,7 @@ export function Button({
       style={({ pressed }) => [
         styles.base,
         styles[variant],
-        pressed && (variant === 'primary' ? styles.pressed : variant === 'secondary' ? styles.secondaryPressed : styles.ghostPressed),
+        pressed && (variant === 'secondary' ? styles.secondaryPressed : variant === 'ghost' ? styles.ghostPressed : styles.pressed),
         disabled && styles.disabled,
       ]}
     >

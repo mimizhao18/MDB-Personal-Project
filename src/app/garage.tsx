@@ -52,7 +52,7 @@ export default function GarageScreen() {
     .sort((a, b) => Number(b.id === profile.car.liveryId) - Number(a.id === profile.car.liveryId) || eraRank(b) - eraRank(a) || a.price - b.price);
 
   return (
-    <SafeAreaView style={styles.container} edges={['bottom']}>
+    <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
       <AmbientGlow color={glowHexFor(previewed.primary, previewed.secondary)} focus={0.4} />
       <ScrollView contentContainerStyle={styles.content}>
         <LiveryPreview

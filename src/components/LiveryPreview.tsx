@@ -2,7 +2,7 @@ import { Text, View } from 'react-native';
 
 import { getEra } from '../data/eras';
 import type { Livery } from '../data/liveries';
-import { makeStyles } from '../design/styles';
+import { makeStyles, useTheme } from '../design/styles';
 import { CarImage } from './CarIcon';
 import { HeroCar } from './HeroCar';
 import { BracketFrame, Button, CreditAmount } from './ui';
@@ -11,6 +11,7 @@ const useStyles = makeStyles((t) => ({
   stack: { gap: t.spacing.md },
   // the 3D car runs to the screen edges, so the glow behind it has room to fade out
   hero: { height: t.size.hero, marginHorizontal: -t.spacing.screen },
+  credits: { position: 'absolute', top: t.spacing.sm, right: t.spacing.screen },
   header: { flexDirection: 'row', alignItems: 'flex-start', justifyContent: 'space-between', gap: t.spacing.md },
   titleBlock: { flex: 1, gap: t.spacing.xs },
   name: { ...t.typography.title, color: t.colors.text },
@@ -19,13 +20,13 @@ const useStyles = makeStyles((t) => ({
   tag: { flexDirection: 'row', alignItems: 'center', gap: t.spacing.sm, paddingTop: t.spacing.xs },
   dot: { width: t.spacing.sm - 2, height: t.spacing.sm - 2, borderRadius: t.radius.dot, backgroundColor: t.colors.accent },
   tagText: { ...t.typography.metaLabel, color: t.colors.accentOnDark },
-  iconFrame: { alignItems: 'center', gap: t.spacing.sm },
+  iconFrame: { alignItems: 'center', gap: t.spacing.xs, paddingVertical: t.spacing.sm },
   iconLabel: { ...t.typography.metaLabel, color: t.colors.textMuted, alignSelf: 'flex-start' },
 }));
 
 /**
- * The livery being looked at: the 3D car you can spin, then its name, generation and team, then what you can do with it
- * (Equip or Buy as a normal button, or a small "Equipped" tag), and below that the 2D race icon. Used by the Garage and the Store.
+ * The livery being looked at: the 3D car you can spin with your credits in its top right corner, then its name, generation and team,
+ * then what you can do with it (Equip or Buy as a normal button, or a small "Equipped" tag), and below that the 2D race icon. Used by the Garage and the Store.
  */
 export function LiveryPreview({
   livery,
@@ -45,6 +46,7 @@ export function LiveryPreview({
   onBuy: () => void;
 }) {
   const styles = useStyles();
+  const t = useTheme();
   const era = getEra(livery.era);
   const canAfford = credits >= livery.price;
   const car = { liveryId: livery.id, number };
@@ -52,6 +54,9 @@ export function LiveryPreview({
     <View style={styles.stack}>
       <View style={styles.hero}>
         <HeroCar car={car} background="transparent" zoom={0.9} />
+        <View style={styles.credits} pointerEvents="none">
+          <CreditAmount amount={credits} small />
+        </View>
       </View>
 
       <View style={styles.header}>
@@ -67,12 +72,11 @@ export function LiveryPreview({
             </View>
           )}
         </View>
-        <CreditAmount amount={credits} small />
       </View>
 
       {!equipped &&
         (owned ? (
-          <Button label="Equip" onPress={onEquip} />
+          <Button label="Equip" variant="soft" onPress={onEquip} />
         ) : (
           <Button
             label={canAfford ? `Buy for ${livery.price} credits` : `${livery.price} credits (need ${livery.price - credits} more)`}
@@ -83,7 +87,7 @@ export function LiveryPreview({
 
       <BracketFrame style={styles.iconFrame}>
         <Text style={styles.iconLabel}>Race icon</Text>
-        <CarImage car={car} size={280} detail="full" showNumber />
+        <CarImage car={car} size={t.size.iconCar} detail="full" showNumber />
       </BracketFrame>
     </View>
   );

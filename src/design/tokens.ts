@@ -88,7 +88,7 @@ export const theme = {
   },
   border: { hairline: 1, selected: 1.5 },
   /** Fixed sizes: every touch target is at least `touch`, buttons and rows are taller. */
-  size: { touch: 44, control: 48, row: 56, tabBar: 48, progress: 4, icon: 22, heroCompact: 176, hero: 260, primary: 56, tick: 8, tickRadius: 3 },
+  size: { touch: 44, control: 48, row: 56, tabBar: 48, progress: 4, icon: 22, heroCompact: 176, hero: 260, iconCar: 180, cardCar: 100, cardCarWide: 190, primary: 56, tick: 8, tickRadius: 3 },
   opacity: { disabled: 0.4, dimmed: 0.5, pressed: 0.85 },
   /** Text styles, ready to spread into a style object. Numbers (stats, timers, XP, credits) use the mono ones. */
   typography: {

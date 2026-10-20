@@ -2,7 +2,9 @@ import { useLocalSearchParams } from 'expo-router';
 import { ScrollView, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { glowHexFor } from '../components/car3d/glow';
 import { LiveryPreview } from '../components/LiveryPreview';
+import { AmbientGlow } from '../components/ui';
 import { LIVERIES } from '../data/liveries';
 import { makeStyles } from '../design/styles';
 import { ownsLivery } from '../logic/garage';
@@ -10,8 +12,8 @@ import { useGarage } from '../ui/useGarage';
 
 const useStyles = makeStyles((t) => ({
   container: { flex: 1 },
-  content: { padding: t.spacing.md, gap: t.spacing.md, paddingBottom: t.spacing.xl },
-  missing: { ...t.type.body, color: t.colors.textMuted, textAlign: 'center', padding: t.spacing.lg },
+  content: { padding: t.spacing.screen, gap: t.spacing.md, paddingBottom: t.spacing.xl },
+  missing: { ...t.typography.body, color: t.colors.textMuted, textAlign: 'center', padding: t.spacing.lg },
 }));
 
 /** One livery in full: the 3D car, its race icon, and the button to buy or equip it. Opened from the Store. */
@@ -27,6 +29,7 @@ export default function LiveryScreen() {
   const owned = ownsLivery(profile, livery);
   return (
     <SafeAreaView style={styles.container} edges={['bottom']}>
+      <AmbientGlow color={glowHexFor(livery.primary, livery.secondary)} focus={0.3} />
       <ScrollView contentContainerStyle={styles.content}>
         <LiveryPreview
           livery={livery}
