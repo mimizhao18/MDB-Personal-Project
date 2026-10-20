@@ -10,6 +10,7 @@ export const SPA: Track = {
   lapLengthKm: 7.004,
   raceDistanceKm: 308.054,
   lapTimeSeconds: 100, // lap record 1:44.701, rounded to the nearest 10 s
+  unlockXp: 0,
   viewBox: SPA_VIEWBOX,
   roadWidth: SPA_ROAD_WIDTH,
   startFinish: SPA_START_FINISH,

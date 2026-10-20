@@ -16,6 +16,7 @@ export const MONACO: Track = {
   lapLengthKm: 3.337,
   raceDistanceKm: 260.286,
   lapTimeSeconds: 70, // lap record 1:12.909, rounded to the nearest 10 s
+  unlockXp: 0,
   viewBox: MONACO_VIEWBOX,
   roadWidth: MONACO_ROAD_WIDTH,
   startFinish: MONACO_START_FINISH,

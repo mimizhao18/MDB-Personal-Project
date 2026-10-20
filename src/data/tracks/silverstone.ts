@@ -16,6 +16,7 @@ export const SILVERSTONE: Track = {
   lapLengthKm: 5.891,
   raceDistanceKm: 306.198,
   lapTimeSeconds: 90, // lap record 1:27.097, rounded to the nearest 10 s
+  unlockXp: 0,
   viewBox: SILVERSTONE_VIEWBOX,
   roadWidth: SILVERSTONE_ROAD_WIDTH,
   startFinish: SILVERSTONE_START_FINISH,

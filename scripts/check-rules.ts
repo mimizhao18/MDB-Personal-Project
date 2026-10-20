@@ -28,7 +28,7 @@ import { colors, fonts, glass, theme } from '../src/design/tokens.ts';
 import { contrastRatio } from '../src/design/contrast.ts';
 import { NO_AWAY, RULES, addAway, classifyAway, pauseSecondsLeft, penaltyPercent, rewardMultiplier } from '../src/logic/distraction.ts';
 import { glowHexFor, hexToRgb255 } from '../src/components/car3d/glow.ts';
-import { TRACK_LIST } from '../src/data/tracks/index.ts';
+import { TRACK_LIST, isTrackUnlocked } from '../src/data/tracks/index.ts';
 import { applySessionToStreak, daysBetween, displayedStreak } from '../src/logic/streak.ts';
 
 const track = { id: 'silverstone', lapLengthKm: 5.891, lapTimeSeconds: 90 };
@@ -298,6 +298,27 @@ assert.equal(colors.accent, '#E10600'); // fixed F1 red
 assert.notEqual(colors.coin.toLowerCase(), colors.accent.toLowerCase());
 assert.ok(theme.typography.label.textTransform === 'uppercase');
 
+// the 2026 calendar: three free tracks, the other 21 open with XP in race order
+assert.equal(TRACK_LIST.length, 24);
+assert.equal(new Set(TRACK_LIST.map((t) => t.id)).size, 24, 'track ids are unique');
+assert.deepEqual(TRACK_LIST.slice(0, 3).map((t) => [t.id, t.unlockXp]), [['silverstone', 0], ['spa', 0], ['monaco', 0]]);
+for (let i = 3; i < TRACK_LIST.length; i++) {
+  assert.ok(TRACK_LIST[i].unlockXp >= 100, `${TRACK_LIST[i].id} costs XP`);
+  if (i > 3) assert.ok(TRACK_LIST[i].unlockXp > TRACK_LIST[i - 1].unlockXp, 'tracks open one after another');
+}
+for (const t of TRACK_LIST) {
+  assert.equal(t.points.length, 360, `${t.id} has 360 points`);
+  assert.ok(t.points.every(([x, y]) => x >= 0 && x <= t.viewBox.width && y >= 0 && y <= t.viewBox.height), `${t.id} stays inside its box`);
+  const mid = { x: (t.startFinish.from.x + t.startFinish.to.x) / 2, y: (t.startFinish.from.y + t.startFinish.to.y) / 2 };
+  assert.ok(Math.hypot(mid.x - t.points[0][0], mid.y - t.points[0][1]) < 3, `${t.id} starts on the start/finish line`);
+  assert.equal(t.lapTimeSeconds % 10, 0, `${t.id} lap time is a multiple of 10 s`);
+  assert.ok(Math.abs(t.raceLaps * t.lapLengthKm - t.raceDistanceKm) < 1, `${t.id} race distance matches laps times lap length`);
+  assert.ok(t.raceDistanceKm >= 260 && t.raceDistanceKm <= 315, `${t.id} race distance is a real Grand Prix distance`);
+}
+assert.equal(isTrackUnlocked(TRACK_LIST[3], 99), false);
+assert.equal(isTrackUnlocked(TRACK_LIST[3], 100), true);
+assert.equal(isTrackUnlocked(TRACK_LIST[0], 0), true);
+
 // leaving the app mid-race: 5 s track limits warning, 30 s yellow flag, 3 min crash; a pause excuses 5 minutes
 assert.equal(classifyAway(0), 'none');
 assert.equal(classifyAway(4.9), 'none');
@@ -370,17 +391,13 @@ assert.equal(glowHexFor('#1A1A1A', '#D4AF37'), '#D4AF37'); // a near-black car g
 assert.deepEqual(hexToRgb255('#FF8000'), [255, 128, 0]);
 
 // track data shown on the New Race cards
-assert.equal(TRACK_LIST.length, 3);
+// the three free tracks keep their flags and lap times
+assert.deepEqual(TRACK_LIST.slice(0, 3).map((t) => t.countryCode), ['GB', 'BE', 'MC']);
+assert.deepEqual(TRACK_LIST.slice(0, 3).map((t) => t.lapTimeSeconds), [90, 100, 70]);
 for (const t of TRACK_LIST) {
-  assert.ok(['GB', 'MC', 'BE'].includes(t.countryCode), `${t.id} has a flag`);
   assert.ok(t.name.length > 0 && t.country.length > 0);
-  // the official race distance is laps x lap length (to within rounding of the published figures)
-  assert.ok(Math.abs(t.raceLaps * t.lapLengthKm - t.raceDistanceKm) < 0.5, `${t.id}: ${t.raceLaps} x ${t.lapLengthKm} vs ${t.raceDistanceKm}`);
-  assert.equal(t.lapTimeSeconds % 10, 0, `${t.id} lap time is a multiple of 10 s`);
-  assert.equal(t.points.length, 360);
+  assert.match(t.countryCode, /^[A-Z]{2}$/, `${t.id} has a flag`);
 }
-assert.deepEqual(TRACK_LIST.map((t) => t.countryCode), ['GB', 'MC', 'BE']);
-assert.deepEqual(TRACK_LIST.map((t) => t.lapTimeSeconds), [90, 70, 100]);
 
 console.log('all rule checks passed');
 

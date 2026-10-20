@@ -7,10 +7,13 @@ import { formatClock } from '../logic/lapProgress';
 import type { Track, TrackId } from '../models/types';
 import { Flag } from './Flag';
 import { TrackView } from './TrackView';
-import { BracketFrame } from './ui';
+import { isTrackUnlocked } from '../data/tracks';
+import { BracketFrame, SegmentedProgress } from './ui';
 
 interface Props {
   tracks: readonly Track[];
+  /** The player's total XP: tracks that need more than this are shown locked. */
+  totalXp: number;
   selectedId: TrackId;
   onSelect: (id: TrackId) => void;
 }
@@ -31,16 +34,18 @@ const useStyles = makeStyles((t) => ({
   statValue: { ...t.typography.statSmall, color: t.colors.text },
   statUnit: { ...t.typography.micro, color: t.colors.textMuted },
   controls: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
-  dots: { flexDirection: 'row', gap: t.spacing.sm, alignItems: 'center' },
-  dot: { width: t.spacing.md - 2, height: t.size.progress, backgroundColor: t.colors.border },
-  dotActive: { backgroundColor: t.colors.accent, width: t.spacing.lg },
+  counter: { ...t.typography.metaValue, color: t.colors.textMuted },
+  dimmed: { gap: t.spacing.md, opacity: t.opacity.unaffordable },
+  lock: { gap: t.spacing.sm, borderTopWidth: t.border.hairline, borderTopColor: t.glass.divider, paddingTop: t.spacing.md },
+  lockLabel: { ...t.typography.metaLabel, color: t.colors.accentOnDark },
+  lockText: { ...t.typography.caption, color: t.colors.textSecondary },
   arrow: { width: t.size.touch, height: t.size.touch, alignItems: 'center', justifyContent: 'center' },
   arrowDisabled: { opacity: t.opacity.disabled },
   arrowText: { ...t.typography.title, color: t.colors.textSecondary },
 }));
 
 /** Tracks side by side: swipe sideways (or use the arrows) and the track in view is the selected one. */
-export function TrackCarousel({ tracks, selectedId, onSelect }: Props) {
+export function TrackCarousel({ tracks, totalXp, selectedId, onSelect }: Props) {
   const styles = useStyles();
   const theme = useTheme();
   const gap = theme.spacing.md;
@@ -86,8 +91,15 @@ export function TrackCarousel({ tracks, selectedId, onSelect }: Props) {
           onScroll={handleScroll}
           scrollEventThrottle={16}
           ItemSeparatorComponent={() => <View style={{ width: gap }} />}
-          renderItem={({ item }) => (
+          // every card has the same width, so the list knows where each one is without drawing them all
+          getItemLayout={(_data, index) => ({ length: width, offset: interval * index, index })}
+          initialNumToRender={3}
+          windowSize={5}
+          renderItem={({ item }) => {
+            const locked = !isTrackUnlocked(item, totalXp);
+            return (
             <BracketFrame style={[styles.card, { width }]}>
+              <View style={locked ? styles.dimmed : styles.card}>
               <View style={styles.header}>
                 <Flag code={item.countryCode} width={theme.size.flag + theme.spacing.sm} />
                 <View style={styles.headerText}>
@@ -108,20 +120,27 @@ export function TrackCarousel({ tracks, selectedId, onSelect }: Props) {
                 <StatBlock label="Distance" value={item.raceDistanceKm.toFixed(0)} unit="km" />
                 <StatBlock label="Lap time" value={formatClock(item.lapTimeSeconds)} />
               </View>
+              </View>
+              {locked && (
+                <View style={styles.lock} accessible accessibilityLabel={`Locked. Reach ${item.unlockXp} XP to unlock. You have ${totalXp}.`}>
+                  <Text style={styles.lockLabel}>Locked</Text>
+                  <Text style={styles.lockText}>
+                    Reach {item.unlockXp} XP to unlock this track. You have {totalXp}.
+                  </Text>
+                  <SegmentedProgress fraction={totalXp / item.unlockXp} />
+                </View>
+              )}
             </BracketFrame>
-          )}
+            );
+          }}
         />
       </View>
 
       <View style={styles.controls}>
         <Arrow label="‹" disabled={selectedIndex === 0} onPress={() => goTo(selectedIndex - 1)} accessibilityLabel="Previous track" />
-        <View style={styles.dots}>
-          {tracks.map((t, i) => (
-            <Pressable key={t.id} onPress={() => goTo(i)} hitSlop={8} accessibilityLabel={`Choose ${t.name}`}>
-              <View style={[styles.dot, i === selectedIndex && styles.dotActive]} />
-            </Pressable>
-          ))}
-        </View>
+        <Text style={styles.counter} accessibilityLabel={`Track ${selectedIndex + 1} of ${tracks.length}`}>
+          {selectedIndex + 1} / {tracks.length}
+        </Text>
         <Arrow label="›" disabled={selectedIndex === tracks.length - 1} onPress={() => goTo(selectedIndex + 1)} accessibilityLabel="Next track" />
       </View>
     </View>

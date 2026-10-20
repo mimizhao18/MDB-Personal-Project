@@ -1,17 +1,18 @@
-import { router } from 'expo-router';
-import { useState } from 'react';
+import { router, useFocusEffect } from 'expo-router';
+import { useCallback, useState } from 'react';
 import { ScrollView, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { Slider } from '../components/Slider';
 import { TrackCarousel } from '../components/TrackCarousel';
 import { SectionLabel, SegmentedControl, StartButton } from '../components/ui';
-import { TRACK_LIST } from '../data/tracks';
+import { TRACK_LIST, isTrackUnlocked } from '../data/tracks';
 import { makeStyles } from '../design/styles';
 import { clampLaps, lapsFromMinutes, maxMinutes, minutesForLaps } from '../logic/raceLength';
 import { distanceKm, lapsToSeconds } from '../logic/rewards';
 import { DEFAULT_LAPS, formatDurationWords } from '../logic/sessionOptions';
 import type { TrackId } from '../models/types';
+import { getProfile } from '../storage/profile';
 
 type Mode = 'laps' | 'minutes';
 const MODES: readonly Mode[] = ['laps', 'minutes'];
@@ -35,6 +36,13 @@ export default function CreateSessionScreen() {
   const [mode, setMode] = useState<Mode>('laps');
   const [requestedLaps, setRequestedLaps] = useState<number>(DEFAULT_LAPS);
   const [speed, setSpeed] = useState(1); // development only: speeds the race up for testing
+  const [totalXp, setTotalXp] = useState(0);
+
+  useFocusEffect(
+    useCallback(() => {
+      getProfile().then((profile) => setTotalXp(profile.totalXp));
+    }, []),
+  );
 
   const track = TRACK_LIST.find((t) => t.id === trackId) ?? TRACK_LIST[0];
   // Laps are always whole, and never more than a full race at this track (matters after switching tracks).
@@ -42,6 +50,7 @@ export default function CreateSessionScreen() {
   const seconds = lapsToSeconds(track, laps);
   const km = distanceKm(track, laps);
   const isFullRace = laps === track.raceLaps;
+  const locked = !isTrackUnlocked(track, totalXp);
 
   const start = () => {
     router.push({
@@ -60,7 +69,7 @@ export default function CreateSessionScreen() {
     <SafeAreaView style={styles.safe} edges={['bottom']}>
       <ScrollView contentContainerStyle={styles.content}>
         <SectionLabel>Track</SectionLabel>
-        <TrackCarousel tracks={TRACK_LIST} selectedId={trackId} onSelect={setTrackId} />
+        <TrackCarousel tracks={TRACK_LIST} totalXp={totalXp} selectedId={trackId} onSelect={setTrackId} />
 
         <SectionLabel>Race length</SectionLabel>
         <SegmentedControl options={MODES} value={mode} onChange={setMode} labelFor={(m) => (m === 'laps' ? 'Laps' : 'Minutes')} />
@@ -97,7 +106,7 @@ export default function CreateSessionScreen() {
       </ScrollView>
 
       <View style={styles.footer}>
-        <StartButton label="Start Race" onPress={start} frame />
+        <StartButton label={locked ? `Locked · ${track.unlockXp} XP` : 'Start Race'} onPress={start} frame disabled={locked} />
       </View>
     </SafeAreaView>
   );
