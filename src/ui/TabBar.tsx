@@ -4,6 +4,7 @@ import { Pressable, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Svg, { Polygon } from 'react-native-svg';
 
+import { Glass } from '../components/ui';
 import { makeStyles, useTheme } from '../design/styles';
 
 // Garage and Store on the left, History and Settings on the right, and Home in the middle on a trapezoid.
@@ -19,7 +20,8 @@ const TABS = [
 export const TAB_PATHS: readonly string[] = TABS.map((t) => t.path);
 
 const useStyles = makeStyles((t) => ({
-  bar: { flexDirection: 'row', alignItems: 'flex-start', backgroundColor: t.colors.background, borderTopWidth: t.border.hairline, borderTopColor: t.colors.border },
+  // a glass strip: the panel's own padding is removed so the tabs fill it
+  bar: { flexDirection: 'row', alignItems: 'flex-start', padding: 0 },
   tab: { flex: 1, alignItems: 'center', justifyContent: 'center' },
   homeTab: { flex: 1.3 },
   // the thin accent line over the active tab
@@ -56,7 +58,7 @@ function HomeShape({ active }: { active: boolean }) {
   );
 }
 
-/** A flat text tab bar: a hairline on top, labels only, the active tab in the accent with a thin line above it. */
+/** A flat glass tab bar: a lit edge on top, labels only, the active tab in the accent with a thin line above it. */
 export function TabBar() {
   const styles = useStyles();
   const t = useTheme();
@@ -64,7 +66,8 @@ export function TabBar() {
   const insets = useSafeAreaInsets();
 
   return (
-    <View style={styles.bar} accessibilityRole="tablist">
+    <View accessibilityRole="tablist">
+      <Glass corner="square" style={styles.bar}>
       {TABS.map((tab) => {
         const active = pathname === tab.path;
         const home = 'home' in tab;
@@ -93,6 +96,7 @@ export function TabBar() {
           </Pressable>
         );
       })}
+      </Glass>
     </View>
   );
 }

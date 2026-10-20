@@ -2,6 +2,7 @@
 export { AmbientGlow } from './AmbientGlow';
 export { Button } from './Button';
 export type { IconName } from './Button';
+export { ChamferButton } from './ChamferButton';
 export { Chip } from './Chip';
 export { CreditAmount } from './CreditAmount';
 export { Glass } from './Glass';

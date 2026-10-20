@@ -120,10 +120,13 @@ export function Car3DView({
   height,
   background = colors.background,
   autoSpin = true,
+  zoom = 1,
 }: {
   car: CarSettings;
   height?: number;
   background?: string;
+  /** Camera distance: below 1 is closer (the car looks bigger), above 1 is farther. */
+  zoom?: number;
   /** Turn slowly by itself when left alone. Off on Home, where the car holds still until you drag it. */
   autoSpin?: boolean;
 }) {
@@ -135,7 +138,7 @@ export function Car3DView({
       return () => setFocused(false);
     }, []),
   );
-  const orbit = useRef<Orbit>({ yaw: 0.75, pitch: 0.2, zoom: 1, dragging: false, lastTouchAt: 0, lastX: 0, lastY: 0 });
+  const orbit = useRef<Orbit>({ yaw: 0.75, pitch: 0.2, zoom, dragging: false, lastTouchAt: 0, lastX: 0, lastY: 0 });
   // Development only: lets the camera be set from the browser console when reviewing the model from different angles.
   useEffect(() => {
     if (__DEV__ && typeof window !== 'undefined') (window as unknown as { __carOrbit?: Orbit }).__carOrbit = orbit.current;
@@ -188,7 +191,7 @@ const styles = StyleSheet.create({
 });
 
 /** For callers that load this module on demand: returns the view as an element, so they need no dynamic component. */
-export function renderCar3D(props: { car: CarSettings; height?: number; background?: string; autoSpin?: boolean }): React.ReactElement {
+export function renderCar3D(props: { car: CarSettings; height?: number; background?: string; autoSpin?: boolean; zoom?: number }): React.ReactElement {
   return <Car3DView {...props} />;
 }
 

@@ -88,7 +88,7 @@ export const theme = {
   },
   border: { hairline: 1, selected: 1.5 },
   /** Fixed sizes: every touch target is at least `touch`, buttons and rows are taller. */
-  size: { touch: 44, control: 48, row: 56, tabBar: 56, progress: 4, icon: 22, heroCompact: 176 },
+  size: { touch: 44, control: 48, row: 56, tabBar: 56, progress: 4, icon: 22, heroCompact: 176, primary: 56, chamfer: 8 },
   opacity: { disabled: 0.4, dimmed: 0.5, pressed: 0.85 },
   /** Text styles, ready to spread into a style object. Numbers (stats, timers, XP, credits) use the mono ones. */
   typography: {
@@ -99,6 +99,9 @@ export const theme = {
     caption: { fontFamily: fonts.regular, fontSize: 13, lineHeight: 18 },
     /** Small uppercase labels, like a telemetry screen. */
     label: { fontFamily: fonts.medium, fontSize: 11, lineHeight: 16, letterSpacing: 1.2, textTransform: 'uppercase' },
+    /** The small text of Home's top bar and similar: labels and numbers share one size. */
+    metaLabel: { fontFamily: fonts.medium, fontSize: 12, lineHeight: 16, letterSpacing: 1, textTransform: 'uppercase' },
+    metaValue: { fontFamily: fonts.monoMedium, fontSize: 12, lineHeight: 16 },
     button: { fontFamily: fonts.semibold, fontSize: 15, lineHeight: 20, letterSpacing: 0.2 },
     statLarge: { fontFamily: fonts.monoSemibold, fontSize: 32, lineHeight: 38, letterSpacing: -0.5 },
     stat: { fontFamily: fonts.monoMedium, fontSize: 20, lineHeight: 26 },
