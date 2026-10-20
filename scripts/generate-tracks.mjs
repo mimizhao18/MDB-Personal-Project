@@ -13,13 +13,13 @@ const POINTS = 360;
 const BOX_WIDTH = 1000;
 const MARGIN = 40;
 const MAX_ROAD_WIDTH = 26;
-const MIN_ROAD_WIDTH = 12;
+const MIN_ROAD_WIDTH = 5;
 
 // our track id -> the circuit's id in the data, and whether the data runs the lap the wrong way round
 const TRACKS = {
   australia: { id: 'au-1953' },
   china: { id: 'cn-2004' },
-  japan: { id: 'jp-1962' },
+  japan: { id: 'jp-1962', fixedWidth: 14 }, // the track crosses itself on a bridge, so the strands are meant to touch there
   bahrain: { id: 'bh-2002' },
   'saudi-arabia': { id: 'sa-2021' },
   miami: { id: 'us-2022' },
@@ -83,7 +83,7 @@ function resample(loop, count) {
   return out;
 }
 
-function build(feature, reverse) {
+function build(feature, reverse, fixedWidth) {
   let coords = feature.geometry.coordinates.slice(0, -1); // the last point repeats the first
   if (reverse) coords = [coords[0], ...coords.slice(1).reverse()];
   const lat0 = coords.reduce((s, c) => s + c[1], 0) / coords.length;
@@ -106,17 +106,88 @@ function build(feature, reverse) {
   const height = Math.round((b.maxY - b.minY) * scale + 2 * MARGIN);
   loop = loop.map(([x, y]) => [(x - b.minX) * scale + MARGIN, (y - b.minY) * scale + MARGIN]);
 
-  const points = resample(loop, POINTS);
+  let points = resample(loop, POINTS);
 
-  // the road is drawn narrower where two strands of the track run close together
-  let closest = Infinity;
-  for (let i = 0; i < POINTS; i++) {
-    for (let j = i + 1; j < POINTS; j++) {
-      const apart = Math.min(j - i, POINTS - (j - i));
-      if (apart > POINTS / 12) closest = Math.min(closest, dist(points[i], points[j]));
+  // The road is drawn as wide as fits: it must not touch another strand of the track (with the dark edge that TrackView adds on
+  // both sides) and must not fill up the inside of a tight corner. Strands that are close only because they are the same corner
+  // (less than three road widths along the lap) are not counted as another strand. Where a track is too cramped for even a
+  // narrow road (Baku's old town, Jeddah's corners), the strands are gently pushed apart a little, like on a track map.
+  const EDGE = 4; // TrackView draws a dark edge: 2 units on each side of the road
+  const GAP = 2; // space left between the edges of two strands
+  const CURVE_K = 4;
+  const lapLength = (list) => list.reduce((sum, p, i) => sum + dist(p, list[(i + 1) % list.length]), 0);
+
+  const tightestRadius = (list) => {
+    let tightest = Infinity;
+    for (let i = 0; i < POINTS; i++) {
+      const a = list[(i - CURVE_K + POINTS) % POINTS], b = list[i], c = list[(i + CURVE_K) % POINTS];
+      const area2 = Math.abs((b[0] - a[0]) * (c[1] - a[1]) - (c[0] - a[0]) * (b[1] - a[1]));
+      if (area2 > 1e-6) tightest = Math.min(tightest, (dist(a, b) * dist(b, c) * dist(a, c)) / (2 * area2));
+    }
+    return tightest;
+  };
+  const crowded = (list, w) => {
+    const spacing = lapLength(list) / POINTS;
+    const pairs = [];
+    for (let i = 0; i < POINTS; i++) {
+      for (let j = i + 1; j < POINTS; j++) {
+        if (Math.min(j - i, POINTS - (j - i)) * spacing >= 3 * w && dist(list[i], list[j]) < w + EDGE + GAP - 0.5) pairs.push([i, j]);
+      }
+    }
+    return pairs;
+  };
+  const fits = (list, w) => tightestRadius(list) >= w / 1.7 && crowded(list, w).length === 0;
+
+  /** Pushes strands that are closer than a road plus its edges apart, keeping the shape (smoothing, and a pull back to where each point was). */
+  const spreadOut = (list, w) => {
+    const spacing = lapLength(list) / POINTS;
+    const wanted = w + EDGE + GAP;
+    const pull = list.map((p) => [...p]);
+    let current = list.map((p) => [...p]);
+    for (let round = 0; round < 600; round++) {
+      const move = current.map(() => [0, 0]);
+      let worst = 0;
+      for (let i = 0; i < POINTS; i++) {
+        for (let j = i + 1; j < POINTS; j++) {
+          if (Math.min(j - i, POINTS - (j - i)) * spacing < 3 * w) continue;
+          const d = dist(current[i], current[j]);
+          if (d >= wanted) continue;
+          worst = Math.max(worst, wanted - d);
+          const push = ((wanted - d) / 2 + 0.05) / (d || 1);
+          const dx = (current[i][0] - current[j][0]) * push, dy = (current[i][1] - current[j][1]) * push;
+          move[i][0] += dx; move[i][1] += dy; move[j][0] -= dx; move[j][1] -= dy;
+        }
+      }
+      if (worst < 0.6) break;
+      current = current.map((p, i) => {
+        const before = current[(i - 1 + POINTS) % POINTS], after = current[(i + 1) % POINTS];
+        return [
+          p[0] + move[i][0] + 0.1 * ((before[0] + after[0]) / 2 - p[0]) + 0.003 * (pull[i][0] - p[0]),
+          p[1] + move[i][1] + 0.1 * ((before[1] + after[1]) / 2 - p[1]) + 0.003 * (pull[i][1] - p[1]),
+        ];
+      });
+    }
+    return resample(current, POINTS);
+  };
+
+  let roadWidth = Number.isFinite(fixedWidth) ? fixedWidth : MAX_ROAD_WIDTH;
+  if (!Number.isFinite(fixedWidth)) {
+    while (roadWidth >= 18 && !fits(points, roadWidth)) roadWidth--;
+    if (roadWidth < 18) {
+      // too cramped: try narrower roads, spreading the strands apart as little as needed
+      for (const w of [18, 16, 14, 12, 10, 8, 7, 6, 5]) {
+        const spread = spreadOut(points, w);
+        const moved = Math.max(...spread.map((p, i) => dist(p, points[i])));
+        if (process.env.DEBUG) console.log('  try', w, 'moved', moved.toFixed(1), 'radius', tightestRadius(spread).toFixed(1), 'crowded', crowded(spread, w).length);
+        if (fits(spread, w) && moved < 45) {
+          points = spread;
+          roadWidth = w;
+          break;
+        }
+        roadWidth = MIN_ROAD_WIDTH;
+      }
     }
   }
-  const roadWidth = Math.max(MIN_ROAD_WIDTH, Math.min(MAX_ROAD_WIDTH, Math.floor(closest * 0.7)));
 
   // the start/finish line crosses the road at point 0
   const [p0, p1] = [points[0], points[2]];
@@ -146,10 +217,10 @@ export interface CalendarShape {
 
 export const CALENDAR_SHAPES: Record<string, CalendarShape> = {
 `;
-for (const [trackId, { id, reverse }] of Object.entries(TRACKS)) {
+for (const [trackId, { id, reverse, fixedWidth }] of Object.entries(TRACKS)) {
   const feature = features.get(id);
   if (!feature) throw new Error(`Circuit ${id} is not in the data`);
-  const shape = build(feature, reverse);
+  const shape = build(feature, reverse, fixedWidth);
   ts += `  '${trackId}': {\n    viewBox: { width: ${shape.viewBox.width}, height: ${shape.viewBox.height} },\n    roadWidth: ${shape.roadWidth},\n`;
   ts += `    startFinish: { from: { x: ${shape.startFinish.from.x}, y: ${shape.startFinish.from.y} }, to: { x: ${shape.startFinish.to.x}, y: ${shape.startFinish.to.y} } },\n`;
   ts += `    points: [${shape.points.map(([x, y]) => `[${x}, ${y}]`).join(', ')}],\n  },\n`;

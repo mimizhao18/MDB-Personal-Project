@@ -1,13 +1,13 @@
-import { useRef, useState } from 'react';
-import { FlatList, Pressable, Text, useWindowDimensions, View } from 'react-native';
+import { memo, useRef, useState } from 'react';
+import { Pressable, ScrollView, Text, useWindowDimensions, View } from 'react-native';
 import type { NativeScrollEvent, NativeSyntheticEvent } from 'react-native';
 
+import { isTrackUnlocked } from '../data/tracks';
 import { makeStyles, useTheme } from '../design/styles';
 import { formatClock } from '../logic/lapProgress';
 import type { Track, TrackId } from '../models/types';
 import { Flag } from './Flag';
 import { TrackView } from './TrackView';
-import { isTrackUnlocked } from '../data/tracks';
 import { BracketFrame, SegmentedProgress } from './ui';
 
 interface Props {
@@ -20,6 +20,7 @@ interface Props {
 
 const useStyles = makeStyles((t) => ({
   container: { gap: t.spacing.sm },
+  row: { gap: t.spacing.md },
   card: { gap: t.spacing.md },
   header: { flexDirection: 'row', alignItems: 'center', gap: t.spacing.md },
   headerText: { flex: 1, gap: t.spacing.xxs },
@@ -35,10 +36,16 @@ const useStyles = makeStyles((t) => ({
   statUnit: { ...t.typography.micro, color: t.colors.textMuted },
   controls: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
   counter: { ...t.typography.metaValue, color: t.colors.textMuted },
-  dimmed: { gap: t.spacing.md, opacity: t.opacity.unaffordable },
-  lock: { gap: t.spacing.sm, borderTopWidth: t.border.hairline, borderTopColor: t.glass.divider, paddingTop: t.spacing.md },
+  // a locked track is dimmed, with a note over the track drawing, so a locked card is as tall as any other
+  dimmed: { opacity: t.opacity.unaffordable },
+  preview: { justifyContent: 'center' },
+  previewTrack: { position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 },
+  // the drawing of a locked track stops above the note about its XP
+  previewTrackLocked: { bottom: t.spacing.lg + t.spacing.xs, opacity: t.opacity.unaffordable },
+  lock: { position: 'absolute', left: 0, right: 0, bottom: 0, gap: t.spacing.xs, paddingVertical: t.spacing.xs },
+  lockRow: { flexDirection: 'row', alignItems: 'baseline', justifyContent: 'space-between', gap: t.spacing.sm },
   lockLabel: { ...t.typography.metaLabel, color: t.colors.accentOnDark },
-  lockText: { ...t.typography.caption, color: t.colors.textSecondary },
+  lockText: { ...t.typography.metaValue, color: t.colors.textSecondary },
   arrow: { width: t.size.touch, height: t.size.touch, alignItems: 'center', justifyContent: 'center' },
   arrowDisabled: { opacity: t.opacity.disabled },
   arrowText: { ...t.typography.title, color: t.colors.textSecondary },
@@ -56,7 +63,7 @@ export function TrackCarousel({ tracks, totalXp, selectedId, onSelect }: Props) 
   const windowWidth = useWindowDimensions().width;
   const [measured, setMeasured] = useState(0);
   const width = measured > 0 ? measured : Math.max(200, Math.min(windowWidth, 460) - theme.spacing.screen * 2);
-  const listRef = useRef<FlatList<Track>>(null);
+  const listRef = useRef<ScrollView>(null);
 
   const interval = width + gap;
   const selectedIndex = Math.max(0, tracks.findIndex((t) => t.id === selectedId));
@@ -65,7 +72,7 @@ export function TrackCarousel({ tracks, totalXp, selectedId, onSelect }: Props) 
   const goTo = (i: number) => {
     const target = clampIndex(i);
     onSelect(tracks[target].id);
-    listRef.current?.scrollToOffset({ offset: target * interval, animated: true });
+    listRef.current?.scrollTo({ x: target * interval, animated: true });
   };
 
   const handleScroll = (e: NativeSyntheticEvent<NativeScrollEvent>) => {
@@ -79,10 +86,8 @@ export function TrackCarousel({ tracks, totalXp, selectedId, onSelect }: Props) 
   return (
     <View style={styles.container}>
       <View onLayout={(e) => setMeasured(Math.round(e.nativeEvent.layout.width))}>
-        <FlatList
+        <ScrollView
           ref={listRef}
-          data={tracks}
-          keyExtractor={(t) => t.id}
           horizontal
           showsHorizontalScrollIndicator={false}
           snapToInterval={interval}
@@ -90,50 +95,12 @@ export function TrackCarousel({ tracks, totalXp, selectedId, onSelect }: Props) 
           decelerationRate="fast"
           onScroll={handleScroll}
           scrollEventThrottle={16}
-          ItemSeparatorComponent={() => <View style={{ width: gap }} />}
-          // every card has the same width, so the list knows where each one is without drawing them all
-          getItemLayout={(_data, index) => ({ length: width, offset: interval * index, index })}
-          initialNumToRender={3}
-          windowSize={5}
-          renderItem={({ item }) => {
-            const locked = !isTrackUnlocked(item, totalXp);
-            return (
-            <BracketFrame style={[styles.card, { width }]}>
-              <View style={locked ? styles.dimmed : styles.card}>
-              <View style={styles.header}>
-                <Flag code={item.countryCode} width={theme.size.flag + theme.spacing.sm} />
-                <View style={styles.headerText}>
-                  <Text style={styles.name} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.7}>
-                    {item.name}
-                  </Text>
-                  <Text style={styles.country}>{item.country}</Text>
-                </View>
-              </View>
-
-              <View style={{ height: previewHeight }}>
-                <TrackView track={item} lapFraction={0} showCar={false} fill />
-              </View>
-
-              <View style={styles.stats}>
-                <StatBlock first label="Length" value={item.lapLengthKm.toFixed(2)} unit="km" />
-                <StatBlock label="Laps" value={String(item.raceLaps)} />
-                <StatBlock label="Distance" value={item.raceDistanceKm.toFixed(0)} unit="km" />
-                <StatBlock label="Lap time" value={formatClock(item.lapTimeSeconds)} />
-              </View>
-              </View>
-              {locked && (
-                <View style={styles.lock} accessible accessibilityLabel={`Locked. Reach ${item.unlockXp} XP to unlock. You have ${totalXp}.`}>
-                  <Text style={styles.lockLabel}>Locked</Text>
-                  <Text style={styles.lockText}>
-                    Reach {item.unlockXp} XP to unlock this track. You have {totalXp}.
-                  </Text>
-                  <SegmentedProgress fraction={totalXp / item.unlockXp} />
-                </View>
-              )}
-            </BracketFrame>
-            );
-          }}
-        />
+          contentContainerStyle={styles.row}
+        >
+          {tracks.map((track) => (
+            <TrackCard key={track.id} track={track} width={width} previewHeight={previewHeight} totalXp={totalXp} />
+          ))}
+        </ScrollView>
       </View>
 
       <View style={styles.controls}>
@@ -146,6 +113,50 @@ export function TrackCarousel({ tracks, totalXp, selectedId, onSelect }: Props) 
     </View>
   );
 }
+
+/** One track: its name and flag, its outline, and its four numbers. A track you have not unlocked yet is dimmed and says how much XP it needs. */
+const TrackCard = memo(function TrackCard({ track, width, previewHeight, totalXp }: { track: Track; width: number; previewHeight: number; totalXp: number }) {
+  const styles = useStyles();
+  const theme = useTheme();
+  const locked = !isTrackUnlocked(track, totalXp);
+  return (
+    <BracketFrame style={[styles.card, { width }]}>
+      <View style={[styles.header, locked && styles.dimmed]}>
+        <Flag code={track.countryCode} width={theme.size.flag + theme.spacing.sm} />
+        <View style={styles.headerText}>
+          <Text style={styles.name} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.7}>
+            {track.name}
+          </Text>
+          <Text style={styles.country}>{track.country}</Text>
+        </View>
+      </View>
+
+      <View style={[styles.preview, { height: previewHeight }]}>
+        <View style={[styles.previewTrack, locked && styles.previewTrackLocked]}>
+          <TrackView track={track} lapFraction={0} showCar={false} fill />
+        </View>
+        {locked && (
+          <View style={styles.lock} accessible accessibilityLabel={`Locked. Reach ${track.unlockXp} XP to unlock. You have ${totalXp}.`}>
+            <View style={styles.lockRow}>
+              <Text style={styles.lockLabel}>Locked</Text>
+              <Text style={styles.lockText}>
+                {totalXp} / {track.unlockXp} XP to unlock
+              </Text>
+            </View>
+            <SegmentedProgress fraction={totalXp / track.unlockXp} />
+          </View>
+        )}
+      </View>
+
+      <View style={[styles.stats, locked && styles.dimmed]}>
+        <StatBlock first label="Length" value={track.lapLengthKm.toFixed(2)} unit="km" />
+        <StatBlock label="Laps" value={String(track.raceLaps)} />
+        <StatBlock label="Distance" value={track.raceDistanceKm.toFixed(0)} unit="km" />
+        <StatBlock label="Lap time" value={formatClock(track.lapTimeSeconds)} />
+      </View>
+    </BracketFrame>
+  );
+});
 
 /** A small label over a number (with its unit), one of the four figures in a track card. */
 function StatBlock({ label, value, unit, first }: { label: string; value: string; unit?: string; first?: boolean }) {
