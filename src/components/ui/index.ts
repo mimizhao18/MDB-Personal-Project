@@ -3,8 +3,6 @@ export { Button } from './Button';
 export type { IconName } from './Button';
 export { Chip } from './Chip';
 export { CreditAmount } from './CreditAmount';
-export { IconTabBar } from './IconTabBar';
-export type { IconTab } from './IconTabBar';
 export { ListRow } from './ListRow';
 export { Divider, Panel } from './Panel';
 export { SectionLabel } from './SectionLabel';

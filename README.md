@@ -167,5 +167,6 @@ See [BACKLOG.md](BACKLOG.md): UI design pass, XP and credit balance, car design,
 
 Expo projects change quickly between releases, so `AGENTS.md` tells coding assistants to check the current Expo docs for the installed SDK before using any Expo API.
 
-- Home is one layout (level and XP on top with a single continuous progress bar, the car, a compact stats row, Start Race). Settings > Home stats lets you pick how the stats look: Strip, Line, Pills, Table or Highlight. In the web preview you can try one with `/?stats=pills`.
-- The Home tab in the bottom bar is a trapezoid that is wider at the bottom (dark red when idle, solid red on Home).
+- Home is one layout: level and credits on top, one continuous XP bar, the 3D car, a three-up stat strip (streak, races, distance) and a red Start Race button.
+- The bottom bar is text only: a hairline on top, the active tab in red with a thin line above it, and Home on a red trapezoid (wider at the bottom) in the middle.
+- The look is a "timing screen": see `src/design/tokens.ts` for every color, font (Inter and JetBrains Mono), size and corner radius, and `src/components/ui` for the shared components. In development, Settings > Development only > Design system shows them all.

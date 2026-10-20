@@ -4,10 +4,9 @@ import { Pressable, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Svg, { Polygon } from 'react-native-svg';
 
-import { makeStyles } from '../design/styles';
-import { colors } from '../theme';
+import { makeStyles, useTheme } from '../design/styles';
 
-// Garage and Store on the left, History and Settings on the right, and Home in the middle, a little more prominent.
+// Garage and Store on the left, History and Settings on the right, and Home in the middle on a trapezoid.
 const TABS = [
   { label: 'Garage', path: '/garage' },
   { label: 'Store', path: '/store' },
@@ -19,43 +18,37 @@ const TABS = [
 /** The screens that belong to the tab bar (and show it when the navigation style is "tabs"). */
 export const TAB_PATHS: readonly string[] = TABS.map((t) => t.path);
 
-const TAB_HEIGHT = 56;
-/** How far each slanted side of the Home trapezoid leans in at the top, in px. */
-const SLANT = 14;
-
 const useStyles = makeStyles((t) => ({
-  bar: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    backgroundColor: t.colors.surface,
-    borderTopWidth: t.border.hairline,
-    borderTopColor: t.colors.border,
-  },
-  tab: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: 6 },
-  homeTab: { flex: 1.5 },
-  indicator: { position: 'absolute', top: -t.border.hairline, left: '30%', right: '30%', height: 2, backgroundColor: t.colors.accent },
-  label: { ...t.type.caption, color: t.colors.textMuted, fontWeight: '600', letterSpacing: 0.4 },
-  labelActive: { color: t.colors.text },
+  bar: { flexDirection: 'row', alignItems: 'flex-start', backgroundColor: t.colors.background, borderTopWidth: t.border.hairline, borderTopColor: t.colors.border },
+  tab: { flex: 1, alignItems: 'center', justifyContent: 'center' },
+  homeTab: { flex: 1.3 },
+  // the thin accent line over the active tab
+  indicator: { position: 'absolute', top: -t.border.hairline, left: t.spacing.md, right: t.spacing.md, height: 2, backgroundColor: t.colors.accent },
+  // a little smaller and tighter than the usual label so "SETTINGS" fits with room to spare
+  label: { ...t.typography.label, fontSize: 10, letterSpacing: 0.6, color: t.colors.textMuted },
+  labelActive: { color: t.colors.accentOnDark },
   homeShape: { position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 },
-  homeLabel: { fontSize: 14, fontWeight: '800', letterSpacing: 0.6, color: t.colors.accentSoftText },
+  homeLabel: { ...t.typography.label, fontFamily: t.typography.button.fontFamily, fontSize: 12, letterSpacing: 0.6, color: t.colors.accentOnDark },
   homeLabelActive: { color: t.colors.accentText },
 }));
 
-/** The Home tab's backdrop: a trapezoid that is wider at the bottom, dark red when idle and solid red on Home. */
+/** The Home tab's backdrop: a trapezoid, wider at the bottom, dark red when idle and solid red on Home. */
 function HomeShape({ active }: { active: boolean }) {
   const styles = useStyles();
+  const t = useTheme();
   const [size, setSize] = useState({ width: 0, height: 0 });
   const { width, height } = size;
+  const slant = t.spacing.md;
   return (
     <View style={styles.homeShape} pointerEvents="none" onLayout={(e) => setSize(e.nativeEvent.layout)}>
       {width > 0 && (
         <Svg width={width} height={height}>
           <Polygon
-            points={`${SLANT},0 ${width - SLANT},0 ${width},${height} 0,${height}`}
-            fill={active ? colors.accent : colors.accentSoft}
-            stroke={colors.accent}
-            strokeWidth={active ? 0 : 1}
-            strokeOpacity={0.5}
+            points={`${slant},0 ${width - slant},0 ${width},${height} 0,${height}`}
+            fill={active ? t.colors.accent : t.colors.accentTint}
+            stroke={t.colors.accent}
+            strokeWidth={active ? 0 : t.border.hairline}
+            strokeOpacity={t.opacity.dimmed}
           />
         </Svg>
       )}
@@ -63,20 +56,22 @@ function HomeShape({ active }: { active: boolean }) {
   );
 }
 
+/** A flat text tab bar: a hairline on top, labels only, the active tab in the accent with a thin line above it. */
 export function TabBar() {
   const styles = useStyles();
+  const t = useTheme();
   const pathname = usePathname();
   const insets = useSafeAreaInsets();
 
   return (
-    <View style={styles.bar}>
+    <View style={styles.bar} accessibilityRole="tablist">
       {TABS.map((tab) => {
         const active = pathname === tab.path;
         const home = 'home' in tab;
         return (
           <Pressable
             key={tab.path}
-            style={[styles.tab, home && styles.homeTab, { height: TAB_HEIGHT + insets.bottom, paddingBottom: insets.bottom }]}
+            style={[styles.tab, home && styles.homeTab, { height: t.size.tabBar + insets.bottom, paddingBottom: insets.bottom }]}
             onPress={() => {
               if (!active) router.replace(tab.path);
             }}

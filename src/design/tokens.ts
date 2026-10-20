@@ -21,6 +21,8 @@ export const colors = {
   accentText: '#FFFFFF',
   /** The accent lightened so that small text and icons on the dark surfaces still pass WCAG AA. */
   accentOnDark: '#FF6B63',
+  /** A dark red tint of the accent: the idle fill of the Home tab. */
+  accentTint: '#2A1513',
   positive: '#3DDC84',
 
   /** legacy: the same grey as `raised`. */

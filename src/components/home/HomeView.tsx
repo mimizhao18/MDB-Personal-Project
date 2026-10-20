@@ -1,13 +1,16 @@
 import { Text, View } from 'react-native';
 
-import { makeStyles } from '../../../design/styles';
-import { HeroCar } from '../../HeroCar';
-import { Button, SegmentedProgress, StatBlock } from '../../ui';
-import type { HomeData } from '../useHomeData';
-import { HomeTopBar } from './parts';
+import { makeStyles } from '../../design/styles';
+import { HeroCar } from '../HeroCar';
+import { Button, CreditAmount, SegmentedProgress, StatBlock } from '../ui';
+import type { HomeData } from './useHomeData';
 
 const useStyles = makeStyles((t) => ({
   screen: { flex: 1, padding: t.spacing.screen, gap: t.spacing.md },
+  top: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
+  level: { flexDirection: 'row', alignItems: 'baseline', gap: t.spacing.sm },
+  levelLabel: { ...t.typography.label, color: t.colors.textMuted },
+  levelNumber: { ...t.typography.stat, color: t.colors.text },
   xp: { gap: t.spacing.xs },
   xpRow: { flexDirection: 'row', justifyContent: 'space-between' },
   xpText: { ...t.typography.statSmall, color: t.colors.textMuted },
@@ -18,15 +21,21 @@ const useStyles = makeStyles((t) => ({
   divided: { borderLeftWidth: t.border.hairline, borderLeftColor: t.colors.border },
 }));
 
-/** Variant 1, Strip: the car as the hero, XP across the top, a three-up stat strip split by hairlines, one red button. */
-export function HomeStrip({ data, onStart, segments }: { data: HomeData; onStart: () => void; segments: number }) {
+/** Home: the car as the hero, one continuous XP bar across the top, a three-up stat strip split by hairlines, one red button. */
+export function HomeView({ data, onStart }: { data: HomeData; onStart: () => void }) {
   const styles = useStyles();
   const { profile, stats, level, streak } = data;
   return (
     <View style={styles.screen}>
-      <HomeTopBar level={level.level} credits={profile.credits} />
+      <View style={styles.top}>
+        <View style={styles.level} accessible accessibilityLabel={`Level ${level.level}`}>
+          <Text style={styles.levelLabel}>Level</Text>
+          <Text style={styles.levelNumber}>{level.level}</Text>
+        </View>
+        <CreditAmount amount={profile.credits} />
+      </View>
       <View style={styles.xp}>
-        <SegmentedProgress fraction={level.fraction} segments={segments} accessibilityLabel="XP to the next level" />
+        <SegmentedProgress fraction={level.fraction} accessibilityLabel="XP to the next level" />
         <View style={styles.xpRow}>
           <Text style={styles.xpLabel}>XP</Text>
           <Text style={styles.xpText}>

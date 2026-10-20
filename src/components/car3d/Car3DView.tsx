@@ -36,9 +36,6 @@ const IDLE_BEFORE_SPIN_MS = 1800;
 const MIN_PITCH = 0.04;
 const MAX_PITCH = 0.62;
 
-/** `background="transparent"` lets whatever is behind the car (a gauge, a panel) show through the 3D view. */
-const seeThrough = (background: string) => background === 'transparent';
-
 function Scene({ livery, orbit, background, autoSpin }: { livery: Livery; orbit: React.MutableRefObject<Orbit>; background: string; autoSpin: boolean }) {
   const { camera, gl, scene } = useThree();
   const car = useMemo(() => buildCar(livery), [livery]);
@@ -85,7 +82,7 @@ function Scene({ livery, orbit, background, autoSpin }: { livery: Livery; orbit:
 
   return (
     <>
-      {!seeThrough(background) && <color attach="background" args={[background]} />}
+      <color attach="background" args={[background]} />
       <ambientLight intensity={0.35} />
       <hemisphereLight args={['#aab4d0', groundTint, 0.6]} />
       <directionalLight position={[5, 7, 4]} intensity={2.2} />
@@ -174,7 +171,7 @@ export function Car3DView({
       accessibilityLabel={`3D view of the ${livery.name} car. Drag to rotate.`}
     >
       <View style={[StyleSheet.absoluteFill, { pointerEvents: 'none' }]}>
-        <Canvas camera={{ fov: 30, position: [6, 2, 6], near: 0.1, far: 60 }} gl={{ antialias: true, alpha: seeThrough(background) }} dpr={[1, 2]} frameloop={focused ? 'always' : 'never'}>
+        <Canvas camera={{ fov: 30, position: [6, 2, 6], near: 0.1, far: 60 }} gl={{ antialias: true }} dpr={[1, 2]} frameloop={focused ? 'always' : 'never'}>
           <Scene livery={livery} orbit={orbit} background={background} autoSpin={autoSpin} />
         </Canvas>
       </View>

@@ -1,8 +1,7 @@
 import { useState } from 'react';
 import { ScrollView, Text, View } from 'react-native';
 
-import { Button, Chip, Divider, IconTabBar, ListRow, Panel, SectionLabel, SegmentedProgress, StatBlock } from '../../components/ui';
-import type { IconTab } from '../../components/ui';
+import { Button, Chip, Divider, ListRow, Panel, SectionLabel, SegmentedProgress, StatBlock } from '../../components/ui';
 import { contrastRatio } from '../../design/contrast';
 import { makeStyles } from '../../design/styles';
 import { colors, theme } from '../../design/tokens';
@@ -20,14 +19,6 @@ const TYPE_SAMPLES = [
   { name: 'statSmall', sample: '5 day streak' },
   { name: 'label', sample: 'Lifetime stats' },
 ] as const;
-
-const TABS: readonly IconTab[] = [
-  { key: 'garage', label: 'Garage', icon: 'car-sport-outline', iconActive: 'car-sport' },
-  { key: 'store', label: 'Store', icon: 'bag-handle-outline', iconActive: 'bag-handle' },
-  { key: 'home', label: 'Home', icon: 'speedometer-outline', iconActive: 'speedometer', emphasized: true },
-  { key: 'history', label: 'History', icon: 'time-outline', iconActive: 'time' },
-  { key: 'settings', label: 'Settings', icon: 'settings-outline', iconActive: 'settings' },
-];
 
 const useStyles = makeStyles((t) => ({
   content: { padding: t.spacing.screen, gap: t.spacing.xl, paddingBottom: t.spacing.xxl },
@@ -53,14 +44,12 @@ const useStyles = makeStyles((t) => ({
   stripCell: { flex: 1, paddingHorizontal: t.spacing.md },
   stripCellDivided: { borderLeftWidth: t.border.hairline, borderLeftColor: t.colors.border },
   barLabel: { ...t.typography.caption, color: t.colors.textMuted, marginBottom: t.spacing.xs },
-  tabDemo: { borderWidth: t.border.hairline, borderColor: t.colors.border },
 }));
 
 /** Dev only: every design token and shared component on one page, for approving the look before screens are changed. */
 export default function DesignSystemScreen() {
   const styles = useStyles();
   const [chip, setChip] = useState('2022');
-  const [tab, setTab] = useState('home');
 
   return (
     <ScrollView contentContainerStyle={styles.content}>
@@ -206,13 +195,6 @@ export default function DesignSystemScreen() {
           <ListRow title="Compare generations" subtitle="Any two generations side by side." icon="git-compare-outline" onPress={() => {}} />
           <ListRow title="Total focus time" value="3 h 18 min" icon="timer-outline" />
           <ListRow title="Reset all data" destructive icon="trash-outline" onPress={() => {}} last />
-        </View>
-      </View>
-
-      <View style={styles.section}>
-        <SectionLabel>Tab bar</SectionLabel>
-        <View style={styles.tabDemo}>
-          <IconTabBar tabs={TABS} activeKey={tab} onSelect={setTab} safeArea={false} />
         </View>
       </View>
     </ScrollView>
