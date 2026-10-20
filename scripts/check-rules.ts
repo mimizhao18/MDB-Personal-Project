@@ -26,6 +26,7 @@ import { recentDays } from '../src/logic/history.ts';
 import { buildDemoData } from '../src/logic/demo.ts';
 import { colors, fonts, glass, theme } from '../src/design/tokens.ts';
 import { contrastRatio } from '../src/design/contrast.ts';
+import { NO_AWAY, RULES, addAway, advanceProgress, classifyAway, pauseSecondsLeft } from '../src/logic/distraction.ts';
 import { glowHexFor, hexToRgb255 } from '../src/components/car3d/glow.ts';
 import { TRACK_LIST } from '../src/data/tracks/index.ts';
 import { applySessionToStreak, daysBetween, displayedStreak } from '../src/logic/streak.ts';
@@ -297,13 +298,42 @@ assert.equal(colors.accent, '#E10600'); // fixed F1 red
 assert.notEqual(colors.coin.toLowerCase(), colors.accent.toLowerCase());
 assert.ok(theme.typography.label.textTransform === 'uppercase');
 
+// leaving the app mid-race: 5 s yellow flag, 30 s safety car, 3 min crash; a pause excuses 5 minutes
+assert.equal(classifyAway(0), 'none');
+assert.equal(classifyAway(4.9), 'none');
+assert.equal(classifyAway(5), 'yellow');
+assert.equal(classifyAway(29.9), 'yellow');
+assert.equal(classifyAway(30), 'safety-car');
+assert.equal(classifyAway(179), 'safety-car');
+assert.equal(classifyAway(180), 'crash');
+assert.equal(pauseSecondsLeft(0), 300);
+assert.equal(pauseSecondsLeft(299000), 1);
+assert.equal(pauseSecondsLeft(301000), 0);
+// under the safety car the car moves at half speed for the first minute of racing, then normally
+assert.deepEqual(advanceProgress(10000, 0), { gainedMs: 10000, slowRemainingMs: 0 });
+assert.deepEqual(advanceProgress(10000, 60000), { gainedMs: 5000, slowRemainingMs: 50000 });
+assert.deepEqual(advanceProgress(70000, 60000), { gainedMs: 30000 + 10000, slowRemainingMs: 0 });
+let totals = addAway(NO_AWAY, 3);
+totals = addAway(totals, 12);
+totals = addAway(totals, 45);
+assert.deepEqual(totals, { seconds: 60, yellowFlags: 1, safetyCars: 1 });
+assert.ok(RULES.yellowAfterSeconds < RULES.safetyCarAfterSeconds && RULES.safetyCarAfterSeconds < RULES.crashAfterSeconds);
+// the race record keeps the distractions and the crash
+const crashed = buildSession({ id: 'c', track, plannedLaps: 10, focusedSeconds: 300, startedAt: start, endedAt: new Date('2026-09-30T10:08:00'), away: totals, crashed: true });
+assert.equal(crashed.finished, false);
+assert.equal(crashed.crashed, true);
+assert.equal(crashed.awaySeconds, 60);
+assert.equal(crashed.yellowFlags, 1);
+assert.equal(crashed.safetyCars, 1);
+assert.equal(done.crashed, undefined); // a clean race has no distraction fields
+
 // the new design system
 assert.ok(theme.radius.control <= 4 && theme.radius.panel <= 6 && theme.radius.control <= theme.radius.panel, 'corners: 4 px controls, 6 px panels at most');
 assert.ok(sp.screen === 16 && Object.values(sp).every((v) => v === sp.xxs || v % 4 === 0), 'spacing sits on a 4 / 8 px grid (2 only to stack text) and screens are padded 16');
 assert.ok(theme.size.touch >= 44 && theme.size.control >= 48, 'touch targets are at least 44 px, buttons 48');
 assert.ok(Object.values(fonts).every((f) => /(400Regular|500Medium|600SemiBold)$/.test(f)), 'only weights 400, 500 and 600');
 assert.ok(Object.values(theme.typography).every((ty) => !('fontWeight' in ty)), 'weight comes from the font, never fontWeight');
-for (const text of ['text', 'textSecondary', 'textMuted', 'accentOnDark', 'positive']) {
+for (const text of ['text', 'textSecondary', 'textMuted', 'accentOnDark', 'positive', 'flag']) {
   for (const surface of ['background', 'surface', 'raised']) {
     assert.ok(contrastRatio(colors[text], colors[surface]) >= 4.5, `${text} on ${surface} passes WCAG AA`);
   }

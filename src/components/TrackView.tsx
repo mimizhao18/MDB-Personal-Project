@@ -1,6 +1,6 @@
 import { memo } from 'react';
 import { StyleSheet, View } from 'react-native';
-import Svg, { G, Line, Path } from 'react-native-svg';
+import Svg, { G, Line, Path, Polygon } from 'react-native-svg';
 
 import { DEFAULT_LIVERY_ID } from '../data/liveries';
 import { colors } from '../design/tokens';
@@ -15,6 +15,8 @@ interface Props {
   car?: CarSettings;
   /** Set to false for a plain track preview with no car. */
   showCar?: boolean;
+  /** Draw the car spun round with a crash burst on it (the race ended in a DNF). */
+  crashed?: boolean;
   /** Fill whatever space the parent gives (keeping the track's proportions) instead of sizing to the width. */
   fill?: boolean;
 }
@@ -25,10 +27,17 @@ const ROAD_COLOR = colors.textSecondary;
 const KERB_EXTRA = 4; // dark edge, split across both sides of the road
 const STANDARD_ROAD_WIDTH = 26; // the car is drawn for this road width and scaled for others
 const KERB_COLOR = colors.raised;
+// a twelve-point star centred on the car, for a crash
+const BURST = Array.from({ length: 24 }, (_, i) => {
+  const radius = i % 2 === 0 ? 34 : 17;
+  const angle = (i * Math.PI) / 12;
+  return `${(Math.cos(angle) * radius).toFixed(1)},${(Math.sin(angle) * radius).toFixed(1)}`;
+}).join(' ');
+const CRASH_SPIN = 50; // degrees the crashed car is turned from the direction of the track
 const CAR_SCALE = 1.35; // the car is drawn a little larger than the road is wide, so it is easy to follow
 
 /** The circuit with the car on it. Drawn in track coordinates and scaled to fit the width. */
-export function TrackView({ track, lapFraction, car = DEFAULT_CAR, showCar = true, fill = false }: Props) {
+export function TrackView({ track, lapFraction, car = DEFAULT_CAR, showCar = true, crashed = false, fill = false }: Props) {
   const { width, height } = track.viewBox;
   const pos = positionOnTrack(track, lapFraction);
 
@@ -36,8 +45,14 @@ export function TrackView({ track, lapFraction, car = DEFAULT_CAR, showCar = tru
     <View style={fill ? styles.fill : [styles.wrap, { aspectRatio: width / height }]}>
       <Svg width="100%" height="100%" viewBox={`0 0 ${width} ${height}`}>
         <TrackLayer track={track} />
+        {showCar && crashed && (
+          <G transform={`translate(${pos.x} ${pos.y}) scale(${track.roadWidth / STANDARD_ROAD_WIDTH})`}>
+            <Polygon points={BURST} fill={colors.flag} fillOpacity={0.9} />
+            <Polygon points={BURST} fill={colors.accent} transform="scale(0.55)" />
+          </G>
+        )}
         {showCar && (
-          <G transform={`translate(${pos.x} ${pos.y}) rotate(${pos.angleDeg}) scale(${(track.roadWidth / STANDARD_ROAD_WIDTH) * CAR_SCALE})`}>
+          <G transform={`translate(${pos.x} ${pos.y}) rotate(${pos.angleDeg + (crashed ? CRASH_SPIN : 0)}) scale(${(track.roadWidth / STANDARD_ROAD_WIDTH) * CAR_SCALE})`}>
             <CarShape car={car} />
           </G>
         )}

@@ -21,6 +21,8 @@ export const colors = {
   /** A dark red tint of the accent: the idle fill of the Home tab. */
   accentTint: '#2A1513',
   positive: '#3DDC84',
+  /** The yellow of a yellow flag and the safety car: used only for race warnings. */
+  flag: '#FFD60A',
   /** The letterbox around the phone-sized app column in a web browser. */
   backdrop: '#050505',
 

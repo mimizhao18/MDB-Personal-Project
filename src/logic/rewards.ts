@@ -1,4 +1,5 @@
 import type { Session, Track } from '../models/types';
+import type { AwayTotals } from './distraction';
 
 /** Planned focus time for a number of whole laps. */
 export function lapsToSeconds(track: Track, laps: number): number {
@@ -58,6 +59,9 @@ export interface SessionInput {
   focusedSeconds: number;
   startedAt: Date;
   endedAt: Date;
+  /** Distractions during the race (see logic/distraction.ts). */
+  away?: AwayTotals;
+  crashed?: boolean;
 }
 
 export function buildSession(input: SessionInput): Session {
@@ -78,5 +82,7 @@ export function buildSession(input: SessionInput): Session {
     distanceKm: distanceKm(track, laps),
     xpEarned: xpForSeconds(focusedSeconds),
     creditsEarned: creditsForSeconds(focusedSeconds),
+    ...(input.away && input.away.seconds > 0 ? { awaySeconds: Math.round(input.away.seconds), yellowFlags: input.away.yellowFlags, safetyCars: input.away.safetyCars } : {}),
+    ...(input.crashed ? { crashed: true } : {}),
   };
 }

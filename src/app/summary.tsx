@@ -16,6 +16,14 @@ import type { PlayerProfile, Session } from '../models/types';
 import { getProfile } from '../storage/profile';
 import { getSessions } from '../storage/sessions';
 
+/** "Away 42 s · 1 yellow flag · 1 safety car", leaving out the counts that are zero. */
+function awayLine(session: Session): string {
+  const parts = [`Away ${formatDurationWords(Math.round(session.awaySeconds ?? 0))}`];
+  if (session.yellowFlags) parts.push(`${session.yellowFlags} yellow ${session.yellowFlags === 1 ? 'flag' : 'flags'}`);
+  if (session.safetyCars) parts.push(`${session.safetyCars} safety ${session.safetyCars === 1 ? 'car' : 'cars'}`);
+  return parts.join(' · ');
+}
+
 export default function SummaryScreen() {
   const styles = useStyles();
   const t = useTheme();
@@ -67,7 +75,7 @@ export default function SummaryScreen() {
               <Text style={styles.label}>{track.name}</Text>
             </View>
           )}
-          <Text style={styles.title}>{session.finished ? 'Chequered flag' : 'Race ended early'}</Text>
+          <Text style={styles.title}>{session.finished ? 'Chequered flag' : session.crashed ? 'DNF · Crashed' : 'Race ended early'}</Text>
         </View>
 
         <BracketFrame style={styles.rewards}>
@@ -90,6 +98,8 @@ export default function SummaryScreen() {
             <StatBlock label="Distance" value={session.distanceKm.toFixed(1)} unit="km" size="small" align="center" />
           </View>
         </View>
+
+        {session.awaySeconds ? <Text style={styles.away}>{awayLine(session)}</Text> : null}
 
         <View style={styles.level}>
           <View style={styles.levelRow}>
@@ -135,6 +145,7 @@ const useStyles = makeStyles((t) => ({
   divided: { borderLeftWidth: t.border.hairline, borderLeftColor: t.glass.divider },
   strip: { flexDirection: 'row' },
   cell: { flex: 1, alignItems: 'center', paddingHorizontal: t.spacing.sm },
+  away: { ...t.typography.caption, color: t.colors.textMuted },
   level: { gap: t.spacing.sm },
   levelRow: { flexDirection: 'row', alignItems: 'baseline', justifyContent: 'space-between' },
   pair: { flexDirection: 'row', alignItems: 'baseline', gap: t.spacing.sm },

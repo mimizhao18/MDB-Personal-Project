@@ -8,6 +8,7 @@ export { CreditAmount } from './CreditAmount';
 export { Glass } from './Glass';
 export { ListRow } from './ListRow';
 export { Divider, Panel } from './Panel';
+export { RaceBanner } from './RaceBanner';
 export { SectionLabel } from './SectionLabel';
 export { SegmentedControl } from './SegmentedControl';
 export { SegmentedProgress } from './SegmentedProgress';

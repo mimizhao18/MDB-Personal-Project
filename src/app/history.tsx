@@ -133,7 +133,7 @@ function SessionRow({ session, last }: { session: Session; last: boolean }) {
       </View>
       <View style={styles.rowSide}>
         <Text style={styles.rowXp}>+{session.xpEarned} XP</Text>
-        {!session.finished && <Text style={styles.early}>Ended early</Text>}
+        {!session.finished && <Text style={styles.early}>{session.crashed ? 'DNF · Crashed' : 'Ended early'}</Text>}
       </View>
     </View>
   );

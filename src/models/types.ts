@@ -45,6 +45,12 @@ export interface Session {
   distanceKm: number;
   xpEarned: number;
   creditsEarned: number;
+  /** Seconds spent out of the app during the race (never counted as focus). Missing on races saved before this existed. */
+  awaySeconds?: number;
+  yellowFlags?: number;
+  safetyCars?: number;
+  /** True if the race ended in a crash because you were away for too long (a DNF). */
+  crashed?: boolean;
 }
 
 export interface CarSettings {

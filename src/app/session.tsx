@@ -6,17 +6,24 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { glowHexFor } from '../components/car3d/glow';
 import { TrackView } from '../components/TrackView';
 import { Flag } from '../components/Flag';
-import { AmbientGlow, Button, SegmentedProgress } from '../components/ui';
+import { AmbientGlow, Button, RaceBanner, SegmentedProgress } from '../components/ui';
 import { getLivery } from '../data/liveries';
 import { TRACKS, isTrackId } from '../data/tracks';
 import { makeStyles, useTheme } from '../design/styles';
 import { useSessionTimer } from '../hooks/useSessionTimer';
+import { RULES } from '../logic/distraction';
 import { formatClock } from '../logic/lapProgress';
 import { buildSession } from '../logic/rewards';
 import type { CarSettings, Track } from '../models/types';
 import { getProfile } from '../storage/profile';
 import { recordSession } from '../storage/sessions';
 import { showAlert } from '../ui/alert';
+
+/** Marks a crash that left no race to save (it happened before the first minute of focus). */
+const NOTHING_SAVED = 'none';
+
+/** How long a yellow flag stays on screen. */
+const YELLOW_FLAG_SHOWN_MS = 6000;
 
 export default function SessionScreen() {
   const styles = useStyles();
@@ -41,7 +48,8 @@ function Race({ track, laps, speed }: { track: Track; laps: number; speed: numbe
   const styles = useStyles();
   const t = useTheme();
   const timer = useSessionTimer(track, laps, speed);
-  const { status, progress: p, startedAt, endedAt, start, pause, resume, end } = timer;
+  const { status, progress: p, startedAt, endedAt, start, pause, resume, end, warning, dismissWarning, slowed, pauseSecondsLeft, away, crashed } = timer;
+  const [crashSessionId, setCrashSessionId] = useState<string | null>(null);
   const saved = useRef(false);
   // On short windows (a laptop browser, a small phone) everything is sized down so the buttons stay on screen.
   const windowHeight = useWindowDimensions().height;
@@ -75,20 +83,35 @@ function Race({ track, laps, speed }: { track: Track; laps: number; speed: numbe
       focusedSeconds: p.elapsedSeconds,
       startedAt: startedAt ?? new Date(),
       endedAt: endedAt ?? new Date(),
+      away,
+      crashed,
     });
+    if (session.xpEarned === 0 && crashed) {
+      // a crash before the first minute earns nothing, so there is no race to save
+      queueMicrotask(() => setCrashSessionId(NOTHING_SAVED));
+      return;
+    }
     if (session.xpEarned === 0) {
       showAlert('Too short to count', 'A race needs at least 1 minute of focus to earn rewards.');
       router.replace('/');
       return;
     }
     recordSession(session).then(
-      () => router.replace({ pathname: '/summary', params: { id: session.id } }),
+      // after a crash the race screen stays to show it; the button there goes on to the results
+      () => (crashed ? setCrashSessionId(session.id) : router.replace({ pathname: '/summary', params: { id: session.id } })),
       () => {
         showAlert('Could not save the race', 'Something went wrong saving your race. Please try again.');
         router.replace('/');
       },
     );
-  }, [status, track, laps, p.elapsedSeconds, startedAt, endedAt]);
+  }, [status, track, laps, p.elapsedSeconds, startedAt, endedAt, away, crashed]);
+
+  // a yellow flag is a quick warning: it clears itself
+  useEffect(() => {
+    if (warning?.kind !== 'yellow') return;
+    const timer = setTimeout(dismissWarning, YELLOW_FLAG_SHOWN_MS);
+    return () => clearTimeout(timer);
+  }, [warning, dismissWarning]);
 
   const confirmEnd = () => {
     showAlert('End race early?', 'You keep the laps and focus time you have done so far.', [
@@ -96,6 +119,28 @@ function Race({ track, laps, speed }: { track: Track; laps: number; speed: numbe
       { text: 'End race', style: 'destructive', onPress: end },
     ]);
   };
+
+  if (status === 'ended' && crashed) {
+    return (
+      <SafeAreaView style={styles.safe} edges={['top', 'bottom']}>
+        <View style={styles.crash}>
+          <View style={styles.crashTrack}>
+            <TrackView track={track} lapFraction={p.lapFraction} car={car} crashed fill />
+          </View>
+          <View style={styles.crashText}>
+            <Text style={styles.crashLabel}>DNF</Text>
+            <Text style={styles.crashTitle}>Crash</Text>
+            <Text style={styles.muted}>You were away from the race for more than {RULES.crashAfterSeconds / 60} minutes, so your car hit the wall. {crashSessionId === NOTHING_SAVED ? 'It was under a minute, so there is nothing to save.' : 'The laps and focus time you did before leaving still count.'}</Text>
+          </View>
+          <Button
+            label={!crashSessionId ? 'Saving…' : crashSessionId === NOTHING_SAVED ? 'Back to Race' : 'See results'}
+            disabled={!crashSessionId}
+            onPress={() => crashSessionId && (crashSessionId === NOTHING_SAVED ? router.replace('/') : router.replace({ pathname: '/summary', params: { id: crashSessionId } }))}
+          />
+        </View>
+      </SafeAreaView>
+    );
+  }
 
   if (status === 'finished' || status === 'ended') {
     return (
@@ -127,13 +172,24 @@ function Race({ track, laps, speed }: { track: Track; laps: number; speed: numbe
 
         <View style={{ height: trackHeight }}>
           <TrackView track={track} lapFraction={p.lapFraction} car={car} fill />
+          {(slowed || warning?.kind === 'yellow') && (
+            <View style={styles.banner}>
+              {slowed ? (
+                <RaceBanner title="Safety car" detail={warning ? `You were away for ${Math.round(warning.awaySeconds)} s. The car runs at half speed for a minute.` : 'The car runs at half speed for a minute.'} />
+              ) : (
+                <RaceBanner title="Yellow flag" detail={`You left the race for ${Math.round(warning?.awaySeconds ?? 0)} s. Stay on track.`} />
+              )}
+            </View>
+          )}
         </View>
 
         <View style={styles.middle}>
           <Text style={compact ? styles.clockCompact : styles.clock} numberOfLines={1} adjustsFontSizeToFit accessibilityLabel={`${formatClock(p.remainingSeconds)} remaining`}>
             {formatClock(p.remainingSeconds)}
           </Text>
-          <Text style={[styles.status, paused && styles.statusPaused]}>{paused ? 'Paused' : 'Remaining'}</Text>
+          <Text style={[styles.status, paused && styles.statusPaused, slowed && !paused && styles.statusSlowed]}>
+            {paused ? `Paused · ${formatClock(pauseSecondsLeft ?? 0)} break left` : slowed ? 'Safety car' : 'Remaining'}
+          </Text>
           <View style={styles.progress}>
             <SegmentedProgress fraction={p.totalFraction} accessibilityLabel="Race progress" />
           </View>
@@ -164,6 +220,13 @@ const useStyles = makeStyles((t) => ({
   clockCompact: { ...t.typography.display, color: t.colors.text, alignSelf: 'stretch', textAlign: 'center' },
   status: { ...t.typography.metaLabel, color: t.colors.textMuted },
   statusPaused: { color: t.colors.accentOnDark },
+  statusSlowed: { color: t.colors.flag },
+  banner: { position: 'absolute', top: 0, left: 0, right: 0 },
+  crash: { flex: 1, padding: t.spacing.screen, gap: t.spacing.lg, justifyContent: 'space-between' },
+  crashTrack: { flex: 1 },
+  crashText: { gap: t.spacing.sm },
+  crashTitle: { ...t.typography.title, color: t.colors.text },
+  crashLabel: { ...t.typography.metaLabel, color: t.colors.accentOnDark },
   progress: { alignSelf: 'stretch', marginTop: t.spacing.sm },
   // room for two buttons, so nothing jumps when pausing
   buttons: { gap: t.spacing.sm, marginTop: t.spacing.lg, minHeight: t.size.control * 2 + t.spacing.sm },
