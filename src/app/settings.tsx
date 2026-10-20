@@ -1,11 +1,11 @@
 import { router } from 'expo-router';
 import { View } from 'react-native';
 
+import { ListRow, SectionLabel } from '../components/ui';
 import { makeStyles } from '../design/styles';
 import { loadDemoData } from '../storage/demo';
 import { resetAllData } from '../storage/reset';
 import { showAlert } from '../ui/alert';
-import { ListGroup, ListRow, SectionLabel } from '../ui/kit';
 
 /** Back to the previous screen, or Home if the page was opened directly (for example after a browser refresh). */
 function goBack() {
@@ -55,25 +55,21 @@ export default function SettingsScreen() {
     <View style={styles.container}>
       <View style={styles.section}>
         <SectionLabel>Cars</SectionLabel>
-        <ListGroup>
-          <ListRow title="Compare generations" subtitle="Any two generations side by side, at the same scale and angle." chevron onPress={() => router.push('/compare')} />
-        </ListGroup>
+        <ListRow title="Compare generations" subtitle="Any two generations side by side, at the same scale and angle." onPress={() => router.push('/compare')} last />
       </View>
 
       <View style={styles.section}>
         <SectionLabel>Data</SectionLabel>
-        <ListGroup>
-          <ListRow title="Reset all data" subtitle="Your races and progress are saved only on this phone." destructive onPress={confirmReset} />
-        </ListGroup>
+        <ListRow title="Reset all data" subtitle="Your races and progress are saved only on this phone." destructive chevron={false} onPress={confirmReset} last />
       </View>
 
       {__DEV__ && (
         <View style={styles.section}>
           <SectionLabel>Development only</SectionLabel>
-          <ListGroup>
-            <ListRow title="Load demo data" subtitle="A week of example races, a 5-day streak and credits to spend. Reset all data clears it." onPress={confirmDemo} />
-            <ListRow title="Design system" subtitle="Every color, text style and shared component on one page." chevron onPress={() => router.push('/dev/design-system')} />
-          </ListGroup>
+          <View>
+            <ListRow title="Load demo data" subtitle="A week of example races, a 5-day streak and credits to spend. Reset all data clears it." chevron={false} onPress={confirmDemo} />
+            <ListRow title="Design system" subtitle="Every color, text style and shared component on one page." onPress={() => router.push('/dev/design-system')} last />
+          </View>
         </View>
       )}
     </View>
@@ -81,6 +77,6 @@ export default function SettingsScreen() {
 }
 
 const useStyles = makeStyles((t) => ({
-  container: { flex: 1, padding: t.spacing.md, gap: t.spacing.lg },
-  section: { gap: t.spacing.sm },
+  container: { flex: 1, padding: t.spacing.screen, gap: t.spacing.xl },
+  section: { gap: t.spacing.xs },
 }));

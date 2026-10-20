@@ -3,18 +3,22 @@ import { useEffect, useState } from 'react';
 import { ScrollView, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { glowHexFor } from '../components/car3d/glow';
+import { Flag } from '../components/Flag';
+import { AmbientGlow, BracketFrame, Button, CreditAmount, SegmentedProgress, StartButton, StatBlock } from '../components/ui';
+import { getLivery } from '../data/liveries';
 import { TRACKS } from '../data/tracks';
-import { makeStyles } from '../design/styles';
+import { makeStyles, useTheme } from '../design/styles';
 import { levelForXp, levelProgress } from '../logic/rewards';
 import { formatDurationWords } from '../logic/sessionOptions';
 import { dayKey, displayedStreak } from '../logic/streak';
 import type { PlayerProfile, Session } from '../models/types';
 import { getProfile } from '../storage/profile';
 import { getSessions } from '../storage/sessions';
-import { Button, Card, ProgressBar, StatStrip } from '../ui/kit';
 
 export default function SummaryScreen() {
   const styles = useStyles();
+  const t = useTheme();
   const { id } = useLocalSearchParams<{ id?: string }>();
   const [session, setSession] = useState<Session | null>(null);
   const [profile, setProfile] = useState<PlayerProfile | null>(null);
@@ -40,7 +44,7 @@ export default function SummaryScreen() {
     return (
       <View style={styles.center}>
         <Text style={styles.title}>Race not found.</Text>
-        <Button label="Back to Home" onPress={() => router.replace('/')} />
+        <Button label="Back to Race" onPress={() => router.replace('/')} />
       </View>
     );
   }
@@ -50,47 +54,67 @@ export default function SummaryScreen() {
   const progress = levelProgress(profile.totalXp);
   const leveledUp = progress.level > levelBefore;
   const streak = displayedStreak(profile, dayKey(new Date()));
+  const livery = getLivery(profile.car.liveryId);
 
   return (
     <SafeAreaView style={styles.safe} edges={['bottom']}>
+      <AmbientGlow color={glowHexFor(livery.primary, livery.secondary)} focus={0.25} />
       <ScrollView contentContainerStyle={styles.content}>
-        <Text style={styles.title}>{session.finished ? 'Chequered flag!' : 'Race ended early'}</Text>
-        <Text style={styles.muted}>{track?.name ?? 'Race'}</Text>
+        <View style={styles.heading}>
+          {track && (
+            <View style={styles.place} accessible accessibilityLabel={`${track.name}, ${track.country}`}>
+              <Flag code={track.countryCode} width={t.size.flag} />
+              <Text style={styles.label}>{track.name}</Text>
+            </View>
+          )}
+          <Text style={styles.title}>{session.finished ? 'Chequered flag' : 'Race ended early'}</Text>
+        </View>
 
-        <StatStrip
-          items={[
-            { label: 'Laps', value: `${session.completedLaps} / ${session.plannedLaps}` },
-            { label: 'Focused', value: formatDurationWords(session.focusedSeconds) },
-            { label: 'Distance', value: `${session.distanceKm.toFixed(1)} km` },
-          ]}
-        />
+        <BracketFrame style={styles.rewards}>
+          <View style={styles.reward}>
+            <StatBlock label="XP earned" value={`+${session.xpEarned}`} size="large" />
+          </View>
+          <View style={[styles.reward, styles.divided]}>
+            <StatBlock label="Credits earned" value={`+${session.creditsEarned}`} size="large" />
+          </View>
+        </BracketFrame>
 
-        <StatStrip
-          items={[
-            { label: 'XP earned', value: `+${session.xpEarned}` },
-            { label: 'Credits earned', value: `+${session.creditsEarned}` },
-          ]}
-        />
+        <View style={styles.strip}>
+          <View style={styles.cell}>
+            <StatBlock label="Laps" value={`${session.completedLaps} / ${session.plannedLaps}`} size="small" align="center" />
+          </View>
+          <View style={[styles.cell, styles.divided]}>
+            <StatBlock label="Focused" value={formatDurationWords(session.focusedSeconds)} size="small" align="center" />
+          </View>
+          <View style={[styles.cell, styles.divided]}>
+            <StatBlock label="Distance" value={session.distanceKm.toFixed(1)} unit="km" size="small" align="center" />
+          </View>
+        </View>
 
-        <Card style={styles.cardGap}>
-          <Text style={styles.cardLabel}>
-            Level {progress.level}
-            {leveledUp ? '  ·  Level up!' : ''}
-          </Text>
-          <ProgressBar fraction={progress.fraction} />
-          <Text style={styles.muted}>
-            {progress.xpIntoLevel} / {progress.xpForNextLevel} XP to level {progress.level + 1}
-          </Text>
-          <Text style={styles.muted}>
-            {profile.credits} credits · {streak} day streak
-          </Text>
-        </Card>
-
+        <View style={styles.level}>
+          <View style={styles.levelRow}>
+            <View style={styles.pair} accessible accessibilityLabel={`Level ${progress.level}${leveledUp ? ', level up' : ''}`}>
+              <Text style={styles.label}>Level</Text>
+              <Text style={styles.value}>{progress.level}</Text>
+              {leveledUp && <Text style={styles.levelUp}>Level up</Text>}
+            </View>
+            <CreditAmount amount={profile.credits} small />
+          </View>
+          <SegmentedProgress fraction={progress.fraction} accessibilityLabel={`XP: ${progress.xpIntoLevel} of ${progress.xpForNextLevel} to level ${progress.level + 1}`} />
+          <View style={styles.levelRow}>
+            <Text style={styles.muted}>
+              {progress.xpIntoLevel} / {progress.xpForNextLevel} XP
+            </Text>
+            <Text style={styles.muted}>
+              {streak} day{streak === 1 ? '' : 's'} streak
+            </Text>
+          </View>
+        </View>
       </ScrollView>
 
       <View style={styles.footer}>
-        <Button label="Race again" onPress={() => router.replace('/create-session')} />
-        <Button label="Home" onPress={() => router.replace('/')} variant="secondary" />
+        <StartButton label="Race again" frame onPress={() => router.replace('/create-session')} />
+        <Button label="Done" variant="ghost" onPress={() => router.replace('/')} />
       </View>
     </SafeAreaView>
   );
@@ -98,17 +122,22 @@ export default function SummaryScreen() {
 
 const useStyles = makeStyles((t) => ({
   safe: { flex: 1 },
-  center: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: t.spacing.md, padding: t.spacing.md },
-  content: { padding: t.spacing.md, gap: t.spacing.md },
-  title: { ...t.type.title, fontSize: 28, color: t.colors.text, textAlign: 'center' },
-  muted: { ...t.type.caption, color: t.colors.textMuted, textAlign: 'center' },
-  cardGap: { gap: t.spacing.sm },
-  cardLabel: { ...t.type.label, color: t.colors.textMuted },
-  footer: {
-    padding: t.spacing.md,
-    gap: t.spacing.sm,
-    borderTopWidth: t.border.hairline,
-    borderTopColor: t.colors.border,
-    backgroundColor: t.colors.background,
-  },
+  center: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: t.spacing.md, padding: t.spacing.screen },
+  content: { padding: t.spacing.screen, gap: t.spacing.lg },
+  heading: { gap: t.spacing.sm },
+  place: { flexDirection: 'row', alignItems: 'center', gap: t.spacing.sm },
+  label: { ...t.typography.metaLabel, color: t.colors.textMuted },
+  value: { ...t.typography.metaValue, color: t.colors.text },
+  title: { ...t.typography.title, color: t.colors.text },
+  muted: { ...t.typography.metaValue, color: t.colors.textMuted },
+  rewards: { flexDirection: 'row', paddingVertical: t.spacing.lg },
+  reward: { flex: 1, paddingHorizontal: t.spacing.md },
+  divided: { borderLeftWidth: t.border.hairline, borderLeftColor: t.glass.divider },
+  strip: { flexDirection: 'row' },
+  cell: { flex: 1, alignItems: 'center', paddingHorizontal: t.spacing.sm },
+  level: { gap: t.spacing.sm },
+  levelRow: { flexDirection: 'row', alignItems: 'baseline', justifyContent: 'space-between' },
+  pair: { flexDirection: 'row', alignItems: 'baseline', gap: t.spacing.sm },
+  levelUp: { ...t.typography.metaLabel, color: t.colors.accentOnDark },
+  footer: { padding: t.spacing.screen, gap: t.spacing.sm, borderTopWidth: t.border.hairline, borderTopColor: t.colors.border },
 }));

@@ -5,13 +5,13 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { Slider } from '../components/Slider';
 import { TrackCarousel } from '../components/TrackCarousel';
+import { SectionLabel, SegmentedControl, StartButton } from '../components/ui';
 import { TRACK_LIST } from '../data/tracks';
 import { makeStyles } from '../design/styles';
 import { clampLaps, lapsFromMinutes, maxMinutes, minutesForLaps } from '../logic/raceLength';
 import { distanceKm, lapsToSeconds } from '../logic/rewards';
 import { DEFAULT_LAPS, formatDurationWords } from '../logic/sessionOptions';
 import type { TrackId } from '../models/types';
-import { Button, SectionLabel, Segmented } from '../ui/kit';
 
 type Mode = 'laps' | 'minutes';
 const MODES: readonly Mode[] = ['laps', 'minutes'];
@@ -19,19 +19,14 @@ const SPEEDS = ['1', '10', '30', '60'] as const;
 
 const useStyles = makeStyles((t) => ({
   safe: { flex: 1 },
-  content: { padding: t.spacing.md, gap: t.spacing.md },
-  muted: { ...t.type.caption, color: t.colors.textMuted },
-  valueBlock: { alignItems: 'center', gap: t.spacing.xs },
-  bigValue: { fontSize: 40, fontWeight: '800', color: t.colors.text, letterSpacing: -0.5 },
-  fullRace: { ...t.type.label, color: t.colors.accent },
+  content: { padding: t.spacing.screen, gap: t.spacing.md },
+  muted: { ...t.typography.caption, color: t.colors.textMuted },
+  valueBlock: { alignItems: 'center', gap: t.spacing.xs, paddingVertical: t.spacing.sm },
+  bigValue: { ...t.typography.statLarge, color: t.colors.text },
+  fullRace: { ...t.typography.metaLabel, color: t.colors.accentOnDark },
   rangeLabels: { flexDirection: 'row', justifyContent: 'space-between' },
-  footer: {
-    padding: t.spacing.md,
-    gap: t.spacing.sm,
-    borderTopWidth: t.border.hairline,
-    borderTopColor: t.colors.border,
-    backgroundColor: t.colors.background,
-  },
+  range: { ...t.typography.metaValue, color: t.colors.textMuted },
+  footer: { padding: t.spacing.screen, borderTopWidth: t.border.hairline, borderTopColor: t.colors.border },
 }));
 
 export default function CreateSessionScreen() {
@@ -68,7 +63,7 @@ export default function CreateSessionScreen() {
         <TrackCarousel tracks={TRACK_LIST} selectedId={trackId} onSelect={setTrackId} />
 
         <SectionLabel>Race length</SectionLabel>
-        <Segmented options={MODES} value={mode} onChange={setMode} labelFor={(m) => (m === 'laps' ? 'Laps' : 'Minutes')} />
+        <SegmentedControl options={MODES} value={mode} onChange={setMode} labelFor={(m) => (m === 'laps' ? 'Laps' : 'Minutes')} />
 
         <View style={styles.valueBlock}>
           <Text style={styles.bigValue}>{bigValue}</Text>
@@ -88,21 +83,21 @@ export default function CreateSessionScreen() {
           />
         )}
         <View style={styles.rangeLabels}>
-          <Text style={styles.muted}>{mode === 'laps' ? '1 lap' : '1 min'}</Text>
-          <Text style={styles.muted}>{mode === 'laps' ? `${track.raceLaps} laps` : `${maxMinutes(track)} min`}</Text>
+          <Text style={styles.range}>{mode === 'laps' ? '1 lap' : '1 min'}</Text>
+          <Text style={styles.range}>{mode === 'laps' ? `${track.raceLaps} laps` : `${maxMinutes(track)} min`}</Text>
         </View>
         {mode === 'minutes' && <Text style={styles.muted}>Races are whole laps, so the time snaps to the nearest lap.</Text>}
 
         {__DEV__ && (
           <>
             <SectionLabel>Test speed (development only)</SectionLabel>
-            <Segmented options={SPEEDS} value={String(speed) as (typeof SPEEDS)[number]} onChange={(x) => setSpeed(Number(x))} labelFor={(x) => `${x}x`} />
+            <SegmentedControl options={SPEEDS} value={String(speed) as (typeof SPEEDS)[number]} onChange={(x) => setSpeed(Number(x))} labelFor={(x) => `${x}x`} />
           </>
         )}
       </ScrollView>
 
       <View style={styles.footer}>
-        <Button label="Start Race" onPress={start} />
+        <StartButton label="Start Race" onPress={start} frame />
       </View>
     </SafeAreaView>
   );

@@ -31,6 +31,7 @@ export function ListRow({
   icon,
   onPress,
   destructive,
+  chevron = true,
   last,
 }: {
   title: string;
@@ -39,6 +40,8 @@ export function ListRow({
   icon?: IconName;
   onPress?: () => void;
   destructive?: boolean;
+  /** Show the arrow at the end of a row that opens something (on by default for rows with onPress). */
+  chevron?: boolean;
   last?: boolean;
 }) {
   const styles = useStyles();
@@ -51,7 +54,7 @@ export function ListRow({
         {subtitle ? <Text style={styles.subtitle}>{subtitle}</Text> : null}
       </View>
       {value ? <Text style={styles.value}>{value}</Text> : null}
-      {onPress ? <Ionicons name="chevron-forward" size={t.size.icon - 4} color={t.colors.textMuted} /> : null}
+      {onPress && chevron ? <Ionicons name="chevron-forward" size={t.size.icon - 4} color={t.colors.textMuted} /> : null}
     </>
   );
   if (!onPress) return <View style={[styles.row, last && styles.last]}>{content}</View>;

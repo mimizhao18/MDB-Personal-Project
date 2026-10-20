@@ -5,9 +5,9 @@ import type { NativeScrollEvent, NativeSyntheticEvent } from 'react-native';
 import { makeStyles, useTheme } from '../design/styles';
 import { formatClock } from '../logic/lapProgress';
 import type { Track, TrackId } from '../models/types';
-import { Card } from '../ui/kit';
 import { Flag } from './Flag';
 import { TrackView } from './TrackView';
+import { BracketFrame } from './ui';
 
 interface Props {
   tracks: readonly Track[];
@@ -15,49 +15,42 @@ interface Props {
   onSelect: (id: TrackId) => void;
 }
 
-const FLAG_WIDTH = 40;
-
 const useStyles = makeStyles((t) => ({
   container: { gap: t.spacing.sm },
   card: { gap: t.spacing.md },
-  header: { flexDirection: 'row', alignItems: 'center', gap: t.spacing.md, marginTop: t.spacing.xs },
-  headerText: { flex: 1 },
-  name: { fontSize: 24, fontWeight: '800', letterSpacing: -0.3, color: t.colors.text },
-  country: { ...t.type.body, color: t.colors.textMuted, marginTop: 1 },
+  header: { flexDirection: 'row', alignItems: 'center', gap: t.spacing.md },
+  headerText: { flex: 1, gap: 2 },
+  name: { ...t.typography.title, color: t.colors.text },
+  country: { ...t.typography.caption, color: t.colors.textMuted },
   // the four numbers in one row, split by hairlines
-  stats: { flexDirection: 'row', borderTopWidth: t.border.hairline, borderTopColor: t.colors.border, paddingTop: t.spacing.md },
-  statBlock: { flex: 1, gap: 2, paddingHorizontal: t.spacing.sm, borderLeftWidth: t.border.hairline, borderLeftColor: t.colors.border },
+  stats: { flexDirection: 'row', borderTopWidth: t.border.hairline, borderTopColor: t.glass.divider, paddingTop: t.spacing.md },
+  statBlock: { flex: 1, gap: 2, paddingHorizontal: t.spacing.sm, borderLeftWidth: t.border.hairline, borderLeftColor: t.glass.divider },
   statBlockFirst: { borderLeftWidth: 0, paddingLeft: 0 },
-  statLabel: { fontSize: 11, color: t.colors.textMuted },
+  statLabel: { ...t.typography.metaLabel, fontSize: 10, color: t.colors.textMuted },
   statValueRow: { flexDirection: 'row', alignItems: 'baseline', gap: 3 },
-  statValue: { fontSize: 17, fontWeight: '700', color: t.colors.text },
-  statUnit: { fontSize: 11, fontWeight: '600', color: t.colors.textMuted },
+  statValue: { ...t.typography.statSmall, color: t.colors.text },
+  statUnit: { ...t.typography.caption, fontSize: 11, color: t.colors.textMuted },
   controls: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
   dots: { flexDirection: 'row', gap: t.spacing.sm, alignItems: 'center' },
-  dot: { width: 14, height: 3, borderRadius: t.radius.sm, backgroundColor: t.colors.border },
-  dotActive: { backgroundColor: t.colors.text, width: 24 },
-  arrow: {
-    width: 44,
-    height: 36,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  arrowDisabled: { opacity: 0.3 },
-  arrowText: { color: t.colors.textMuted, fontSize: 26, fontWeight: '600', lineHeight: 30 },
+  dot: { width: t.spacing.md - 2, height: 3, backgroundColor: t.colors.border },
+  dotActive: { backgroundColor: t.colors.accent, width: t.spacing.lg },
+  arrow: { width: t.size.touch, height: t.size.touch, alignItems: 'center', justifyContent: 'center' },
+  arrowDisabled: { opacity: t.opacity.disabled },
+  arrowText: { ...t.typography.title, color: t.colors.textSecondary },
 }));
 
 /** Tracks side by side: swipe sideways (or use the arrows) and the track in view is the selected one. */
 export function TrackCarousel({ tracks, selectedId, onSelect }: Props) {
   const styles = useStyles();
   const theme = useTheme();
-  const gap = theme.spacing.sm + 4;
+  const gap = theme.spacing.md;
   const cardPadding = theme.spacing.md;
 
   // Start from an estimate of the available width (the app is at most 460 wide on web, minus the screen padding),
   // then use the real measured width once the layout reports it.
   const windowWidth = useWindowDimensions().width;
   const [measured, setMeasured] = useState(0);
-  const width = measured > 0 ? measured : Math.max(200, Math.min(windowWidth, 460) - theme.spacing.md * 2);
+  const width = measured > 0 ? measured : Math.max(200, Math.min(windowWidth, 460) - theme.spacing.screen * 2);
   const listRef = useRef<FlatList<Track>>(null);
 
   const interval = width + gap;
@@ -77,9 +70,6 @@ export function TrackCarousel({ tracks, selectedId, onSelect }: Props) {
   };
 
   const previewHeight = Math.round((width - cardPadding * 2) * 0.42);
-  // Room for the name: the card's inner width minus the flag and the gap beside it. Long names are sized down to fit.
-  const nameRoom = width - cardPadding * 2 - FLAG_WIDTH - theme.spacing.md;
-  const nameSize = (name: string) => Math.max(18, Math.min(24, Math.floor(nameRoom / (name.length * 0.64))));
 
   return (
     <View style={styles.container}>
@@ -97,11 +87,11 @@ export function TrackCarousel({ tracks, selectedId, onSelect }: Props) {
           scrollEventThrottle={16}
           ItemSeparatorComponent={() => <View style={{ width: gap }} />}
           renderItem={({ item }) => (
-            <Card style={[styles.card, { width }]}>
+            <BracketFrame style={[styles.card, { width }]}>
               <View style={styles.header}>
-                <Flag code={item.countryCode} width={FLAG_WIDTH} />
+                <Flag code={item.countryCode} width={theme.size.flag + theme.spacing.sm} />
                 <View style={styles.headerText}>
-                  <Text style={[styles.name, { fontSize: nameSize(item.name) }]} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.7}>
+                  <Text style={styles.name} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.7}>
                     {item.name}
                   </Text>
                   <Text style={styles.country}>{item.country}</Text>
@@ -113,12 +103,12 @@ export function TrackCarousel({ tracks, selectedId, onSelect }: Props) {
               </View>
 
               <View style={styles.stats}>
-                <StatBlock first label="Lap length" value={item.lapLengthKm.toFixed(2)} unit="km" />
+                <StatBlock first label="Length" value={item.lapLengthKm.toFixed(2)} unit="km" />
                 <StatBlock label="Laps" value={String(item.raceLaps)} />
                 <StatBlock label="Distance" value={item.raceDistanceKm.toFixed(0)} unit="km" />
                 <StatBlock label="Lap time" value={formatClock(item.lapTimeSeconds)} />
               </View>
-            </Card>
+            </BracketFrame>
           )}
         />
       </View>
@@ -155,14 +145,7 @@ function StatBlock({ label, value, unit, first }: { label: string; value: string
 function Arrow({ label, disabled, onPress, accessibilityLabel }: { label: string; disabled: boolean; onPress: () => void; accessibilityLabel: string }) {
   const styles = useStyles();
   return (
-    <Pressable
-      style={[styles.arrow, disabled && styles.arrowDisabled]}
-      onPress={onPress}
-      disabled={disabled}
-      hitSlop={8}
-      accessibilityRole="button"
-      accessibilityLabel={accessibilityLabel}
-    >
+    <Pressable style={[styles.arrow, disabled && styles.arrowDisabled]} onPress={onPress} disabled={disabled} accessibilityRole="button" accessibilityLabel={accessibilityLabel}>
       <Text style={styles.arrowText}>{label}</Text>
     </Pressable>
   );

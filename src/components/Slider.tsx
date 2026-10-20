@@ -1,7 +1,7 @@
 import { useRef, useState } from 'react';
 import { GestureResponderEvent, View } from 'react-native';
 
-import { makeStyles } from '../design/styles';
+import { makeStyles, useTheme } from '../design/styles';
 
 interface Props {
   value: number;
@@ -12,28 +12,18 @@ interface Props {
   accessibilityLabel?: string;
 }
 
-const THUMB_W = 14; // a tall bar handle with fully rounded ends
-const THUMB_H = 30;
-const TRACK_HEIGHT = 4;
-
 const useStyles = makeStyles((t) => ({
-  touchArea: { height: 48, justifyContent: 'center', marginHorizontal: THUMB_W / 2 },
-  bar: { height: TRACK_HEIGHT, borderRadius: t.radius.sm, backgroundColor: t.colors.border, overflow: 'hidden' },
+  touchArea: { height: t.size.control, justifyContent: 'center', marginHorizontal: t.size.thumbWidth / 2 },
+  bar: { height: t.size.progress, backgroundColor: t.colors.border, overflow: 'hidden' },
   fill: { height: '100%', backgroundColor: t.colors.accent },
-  thumb: {
-    position: 'absolute',
-    width: THUMB_W,
-    height: THUMB_H,
-    borderRadius: THUMB_W / 2,
-    backgroundColor: t.colors.text,
-    borderWidth: 2,
-    borderColor: t.colors.accent,
-  },
+  // a slim upright handle with almost square corners, in the same white as the text
+  thumb: { position: 'absolute', width: t.size.thumbWidth, height: t.size.thumbHeight, borderRadius: t.radius.control / 2, backgroundColor: t.colors.text },
 }));
 
 /** A simple horizontal slider that snaps to `step`. Touch or drag anywhere along the bar. */
 export function Slider({ value, min, max, step = 1, onChange, accessibilityLabel }: Props) {
   const styles = useStyles();
+  const { size } = useTheme();
   const [width, setWidth] = useState(0);
   const barRef = useRef<View>(null);
 
@@ -51,7 +41,7 @@ export function Slider({ value, min, max, step = 1, onChange, accessibilityLabel
   };
 
   const fraction = max === min ? 0 : (value - min) / (max - min);
-  const thumbLeft = fraction * width - THUMB_W / 2;
+  const thumbLeft = fraction * width - size.thumbWidth / 2;
 
   return (
     <View
