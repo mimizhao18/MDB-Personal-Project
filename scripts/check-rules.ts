@@ -24,7 +24,7 @@ import { specFor, GEN2022, GEN2026 } from '../src/data/cars/index.ts';
 import { specFacts } from '../src/data/cars/spec.ts';
 import { recentDays } from '../src/logic/history.ts';
 import { buildDemoData } from '../src/logic/demo.ts';
-import { colors, fonts, theme } from '../src/design/tokens.ts';
+import { colors, fonts, glass, theme } from '../src/design/tokens.ts';
 import { contrastRatio } from '../src/design/contrast.ts';
 import { glowHexFor, hexToRgb255 } from '../src/components/car3d/glow.ts';
 import { TRACK_LIST } from '../src/data/tracks/index.ts';
@@ -311,6 +311,7 @@ for (const text of ['text', 'textSecondary', 'textMuted', 'accentOnDark', 'posit
   }
 }
 assert.ok(contrastRatio(colors.accentText, colors.accent) >= 4.5, 'white on the accent passes WCAG AA');
+assert.ok(glass.ambient <= 0.3 && glass.fillTop <= 0.12 && glass.edgeTop <= 0.3, 'glass stays subtle');
 assert.ok(contrastRatio(colors.accent, colors.background) >= 3, 'the accent is visible enough for icons and lines');
 
 // 3D car glow follows the livery

@@ -47,8 +47,27 @@ export const fonts = {
   monoSemibold: 'JetBrainsMono_600SemiBold',
 } as const;
 
+/**
+ * The "glass" look used on Home: a faint white fill that is a little brighter at the top, and an edge that catches
+ * light along the top. Opacities are 0 to 1 and are applied to `tint`.
+ */
+export const glass = {
+  tint: '#FFFFFF',
+  fillTop: 0.1,
+  fillBottom: 0.03,
+  edgeTop: 0.28,
+  edgeBottom: 0.06,
+  /** A hairline inside a glass panel. */
+  divider: 'rgba(255,255,255,0.10)',
+  /** The glow behind the car: the strongest opacity of the livery color. */
+  ambient: 0.22,
+  /** A soft red glow under the primary button. */
+  buttonGlow: '0 4px 20px rgba(225,6,0,0.28)',
+} as const;
+
 export const theme = {
   colors,
+  glass,
   /** An 8 px grid (4 for tight gaps). Screens are padded by `screen`. */
   spacing: { xs: 4, sm: 8, md: 16, lg: 24, xl: 32, xxl: 48, screen: 16 },
   radius: {
