@@ -14,3 +14,14 @@ export function noteTabChange(fromIndex: number, toIndex: number): void {
 export function tabAnimation(): TabSlide {
   return next;
 }
+
+let currentPath = '/';
+
+/** The screen that is showing, kept here so gesture callbacks (created once) can read it. */
+export function setCurrentPath(path: string): void {
+  currentPath = path;
+}
+
+export function getCurrentPath(): string {
+  return currentPath;
+}

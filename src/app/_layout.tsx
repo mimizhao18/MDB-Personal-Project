@@ -11,6 +11,7 @@ import { AlertHost } from '../ui/AlertHost';
 import { BackButton } from '../ui/BackButton';
 import { TAB_PATHS, TabBar } from '../ui/TabBar';
 import { tabAnimation } from '../ui/tabTransition';
+import { useTabSwipe } from '../ui/useTabSwipe';
 
 // The navigator paints its own background behind every screen, so it needs the app's dark colors too (visible on web).
 const appTheme = {
@@ -20,7 +21,8 @@ const appTheme = {
 
 // Garage, Store, Race (Home), History and Settings are the tabs: top-level screens, so no back button on them. They slide in
 // from the side the tab is on (see tabTransition.ts); replacing a screen animates like a push so the direction is the one asked for.
-const topLevel = { headerBackVisible: false, headerLeft: () => null };
+const noItems = () => [];
+const topLevel = { headerBackVisible: false, headerLeft: () => null, unstable_headerLeftItems: noItems };
 const tabScreen = (title: string, extra: Record<string, unknown> = {}) => () => ({ title, ...extra, animation: tabAnimation(), animationTypeForReplace: 'push' as const });
 
 // keep the splash screen up until the fonts are ready
@@ -28,6 +30,7 @@ void SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
   const pathname = usePathname();
+  const swipe = useTabSwipe();
   const [fontsLoaded, fontsError] = useAppFonts();
   const ready = fontsLoaded || !!fontsError;
 
@@ -40,7 +43,7 @@ export default function RootLayout() {
   return (
     <ThemeProvider value={appTheme}>
       <View style={styles.page}>
-        <View style={styles.app}>
+        <View style={styles.app} {...swipe}>
           <StatusBar style="light" />
           <Stack
             screenOptions={{
@@ -50,6 +53,8 @@ export default function RootLayout() {
               headerShadowVisible: false,
               // the app's own back button instead of the system's round one
               headerLeft: ({ canGoBack }: { canGoBack?: boolean }) => (canGoBack ? <BackButton onPress={() => router.back()} /> : null),
+              // on iOS 26 the system puts a round glass container behind header buttons; this hides it
+              unstable_headerLeftItems: ({ canGoBack }: { canGoBack?: boolean }) => (canGoBack ? [{ type: 'custom' as const, element: <BackButton onPress={() => router.back()} />, hidesSharedBackground: true }] : []),
               contentStyle: { backgroundColor: colors.background },
             }}
           >
@@ -63,7 +68,7 @@ export default function RootLayout() {
             <Stack.Screen name="compare" options={{ title: 'Compare generations' }} />
             {/* Swipe-back is off here because dragging the race-length slider to the right looks like a back swipe. */}
             <Stack.Screen name="create-session" options={{ title: 'New Race', gestureEnabled: false }} />
-            <Stack.Screen name="summary" options={{ title: 'Race Summary', headerBackVisible: false, headerLeft: () => null, gestureEnabled: false }} />
+            <Stack.Screen name="summary" options={{ title: 'Race Summary', headerBackVisible: false, headerLeft: () => null, unstable_headerLeftItems: noItems, gestureEnabled: false }} />
             <Stack.Screen name="session" options={{ title: 'Race', headerShown: false, gestureEnabled: false }} />
           </Stack>
           {TAB_PATHS.includes(pathname) && <TabBar />}
