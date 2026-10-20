@@ -10,4 +10,5 @@ export { ListRow } from './ListRow';
 export { Divider, Panel } from './Panel';
 export { SectionLabel } from './SectionLabel';
 export { SegmentedProgress } from './SegmentedProgress';
+export { StartButton } from './StartButton';
 export { StatBlock } from './StatBlock';

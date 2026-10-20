@@ -59,6 +59,8 @@ export const glass = {
   edgeBottom: 0.06,
   /** A hairline inside a glass panel. */
   divider: 'rgba(255,255,255,0.10)',
+  /** Corner brackets and similar thin marks. */
+  mark: 0.55,
   /** The glow behind the car: the strongest opacity of the livery color. */
   ambient: 0.22,
 } as const;
@@ -86,7 +88,7 @@ export const theme = {
   },
   border: { hairline: 1, selected: 1.5 },
   /** Fixed sizes: every touch target is at least `touch`, buttons and rows are taller. */
-  size: { touch: 44, control: 48, row: 56, tabBar: 56, progress: 4, icon: 22, heroCompact: 176, primary: 56, chamfer: 8 },
+  size: { touch: 44, control: 48, row: 56, tabBar: 56, progress: 4, icon: 22, heroCompact: 176, primary: 56, chamfer: 8, tick: 10 },
   opacity: { disabled: 0.4, dimmed: 0.5, pressed: 0.85 },
   /** Text styles, ready to spread into a style object. Numbers (stats, timers, XP, credits) use the mono ones. */
   typography: {

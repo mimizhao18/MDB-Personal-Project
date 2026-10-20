@@ -59,10 +59,11 @@ function HomeShape({ active }: { active: boolean }) {
 }
 
 /** A flat glass tab bar: a lit edge on top, labels only, the active tab in the accent with a thin line above it. */
-export function TabBar() {
+export function TabBar({ activePath }: { activePath?: string } = {}) {
   const styles = useStyles();
   const t = useTheme();
-  const pathname = usePathname();
+  const routerPath = usePathname();
+  const pathname = activePath ?? routerPath;
   const insets = useSafeAreaInsets();
 
   return (
