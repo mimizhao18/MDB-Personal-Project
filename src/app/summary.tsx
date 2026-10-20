@@ -100,6 +100,11 @@ export default function SummaryScreen() {
         </View>
 
         {session.awaySeconds ? <Text style={styles.away}>{awayLine(session)}</Text> : null}
+        {session.rewardPenaltyPercent ? (
+          <Text style={styles.penalty}>
+            Rewards reduced by {session.rewardPenaltyPercent}% for {(session.yellowFlags ?? 0) + (session.safetyCars ?? 0)} flags
+          </Text>
+        ) : null}
 
         <View style={styles.level}>
           <View style={styles.levelRow}>
@@ -146,6 +151,7 @@ const useStyles = makeStyles((t) => ({
   strip: { flexDirection: 'row' },
   cell: { flex: 1, alignItems: 'center', paddingHorizontal: t.spacing.sm },
   away: { ...t.typography.caption, color: t.colors.textMuted },
+  penalty: { ...t.typography.caption, color: t.colors.flag },
   level: { gap: t.spacing.sm },
   levelRow: { flexDirection: 'row', alignItems: 'baseline', justifyContent: 'space-between' },
   pair: { flexDirection: 'row', alignItems: 'baseline', gap: t.spacing.sm },

@@ -4,6 +4,8 @@
 //   30 s to 3 min  safety car      the car runs at half speed for the next minute
 //   3 min or more  crash           the race ends with a DNF
 // Pausing first excuses a break of up to 5 minutes. After that, time away counts as a distraction again.
+// Two or more flags (yellow flags and safety cars together) also cut the XP and credits you earn: 10% off for two,
+// another 10% for each further one, never more than 50%.
 
 export const RULES = {
   yellowAfterSeconds: 5,
@@ -14,6 +16,15 @@ export const RULES = {
   safetyCarSeconds: 60,
   /** How fast the car (and the clock) moves during the safety car period, compared with normal. */
   safetyCarSpeed: 0.5,
+} as const;
+
+/** How the rewards shrink as flags pile up. */
+export const PENALTY = {
+  /** Flags (yellow flags plus safety cars) that cost nothing. */
+  freeFlags: 1,
+  /** Percent taken off the rewards for each flag after the free ones. */
+  stepPercent: 10,
+  maxPercent: 50,
 } as const;
 
 export type Distraction = 'none' | 'yellow' | 'safety-car' | 'crash';
@@ -58,4 +69,16 @@ export function addAway(totals: AwayTotals, awaySeconds: number): AwayTotals {
     yellowFlags: totals.yellowFlags + (kind === 'yellow' ? 1 : 0),
     safetyCars: totals.safetyCars + (kind === 'safety-car' ? 1 : 0),
   };
+}
+
+/** The percent taken off XP and credits for the flags in a race: 0 for none or one flag, 10 for two, 20 for three, up to 50. */
+export function penaltyPercent(totals: AwayTotals): number {
+  const flags = totals.yellowFlags + totals.safetyCars;
+  if (flags <= PENALTY.freeFlags) return 0;
+  return Math.min(PENALTY.maxPercent, (flags - PENALTY.freeFlags) * PENALTY.stepPercent);
+}
+
+/** What the rewards are multiplied by: 1 for no penalty, 0.9 for 10%, and so on. */
+export function rewardMultiplier(totals: AwayTotals): number {
+  return 1 - penaltyPercent(totals) / 100;
 }

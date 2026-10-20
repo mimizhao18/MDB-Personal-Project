@@ -26,7 +26,7 @@ import { recentDays } from '../src/logic/history.ts';
 import { buildDemoData } from '../src/logic/demo.ts';
 import { colors, fonts, glass, theme } from '../src/design/tokens.ts';
 import { contrastRatio } from '../src/design/contrast.ts';
-import { NO_AWAY, RULES, addAway, advanceProgress, classifyAway, pauseSecondsLeft } from '../src/logic/distraction.ts';
+import { NO_AWAY, RULES, addAway, advanceProgress, classifyAway, pauseSecondsLeft, penaltyPercent, rewardMultiplier } from '../src/logic/distraction.ts';
 import { glowHexFor, hexToRgb255 } from '../src/components/car3d/glow.ts';
 import { TRACK_LIST } from '../src/data/tracks/index.ts';
 import { applySessionToStreak, daysBetween, displayedStreak } from '../src/logic/streak.ts';
@@ -325,6 +325,25 @@ assert.equal(crashed.crashed, true);
 assert.equal(crashed.awaySeconds, 60);
 assert.equal(crashed.yellowFlags, 1);
 assert.equal(crashed.safetyCars, 1);
+// two or more flags (yellow flags and safety cars together) cut the rewards: 10% for two, 10% more for each further one, up to 50%
+const flags = (yellow: number, safety: number) => ({ seconds: 99, yellowFlags: yellow, safetyCars: safety });
+assert.equal(penaltyPercent(NO_AWAY), 0);
+assert.equal(penaltyPercent(flags(1, 0)), 0);
+assert.equal(penaltyPercent(flags(0, 1)), 0);
+assert.equal(penaltyPercent(flags(2, 0)), 10);
+assert.equal(penaltyPercent(flags(1, 1)), 10);
+assert.equal(penaltyPercent(flags(3, 1)), 30);
+assert.equal(penaltyPercent(flags(9, 9)), 50);
+assert.equal(rewardMultiplier(flags(2, 0)), 0.9);
+const clean = buildSession({ id: 'p0', track, plannedLaps: 10, focusedSeconds: 900, startedAt: start, endedAt: new Date('2026-09-30T10:15:00'), away: flags(1, 0) });
+assert.equal(clean.xpEarned, 15);
+assert.equal(clean.rewardPenaltyPercent, undefined);
+const docked = buildSession({ id: 'p1', track, plannedLaps: 10, focusedSeconds: 900, startedAt: start, endedAt: new Date('2026-09-30T10:15:00'), away: flags(2, 0) });
+assert.equal(docked.xpEarned, 13); // 15 minus 10%, rounded down
+assert.equal(docked.creditsEarned, 13);
+assert.equal(docked.rewardPenaltyPercent, 10);
+const dockedMore = buildSession({ id: 'p2', track, plannedLaps: 10, focusedSeconds: 900, startedAt: start, endedAt: new Date('2026-09-30T10:15:00'), away: flags(3, 2) });
+assert.equal(dockedMore.xpEarned, 9); // 15 minus 40%
 assert.equal(done.crashed, undefined); // a clean race has no distraction fields
 
 // the new design system

@@ -1,4 +1,5 @@
 import type { Session, Track } from '../models/types';
+import { NO_AWAY, penaltyPercent } from './distraction';
 import type { AwayTotals } from './distraction';
 
 /** Planned focus time for a number of whole laps. */
@@ -64,12 +65,19 @@ export interface SessionInput {
   crashed?: boolean;
 }
 
+/** `amount` with `percent` taken off, rounded down (whole numbers only, so no rounding surprises). */
+function afterPenalty(amount: number, percent: number): number {
+  return Math.floor((amount * (100 - percent)) / 100);
+}
+
 export function buildSession(input: SessionInput): Session {
   const { track, plannedLaps } = input;
   const plannedSeconds = lapsToSeconds(track, plannedLaps);
   // Never credit more focus time than the session planned.
   const focusedSeconds = Math.max(0, Math.min(Math.floor(input.focusedSeconds), plannedSeconds));
   const laps = completedLaps(track, focusedSeconds, plannedLaps);
+  const away = input.away ?? NO_AWAY;
+  const penalty = penaltyPercent(away);
   return {
     id: input.id,
     trackId: track.id,
@@ -80,9 +88,10 @@ export function buildSession(input: SessionInput): Session {
     startedAt: input.startedAt.toISOString(),
     endedAt: input.endedAt.toISOString(),
     distanceKm: distanceKm(track, laps),
-    xpEarned: xpForSeconds(focusedSeconds),
-    creditsEarned: creditsForSeconds(focusedSeconds),
+    xpEarned: afterPenalty(xpForSeconds(focusedSeconds), penalty),
+    creditsEarned: afterPenalty(creditsForSeconds(focusedSeconds), penalty),
     ...(input.away && input.away.seconds > 0 ? { awaySeconds: Math.round(input.away.seconds), yellowFlags: input.away.yellowFlags, safetyCars: input.away.safetyCars } : {}),
+    ...(penalty > 0 ? { rewardPenaltyPercent: penalty } : {}),
     ...(input.crashed ? { crashed: true } : {}),
   };
 }

@@ -49,6 +49,8 @@ export interface Session {
   awaySeconds?: number;
   yellowFlags?: number;
   safetyCars?: number;
+  /** Percent taken off the XP and credits because of the flags (only saved when it is more than 0). */
+  rewardPenaltyPercent?: number;
   /** True if the race ended in a crash because you were away for too long (a DNF). */
   crashed?: boolean;
 }

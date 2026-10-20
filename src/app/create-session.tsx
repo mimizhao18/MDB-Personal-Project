@@ -9,7 +9,7 @@ import { SectionLabel, SegmentedControl, StartButton } from '../components/ui';
 import { TRACK_LIST } from '../data/tracks';
 import { makeStyles } from '../design/styles';
 import { clampLaps, lapsFromMinutes, maxMinutes, minutesForLaps } from '../logic/raceLength';
-import { RULES } from '../logic/distraction';
+import { PENALTY, RULES } from '../logic/distraction';
 import { distanceKm, lapsToSeconds } from '../logic/rewards';
 import { DEFAULT_LAPS, formatDurationWords } from '../logic/sessionOptions';
 import type { TrackId } from '../models/types';
@@ -101,7 +101,7 @@ export default function CreateSessionScreen() {
       <View style={styles.footer}>
         <Text style={styles.rules}>
           Time you spend out of the app does not count. After {RULES.yellowAfterSeconds} s you get a yellow flag, after {RULES.safetyCarAfterSeconds} s the safety car slows you, and after {RULES.crashAfterSeconds / 60} minutes you crash (DNF). Pause first for a break of up to{' '}
-          {RULES.pauseLimitSeconds / 60} minutes.
+          {RULES.pauseLimitSeconds / 60} minutes. From the second flag or safety car on, your rewards are cut by {PENALTY.stepPercent}%, and by {PENALTY.stepPercent}% more for each further one.
         </Text>
         <StartButton label="Start Race" onPress={start} frame />
       </View>

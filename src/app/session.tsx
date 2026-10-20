@@ -11,7 +11,7 @@ import { getLivery } from '../data/liveries';
 import { TRACKS, isTrackId } from '../data/tracks';
 import { makeStyles, useTheme } from '../design/styles';
 import { useSessionTimer } from '../hooks/useSessionTimer';
-import { RULES } from '../logic/distraction';
+import { RULES, penaltyPercent } from '../logic/distraction';
 import { formatClock } from '../logic/lapProgress';
 import { buildSession } from '../logic/rewards';
 import type { CarSettings, Track } from '../models/types';
@@ -153,6 +153,9 @@ function Race({ track, laps, speed }: { track: Track; laps: number; speed: numbe
 
   const livery = car ? getLivery(car.liveryId) : undefined;
   const paused = status === 'paused';
+  // from the second flag on, the banner also says that the rewards are being cut
+  const penalty = penaltyPercent(away);
+  const penaltyNote = penalty > 0 ? ` Rewards -${penalty}%.` : '';
 
   return (
     <SafeAreaView style={styles.safe} edges={['top', 'bottom']}>
@@ -175,9 +178,9 @@ function Race({ track, laps, speed }: { track: Track; laps: number; speed: numbe
           {(slowed || warning?.kind === 'yellow') && (
             <View style={styles.banner}>
               {slowed ? (
-                <RaceBanner title="Safety car" detail={warning ? `You were away for ${Math.round(warning.awaySeconds)} s. The car runs at half speed for a minute.` : 'The car runs at half speed for a minute.'} />
+                <RaceBanner title="Safety car" detail={`${warning ? `You were away for ${Math.round(warning.awaySeconds)} s. ` : ''}The car runs at half speed for a minute.${penaltyNote}`} />
               ) : (
-                <RaceBanner title="Yellow flag" detail={`You left the race for ${Math.round(warning?.awaySeconds ?? 0)} s. Stay on track.`} />
+                <RaceBanner title="Yellow flag" detail={`You left the race for ${Math.round(warning?.awaySeconds ?? 0)} s. Stay on track.${penaltyNote}`} />
               )}
             </View>
           )}
