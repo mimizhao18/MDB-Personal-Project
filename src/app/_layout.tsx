@@ -7,6 +7,7 @@ import { Platform, StyleSheet, View } from 'react-native';
 import { useAppFonts } from '../design/fonts';
 import { fonts, theme } from '../design/tokens';
 import { colors } from '../theme';
+import { AlertHost } from '../ui/AlertHost';
 import { TAB_PATHS, TabBar } from '../ui/TabBar';
 
 // The navigator paints its own background behind every screen, so it needs the app's dark colors too (visible on web).
@@ -57,9 +58,10 @@ export default function RootLayout() {
             {/* Swipe-back is off here because dragging the race-length slider to the right looks like a back swipe. */}
             <Stack.Screen name="create-session" options={{ title: 'New Race', gestureEnabled: false }} />
             <Stack.Screen name="summary" options={{ title: 'Race Summary', headerBackVisible: false, headerLeft: () => null, gestureEnabled: false }} />
-            <Stack.Screen name="session" options={{ title: 'Race', headerBackVisible: false, headerLeft: () => null, gestureEnabled: false }} />
+            <Stack.Screen name="session" options={{ title: 'Race', headerShown: false, gestureEnabled: false }} />
           </Stack>
           {TAB_PATHS.includes(pathname) && <TabBar />}
+          <AlertHost />
         </View>
       </View>
     </ThemeProvider>

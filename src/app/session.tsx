@@ -5,7 +5,8 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { glowHexFor } from '../components/car3d/glow';
 import { TrackView } from '../components/TrackView';
-import { AmbientGlow, Button, SegmentedProgress, StartButton } from '../components/ui';
+import { Flag } from '../components/Flag';
+import { AmbientGlow, Button, SegmentedProgress } from '../components/ui';
 import { getLivery } from '../data/liveries';
 import { TRACKS, isTrackId } from '../data/tracks';
 import { makeStyles, useTheme } from '../design/styles';
@@ -109,11 +110,14 @@ function Race({ track, laps, speed }: { track: Track; laps: number; speed: numbe
   const paused = status === 'paused';
 
   return (
-    <SafeAreaView style={styles.safe} edges={['bottom']}>
+    <SafeAreaView style={styles.safe} edges={['top', 'bottom']}>
       {livery && <AmbientGlow color={glowHexFor(livery.primary, livery.secondary)} focus={0.3} />}
       <View style={[styles.content, compact && styles.contentCompact]}>
         <View style={styles.top}>
-          <Text style={styles.trackName}>{track.name}</Text>
+          <View style={styles.place} accessible accessibilityLabel={`${track.name}, ${track.country}`}>
+            <Flag code={track.countryCode} width={t.size.flag} />
+            <Text style={styles.trackName}>{track.name}</Text>
+          </View>
           <View style={styles.lap} accessible accessibilityLabel={`Lap ${p.currentLap} of ${laps}`}>
             <Text style={styles.trackName}>Lap </Text>
             <Text style={styles.lapNumber}>{p.currentLap}</Text>
@@ -137,7 +141,7 @@ function Race({ track, laps, speed }: { track: Track; laps: number; speed: numbe
 
         <View style={styles.buttons}>
           {status === 'running' && <Button label="Pause" variant="secondary" onPress={pause} />}
-          {paused && <StartButton label="Resume" frame onPress={resume} />}
+          {paused && <Button label="Resume" variant="soft" onPress={resume} />}
           {paused && <Button label="End race" variant="ghost" onPress={confirmEnd} />}
         </View>
       </View>
@@ -150,7 +154,8 @@ const useStyles = makeStyles((t) => ({
   content: { flex: 1, padding: t.spacing.screen, justifyContent: 'space-between' },
   contentCompact: { paddingVertical: t.spacing.sm },
   center: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: t.spacing.md, padding: t.spacing.screen },
-  top: { flexDirection: 'row', alignItems: 'baseline', justifyContent: 'space-between' },
+  top: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
+  place: { flexDirection: 'row', alignItems: 'center', gap: t.spacing.sm },
   trackName: { ...t.typography.metaLabel, color: t.colors.textMuted },
   lap: { flexDirection: 'row', alignItems: 'baseline' },
   lapNumber: { ...t.typography.metaValue, color: t.colors.text },
@@ -161,7 +166,7 @@ const useStyles = makeStyles((t) => ({
   statusPaused: { color: t.colors.accentOnDark },
   progress: { alignSelf: 'stretch', marginTop: t.spacing.sm },
   // room for two buttons, so nothing jumps when pausing
-  buttons: { gap: t.spacing.sm, minHeight: t.size.primary + t.size.control + t.spacing.xl },
+  buttons: { gap: t.spacing.sm, marginTop: t.spacing.lg, minHeight: t.size.control * 2 + t.spacing.sm },
   title: { ...t.typography.title, color: t.colors.text, textAlign: 'center' },
   muted: { ...t.typography.caption, color: t.colors.textMuted },
 }));
