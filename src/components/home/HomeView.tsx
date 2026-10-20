@@ -49,7 +49,7 @@ export function HomeView({ data, onStart }: { data: HomeData; onStart: () => voi
               <Text style={styles.metaLabel}>Level</Text>
               <Text style={styles.metaValue}>{level.level}</Text>
             </View>
-            <CreditAmount amount={profile.credits} small />
+            <CreditAmount amount={profile.credits} size="meta" />
           </View>
           <SegmentedProgress fraction={level.fraction} accessibilityLabel={`XP: ${level.xpIntoLevel} of ${level.xpForNextLevel} to the next level`} />
           <Text style={styles.xp}>

@@ -98,7 +98,7 @@ export default function SummaryScreen() {
               <Text style={styles.value}>{progress.level}</Text>
               {leveledUp && <Text style={styles.levelUp}>Level up</Text>}
             </View>
-            <CreditAmount amount={profile.credits} small />
+            <CreditAmount amount={profile.credits} size="meta" />
           </View>
           <SegmentedProgress fraction={progress.fraction} accessibilityLabel={`XP: ${progress.xpIntoLevel} of ${progress.xpForNextLevel} to level ${progress.level + 1}`} />
           <View style={styles.levelRow}>

@@ -99,6 +99,8 @@ export const theme = {
     button: { fontFamily: fonts.semibold, fontSize: 15, lineHeight: 20, letterSpacing: 0.2 },
     statLarge: { fontFamily: fonts.monoSemibold, fontSize: 32, lineHeight: 38, letterSpacing: -0.5 },
     stat: { fontFamily: fonts.monoMedium, fontSize: 20, lineHeight: 26 },
+    /** Your available credits in the top right corner of the Garage, Store and livery screens. */
+    statCompact: { fontFamily: fonts.monoMedium, fontSize: 16, lineHeight: 22 },
     statSmall: { fontFamily: fonts.monoMedium, fontSize: 14, lineHeight: 20 },
   },
 } as const;

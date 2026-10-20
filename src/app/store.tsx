@@ -36,7 +36,7 @@ export default function StoreScreen() {
       <ScrollView contentContainerStyle={styles.content}>
         <View style={styles.top}>
           <Text style={styles.count}>{forSale.length === 0 ? 'Nothing left to buy' : `${forSale.length} liveries for sale`}</Text>
-          <CreditAmount amount={profile.credits} small />
+          <CreditAmount amount={profile.credits} size="compact" />
         </View>
 
         {forSale.length === 0 ? (

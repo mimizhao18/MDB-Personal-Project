@@ -26,7 +26,7 @@ const useStyles = makeStyles((t) => ({
 
 /**
  * The livery being looked at: the 3D car you can spin with your credits in its top right corner, then its name, generation and team,
- * then what you can do with it (Equip or Buy as a normal button, or a small "Equipped" tag; a livery you do not own shows its price beside the name), and below that the 2D race icon. Used by the Garage and the Store.
+ * then what you can do with it (Equip as a quiet button, Buy as the solid red one, or a small "Equipped" tag; a livery you do not own shows its price beside the name), and below that the 2D race icon. Used by the Garage and the Store.
  */
 export function LiveryPreview({
   livery,
@@ -48,14 +48,13 @@ export function LiveryPreview({
   const styles = useStyles();
   const t = useTheme();
   const era = getEra(livery.era);
-  const canAfford = credits >= livery.price;
   const car = { liveryId: livery.id, number };
   return (
     <View style={styles.stack}>
       <View style={styles.hero}>
         <HeroCar car={car} background="transparent" zoom={0.9} />
         <View style={styles.credits} pointerEvents="none">
-          <CreditAmount amount={credits} small />
+          <CreditAmount amount={credits} size="compact" />
         </View>
       </View>
 
@@ -79,7 +78,7 @@ export function LiveryPreview({
         (owned ? (
           <Button label="Equip" variant="soft" onPress={onEquip} />
         ) : (
-          <Button label="Buy" accessibilityLabel={`Buy for ${livery.price} credits`} variant={canAfford ? 'primary' : 'secondary'} onPress={onBuy} />
+          <Button label="Buy" accessibilityLabel={`Buy for ${livery.price} credits`} onPress={onBuy} />
         ))}
 
       <BracketFrame style={styles.iconFrame}>
