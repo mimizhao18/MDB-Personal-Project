@@ -37,6 +37,7 @@ export default function RootLayout() {
             <Stack.Screen name="store" options={{ title: 'Store', ...topLevel }} />
             <Stack.Screen name="settings" options={{ title: 'Settings', ...topLevel }} />
             <Stack.Screen name="livery" options={{ title: 'Livery' }} />
+            <Stack.Screen name="home-design" options={{ title: 'Home design' }} />
             <Stack.Screen name="compare" options={{ title: 'Compare generations' }} />
             {/* Swipe-back is off here because dragging the race-length slider to the right looks like a back swipe. */}
             <Stack.Screen name="create-session" options={{ title: 'New Race', gestureEnabled: false }} />

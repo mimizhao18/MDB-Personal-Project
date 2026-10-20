@@ -54,6 +54,13 @@ export default function SettingsScreen() {
   return (
     <View style={styles.container}>
       <View style={styles.section}>
+        <SectionLabel>Appearance</SectionLabel>
+        <ListGroup>
+          <ListRow title="Home design" subtitle="Choose how the Home screen is laid out." chevron onPress={() => router.push('/home-design')} />
+        </ListGroup>
+      </View>
+
+      <View style={styles.section}>
         <SectionLabel>Cars</SectionLabel>
         <ListGroup>
           <ListRow title="Compare generations" subtitle="Any two generations side by side, at the same scale and angle." chevron onPress={() => router.push('/compare')} />

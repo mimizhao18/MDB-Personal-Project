@@ -1,85 +1,38 @@
-import { router, useFocusEffect } from 'expo-router';
+import { router, useFocusEffect, useLocalSearchParams } from 'expo-router';
 import { useCallback, useState } from 'react';
-import { Text, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { HeroCar } from '../components/HeroCar';
-import { makeStyles } from '../design/styles';
-import { levelProgress } from '../logic/rewards';
-import { formatDurationWords } from '../logic/sessionOptions';
-import { lifetimeStats } from '../logic/stats';
-import type { LifetimeStats } from '../logic/stats';
-import { dayKey, displayedStreak } from '../logic/streak';
-import type { PlayerProfile } from '../models/types';
-import { DEFAULT_PROFILE, getProfile } from '../storage/profile';
-import { getSessions } from '../storage/sessions';
-import { Credits } from '../ui/Credits';
-import { Button, ProgressBar, StatStrip } from '../ui/kit';
+import { HomeCards } from '../components/home/HomeCards';
+import { HomeClassic } from '../components/home/HomeClassic';
+import { HomePoster } from '../components/home/HomePoster';
+import { HomeRing } from '../components/home/HomeRing';
+import { HomeTelemetry } from '../components/home/HomeTelemetry';
+import { useHomeData } from '../components/home/useHomeData';
+import { DEFAULT_HOME_DESIGN, getHomeDesign, isHomeDesignId } from '../storage/homeDesign';
+import type { HomeDesignId } from '../storage/homeDesign';
 
-const EMPTY_STATS: LifetimeStats = { races: 0, laps: 0, distanceKm: 0, focusedSeconds: 0 };
-
-const useStyles = makeStyles((t) => ({
-  safe: { flex: 1, padding: t.spacing.md, gap: t.spacing.md },
-  topBar: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', gap: t.spacing.md },
-  levelBlock: { flex: 1, gap: t.spacing.xs },
-  level: { ...t.type.title, color: t.colors.text },
-  caption: { ...t.type.caption, color: t.colors.textMuted },
-  // the 3D car runs edge to edge (past the screen padding) so its floor glow has room to fade out before the edge
-  carArea: { flex: 1, marginHorizontal: -t.spacing.md },
-  focusTotal: { ...t.type.caption, color: t.colors.textMuted, textAlign: 'center' },
-}));
-
+/** Home: the layout is the one chosen in Settings > Home design (add ?design=ring and so on to try one without saving it). */
 export default function HomeScreen() {
-  const styles = useStyles();
-  const [profile, setProfile] = useState<PlayerProfile>(DEFAULT_PROFILE);
-  const [stats, setStats] = useState<LifetimeStats>(EMPTY_STATS);
-
-  // Reload every time Home comes back into view, e.g. after a race.
+  const data = useHomeData();
+  const params = useLocalSearchParams<{ design?: string }>();
+  const [saved, setSaved] = useState<HomeDesignId>(DEFAULT_HOME_DESIGN);
   useFocusEffect(
     useCallback(() => {
-      let cancelled = false;
-      Promise.all([getProfile(), getSessions()]).then(([p, sessions]) => {
-        if (cancelled) return;
-        setProfile(p);
-        setStats(lifetimeStats(sessions));
-      });
-      return () => {
-        cancelled = true;
-      };
+      getHomeDesign().then(setSaved);
     }, []),
   );
+  const design: HomeDesignId = isHomeDesignId(params.design) ? params.design : saved;
+  const start = () => router.push('/create-session');
 
-  const level = levelProgress(profile.totalXp);
-  const streak = displayedStreak(profile, dayKey(new Date()));
-  const focusLine = stats.focusedSeconds > 0 ? `${formatDurationWords(stats.focusedSeconds)} focused in total` : 'No races yet. Start your first one!';
-
-  return (
-    <SafeAreaView style={styles.safe}>
-      <View style={styles.topBar}>
-        <View style={styles.levelBlock}>
-          <Text style={styles.level}>Level {level.level}</Text>
-          <ProgressBar fraction={level.fraction} />
-          <Text style={styles.caption}>
-            {level.xpIntoLevel} / {level.xpForNextLevel} XP
-          </Text>
-        </View>
-        <Credits amount={profile.credits} size={20} />
-      </View>
-
-      <View style={styles.carArea}>
-        <HeroCar car={profile.car} autoSpin={false} />
-      </View>
-
-      <StatStrip
-        items={[
-          { label: 'Day streak', value: String(streak) },
-          { label: 'Races', value: String(stats.races) },
-          { label: 'Laps', value: String(stats.laps) },
-          { label: 'Km', value: stats.distanceKm.toFixed(0) },
-        ]}
-      />
-      <Text style={styles.focusTotal}>{focusLine}</Text>
-      <Button label="Start Race" onPress={() => router.push('/create-session')} />
-    </SafeAreaView>
-  );
+  switch (design) {
+    case 'ring':
+      return <HomeRing data={data} onStart={start} />;
+    case 'cards':
+      return <HomeCards data={data} onStart={start} />;
+    case 'poster':
+      return <HomePoster data={data} onStart={start} />;
+    case 'telemetry':
+      return <HomeTelemetry data={data} onStart={start} />;
+    default:
+      return <HomeClassic data={data} onStart={start} />;
+  }
 }

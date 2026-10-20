@@ -24,7 +24,6 @@ const useStyles = makeStyles((t) => ({
   label: { ...t.type.label, color: t.colors.textMuted },
   count: { ...t.type.heading, color: t.colors.text },
   countTotal: { color: t.colors.textMuted, fontWeight: '600' },
-  hint: { ...t.type.caption, color: t.colors.textMuted },
   grid: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between', rowGap: t.spacing.sm },
   empty: { alignItems: 'center', gap: t.spacing.md, paddingVertical: t.spacing.lg },
   emptyText: { ...t.type.body, color: t.colors.textMuted, textAlign: 'center' },
@@ -56,7 +55,7 @@ export default function GarageScreen() {
 
   const owned = LIVERIES.filter((l) => ownsLivery(profile, l));
   const previewed = getLivery(previewId ?? profile.car.liveryId);
-  const countIn = (era: EraId) => `${owned.filter((l) => l.era === era).length}/${LIVERIES.filter((l) => l.era === era).length}`;
+  const chipEras = ERAS.filter((e) => owned.some((l) => l.era === e.id)).map((e) => e.id);
   // newest generation first, the equipped livery before everything else
   const eraRank = (l: Livery) => ERAS.findIndex((e) => e.id === l.era);
   const shown = owned
@@ -76,7 +75,7 @@ export default function GarageScreen() {
           onBuy={() => buy(previewed)}
         />
 
-        <Card style={styles.collection}>
+        <View style={styles.collection}>
           <View style={styles.collectionHeader}>
             <Text style={styles.label}>Your collection</Text>
             <Text style={styles.count}>
@@ -85,16 +84,16 @@ export default function GarageScreen() {
             </Text>
           </View>
           <ProgressBar fraction={owned.length / LIVERIES.length} />
-          <Text style={styles.hint}>Earn credits by racing, then unlock more liveries in the Store.</Text>
-        </Card>
+        </View>
 
-        <Chips
-          options={['all', ...ERAS.map((e) => e.id)] as readonly EraFilter[]}
-          value={filter}
-          onChange={setFilter}
-          labelFor={(v) => (v === 'all' ? 'All' : ERAS.find((e) => e.id === v)!.name)}
-          countFor={(v) => (v === 'all' ? `${owned.length}` : countIn(v))}
-        />
+        {chipEras.length > 1 && (
+          <Chips
+            options={['all', ...chipEras] as readonly EraFilter[]}
+            value={filter}
+            onChange={setFilter}
+            labelFor={(v) => (v === 'all' ? 'All' : ERAS.find((e) => e.id === v)!.name)}
+          />
+        )}
 
         {shown.length === 0 ? (
           <View style={styles.empty}>

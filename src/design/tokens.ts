@@ -12,6 +12,9 @@ export const colors = {
   textMuted: '#9A9AA3',
   accent: '#E10600',
   accentText: '#FFFFFF',
+  /** A dark red tint and a light red, for quiet red highlights (the Home tab, destructive text). */
+  accentSoft: '#2A1513',
+  accentSoftText: '#FF6B63',
   positive: '#3DDC84',
   /** The credits coin. */
   coin: '#F4F4F5',

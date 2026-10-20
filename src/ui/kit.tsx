@@ -69,18 +69,12 @@ const useStyles = makeStyles((t) => ({
   chipText: { color: t.colors.textMuted, fontSize: 14, fontWeight: '700' },
   chipTextActive: { color: t.colors.text },
   chipCount: { color: t.colors.textMuted, fontSize: 12, fontWeight: '600' },
-  sortRow: { flexDirection: 'row', alignItems: 'center', gap: t.spacing.md },
-  sortLabel: { ...t.type.caption, color: t.colors.textMuted },
-  sortOption: { paddingVertical: t.spacing.sm, borderBottomWidth: 2, borderBottomColor: 'transparent' },
-  sortOptionActive: { borderBottomColor: t.colors.text },
-  sortText: { fontSize: 14, fontWeight: '600', color: t.colors.textMuted },
-  sortTextActive: { color: t.colors.text },
   group: { backgroundColor: t.colors.surface, borderRadius: t.radius.lg, borderWidth: t.border.hairline, borderColor: t.colors.border, overflow: 'hidden' },
   divider: { height: t.border.hairline, backgroundColor: t.colors.border, marginLeft: t.spacing.md },
   row: { flexDirection: 'row', alignItems: 'center', gap: t.spacing.md, minHeight: 56, paddingVertical: t.spacing.sm + 2, paddingHorizontal: t.spacing.md },
   rowText: { flex: 1, gap: 2 },
   rowTitle: { fontSize: 16, fontWeight: '600', color: t.colors.text },
-  rowTitleDestructive: { color: '#FF6B63' },
+  rowTitleDestructive: { color: t.colors.accentSoftText },
   rowSubtitle: { ...t.type.caption, color: t.colors.textMuted },
   rowChevron: { fontSize: 22, color: t.colors.textMuted },
 }));
@@ -258,23 +252,5 @@ export function ListRow({
       </View>
       {chevron && <Text style={styles.rowChevron}>›</Text>}
     </Pressable>
-  );
-}
-
-/** A "Sort" row of plain text choices, the selected one underlined: lighter than a segmented control. */
-export function SortRow<T extends string>({ label = 'Sort', options, value, onChange, labelFor }: { label?: string; options: readonly T[]; value: T; onChange: (value: T) => void; labelFor?: (value: T) => string }) {
-  const styles = useStyles();
-  return (
-    <View style={styles.sortRow}>
-      <Text style={styles.sortLabel}>{label}</Text>
-      {options.map((option) => {
-        const active = option === value;
-        return (
-          <Pressable key={option} style={[styles.sortOption, active && styles.sortOptionActive]} onPress={() => onChange(option)} accessibilityRole="button" accessibilityState={{ selected: active }}>
-            <Text style={[styles.sortText, active && styles.sortTextActive]}>{labelFor ? labelFor(option) : option}</Text>
-          </Pressable>
-        );
-      })}
-    </View>
   );
 }
