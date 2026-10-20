@@ -61,8 +61,6 @@ export const glass = {
   divider: 'rgba(255,255,255,0.10)',
   /** The glow behind the car: the strongest opacity of the livery color. */
   ambient: 0.22,
-  /** A soft red glow under the primary button. */
-  buttonGlow: '0 4px 20px rgba(225,6,0,0.28)',
 } as const;
 
 export const theme = {

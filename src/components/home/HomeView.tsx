@@ -22,7 +22,6 @@ const useStyles = makeStyles((t) => ({
   strip: { flexDirection: 'row', paddingHorizontal: 0, paddingVertical: t.spacing.sm },
   cell: { flex: 1, alignItems: 'center' },
   divided: { borderLeftWidth: t.border.hairline, borderLeftColor: t.glass.divider },
-  start: { boxShadow: t.glass.buttonGlow },
 }));
 
 /**
@@ -68,9 +67,7 @@ export function HomeView({ data, onStart }: { data: HomeData; onStart: () => voi
             <StatBlock label="Distance" value={stats.distanceKm.toFixed(0)} unit="km" size="small" align="center" />
           </View>
         </Glass>
-        <View style={styles.start}>
-          <ChamferButton label="Start Race" onPress={onStart} />
-        </View>
+        <ChamferButton label="Start Race" onPress={onStart} />
       </View>
     </View>
   );
