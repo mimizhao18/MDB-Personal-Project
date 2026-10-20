@@ -7,11 +7,11 @@ import Svg, { Line, Polygon } from 'react-native-svg';
 import { Glass } from '../components/ui';
 import { makeStyles, useTheme } from '../design/styles';
 
-// Garage and Store on the left, History and Settings on the right, and Home in the middle on a trapezoid.
+// Garage and Store on the left, History and Settings on the right, and Race (the Home screen) in the middle on a trapezoid.
 const TABS = [
   { label: 'Garage', path: '/garage' },
   { label: 'Store', path: '/store' },
-  { label: 'Home', path: '/', home: true },
+  { label: 'Race', path: '/', home: true },
   { label: 'History', path: '/history' },
   { label: 'Settings', path: '/settings' },
 ] as const;
@@ -35,7 +35,7 @@ const useStyles = makeStyles((t) => ({
 }));
 
 /**
- * The Home tab's backdrop: a trapezoid, wider at the bottom, with a thin red line outside each slanted side (the same
+ * The Race (Home) tab's backdrop: a trapezoid, wider at the bottom, with a thin red line outside each slanted side (the same
  * double outline as the Start Race button). The shape inside is dark red when idle and solid red on Home.
  */
 function HomeShape({ active }: { active: boolean }) {
@@ -70,7 +70,7 @@ export function TabBar({ activePath }: { activePath?: string } = {}) {
   const pathname = activePath ?? routerPath;
   const insets = useSafeAreaInsets();
   // the labels may sit over the top of the home-indicator area, so only part of the bottom inset is added under them
-  const below = Math.max(0, insets.bottom - t.spacing.lg);
+  const below = Math.max(0, insets.bottom - t.spacing.lg - t.spacing.sm);
 
   return (
     <View accessibilityRole="tablist">

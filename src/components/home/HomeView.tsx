@@ -16,6 +16,7 @@ const useStyles = makeStyles((t) => ({
   pair: { flexDirection: 'row', alignItems: 'baseline', gap: t.spacing.sm },
   metaLabel: { ...t.typography.metaLabel, color: t.colors.textMuted },
   metaValue: { ...t.typography.metaValue, color: t.colors.text },
+  xp: { ...t.typography.metaValue, color: t.colors.textMuted },
   car: { flex: 1, marginHorizontal: -t.spacing.screen },
   // the stats are the quietest thing on screen: small figures in a corner-ticked strip
   strip: { flexDirection: 'row', paddingVertical: t.spacing.sm },
@@ -25,7 +26,7 @@ const useStyles = makeStyles((t) => ({
 }));
 
 /**
- * Home, in order of importance: the car and the Start button, then the level line with a thin XP bar under it, and a
+ * Home, in order of importance: the car and the Start button, then the level line with a thin XP bar and the XP count under it, and a
  * corner-ticked strip of stats. A soft glow in the car's color sits behind everything.
  */
 export function HomeView({ data, onStart }: { data: HomeData; onStart: () => void }) {
@@ -51,6 +52,9 @@ export function HomeView({ data, onStart }: { data: HomeData; onStart: () => voi
             <CreditAmount amount={profile.credits} small />
           </View>
           <SegmentedProgress fraction={level.fraction} accessibilityLabel={`XP: ${level.xpIntoLevel} of ${level.xpForNextLevel} to the next level`} />
+          <Text style={styles.xp}>
+            {level.xpIntoLevel} / {level.xpForNextLevel}
+          </Text>
         </View>
         <View style={styles.car}>
           <HeroCar car={profile.car} autoSpin={false} background="transparent" zoom={0.88} />

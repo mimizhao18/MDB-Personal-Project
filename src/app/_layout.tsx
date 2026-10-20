@@ -5,6 +5,7 @@ import { useEffect } from 'react';
 import { Platform, StyleSheet, View } from 'react-native';
 
 import { useAppFonts } from '../design/fonts';
+import { fonts, theme } from '../design/tokens';
 import { colors } from '../theme';
 import { TAB_PATHS, TabBar } from '../ui/TabBar';
 
@@ -40,7 +41,7 @@ export default function RootLayout() {
             screenOptions={{
               headerStyle: { backgroundColor: colors.background },
               headerTintColor: colors.text,
-              headerTitleStyle: { fontWeight: '700', fontSize: 17 },
+              headerTitleStyle: { fontFamily: fonts.semibold, fontSize: theme.typography.heading.fontSize },
               headerShadowVisible: false,
               contentStyle: { backgroundColor: colors.background },
             }}

@@ -12,7 +12,7 @@ const useStyles = makeStyles(() => ({
  * A soft pool of color behind a screen's content, in the car's color: a strong glow centered behind the car and a faint one
  * in the top corner. Put it first inside a screen so everything else, glass panels included, sits on top of it.
  */
-export function AmbientGlow({ color }: { color: string }) {
+export function AmbientGlow({ color, focus = 0.5 }: { color: string; /** Where the main glow sits from the top, 0 to 1. */ focus?: number }) {
   const styles = useStyles();
   const { glass } = useTheme();
   const id = useId().replace(/[^a-zA-Z0-9]/g, '');
@@ -24,7 +24,7 @@ export function AmbientGlow({ color }: { color: string }) {
       {width > 0 && (
         <Svg width={width} height={height}>
           <Defs>
-            <RadialGradient id={`${id}c`} gradientUnits="userSpaceOnUse" cx={width * 0.5} cy={height * 0.5} r={width * 0.95}>
+            <RadialGradient id={`${id}c`} gradientUnits="userSpaceOnUse" cx={width * 0.5} cy={height * focus} r={width * 0.95}>
               <Stop offset="0" stopColor={color} stopOpacity={glass.ambient} />
               <Stop offset="1" stopColor={color} stopOpacity={0} />
             </RadialGradient>

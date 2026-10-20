@@ -3,31 +3,29 @@ import { Text, View } from 'react-native';
 import { getEra } from '../data/eras';
 import type { Livery } from '../data/liveries';
 import { makeStyles } from '../design/styles';
-import { Credits } from '../ui/Credits';
-import { Button, Card } from '../ui/kit';
-import { colors } from '../theme';
 import { CarImage } from './CarIcon';
 import { HeroCar } from './HeroCar';
+import { BracketFrame, Button, CreditAmount } from './ui';
 
 const useStyles = makeStyles((t) => ({
   stack: { gap: t.spacing.md },
-  // fills the card edge to edge (past its padding) so the 3D car's floor glow has room to fade out before the edge
-  heroBleed: { alignSelf: 'stretch', marginHorizontal: -t.spacing.md, marginTop: -t.spacing.xs },
+  // the 3D car runs to the screen edges, so the glow behind it has room to fade out
+  hero: { height: t.size.hero, marginHorizontal: -t.spacing.screen },
   header: { flexDirection: 'row', alignItems: 'flex-start', justifyContent: 'space-between', gap: t.spacing.md },
-  titleBlock: { flex: 1, gap: 2 },
-  name: { ...t.type.title, fontSize: 22, color: t.colors.text },
-  meta: { ...t.type.caption, color: t.colors.textMuted },
-  action: { marginTop: t.spacing.md },
-  iconCard: { alignItems: 'center', gap: t.spacing.sm },
-  label: { ...t.type.label, color: t.colors.textMuted, alignSelf: 'flex-start' },
-  // the race icon on a plain dark panel: the same car you see from above on the track, at a size you can inspect
-  iconPanel: { alignSelf: 'stretch', alignItems: 'center', paddingVertical: t.spacing.sm, backgroundColor: t.colors.surfaceRaised, borderRadius: t.radius.md },
-  caption: { ...t.type.caption, color: t.colors.textMuted, textAlign: 'center' },
+  titleBlock: { flex: 1, gap: t.spacing.xs },
+  name: { ...t.typography.title, color: t.colors.text },
+  meta: { ...t.typography.caption, color: t.colors.textMuted },
+  // a small "Equipped" tag in place of a button: a red dot and a label
+  tag: { flexDirection: 'row', alignItems: 'center', gap: t.spacing.sm, paddingTop: t.spacing.xs },
+  dot: { width: t.spacing.sm - 2, height: t.spacing.sm - 2, borderRadius: t.radius.dot, backgroundColor: t.colors.accent },
+  tagText: { ...t.typography.metaLabel, color: t.colors.accentOnDark },
+  iconFrame: { alignItems: 'center', gap: t.spacing.sm },
+  iconLabel: { ...t.typography.metaLabel, color: t.colors.textMuted, alignSelf: 'flex-start' },
 }));
 
 /**
- * The livery being looked at: the 3D car you can spin with its name and the equip/buy button, and below it the 2D race
- * icon at a decent size. Used by both the Garage and the Store.
+ * The livery being looked at: the 3D car you can spin, then its name, generation and team, then what you can do with it
+ * (Equip or Buy as a normal button, or a small "Equipped" tag), and below that the 2D race icon. Used by the Garage and the Store.
  */
 export function LiveryPreview({
   livery,
@@ -52,41 +50,41 @@ export function LiveryPreview({
   const car = { liveryId: livery.id, number };
   return (
     <View style={styles.stack}>
-      <Card>
-        <View style={styles.heroBleed}>
-          <HeroCar car={car} height={220} background={colors.surface} />
-        </View>
-        <View style={styles.header}>
-          <View style={styles.titleBlock}>
-            <Text style={styles.name}>{livery.name}</Text>
-            <Text style={styles.meta} numberOfLines={1}>
-              {era.name} car · {livery.team}
-            </Text>
-          </View>
-          <Credits amount={credits} />
-        </View>
-        <View style={styles.action}>
-          {equipped ? (
-            <Button label="✓  Equipped" variant="secondary" disabled onPress={() => {}} accessibilityLabel="Equipped" />
-          ) : owned ? (
-            <Button label="Equip" onPress={onEquip} />
-          ) : (
-            <Button
-              label={canAfford ? `Buy for ${livery.price} credits` : `${livery.price} credits (need ${livery.price - credits} more)`}
-              variant={canAfford ? 'primary' : 'secondary'}
-              onPress={onBuy}
-            />
+      <View style={styles.hero}>
+        <HeroCar car={car} background="transparent" zoom={0.9} />
+      </View>
+
+      <View style={styles.header}>
+        <View style={styles.titleBlock}>
+          <Text style={styles.name}>{livery.name}</Text>
+          <Text style={styles.meta} numberOfLines={1}>
+            {era.name} car · {livery.team}
+          </Text>
+          {equipped && (
+            <View style={styles.tag} accessible accessibilityLabel="Equipped">
+              <View style={styles.dot} />
+              <Text style={styles.tagText}>Equipped</Text>
+            </View>
           )}
         </View>
-      </Card>
+        <CreditAmount amount={credits} small />
+      </View>
 
-      <Card style={styles.iconCard}>
-        <Text style={styles.label}>Race icon</Text>
-        <View style={styles.iconPanel}>
-          <CarImage car={car} size={300} detail="full" showNumber />
-        </View>
-        <Text style={styles.caption}>How this car looks from above on the track</Text>
-      </Card>
+      {!equipped &&
+        (owned ? (
+          <Button label="Equip" onPress={onEquip} />
+        ) : (
+          <Button
+            label={canAfford ? `Buy for ${livery.price} credits` : `${livery.price} credits (need ${livery.price - credits} more)`}
+            variant={canAfford ? 'primary' : 'secondary'}
+            onPress={onBuy}
+          />
+        ))}
+
+      <BracketFrame style={styles.iconFrame}>
+        <Text style={styles.iconLabel}>Race icon</Text>
+        <CarImage car={car} size={280} detail="full" showNumber />
+      </BracketFrame>
     </View>
   );
 }
