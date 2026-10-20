@@ -22,18 +22,20 @@ export function BracketFrame({ children, style }: { children: ReactNode; style?:
   const { width: w, height: h } = box;
   const n = sizes.tick;
   const o = border.hairline / 2;
+  const r = sizes.tickRadius;
+  // each tick turns its corner with a small curve instead of a sharp point
   const d = [
-    `M ${o} ${n} L ${o} ${o} L ${n} ${o}`,
-    `M ${w - n} ${o} L ${w - o} ${o} L ${w - o} ${n}`,
-    `M ${w - o} ${h - n} L ${w - o} ${h - o} L ${w - n} ${h - o}`,
-    `M ${n} ${h - o} L ${o} ${h - o} L ${o} ${h - n}`,
+    `M ${o} ${n} L ${o} ${o + r} Q ${o} ${o} ${o + r} ${o} L ${n} ${o}`,
+    `M ${w - n} ${o} L ${w - o - r} ${o} Q ${w - o} ${o} ${w - o} ${o + r} L ${w - o} ${n}`,
+    `M ${w - o} ${h - n} L ${w - o} ${h - o - r} Q ${w - o} ${h - o} ${w - o - r} ${h - o} L ${w - n} ${h - o}`,
+    `M ${n} ${h - o} L ${o + r} ${h - o} Q ${o} ${h - o} ${o} ${h - o - r} L ${o} ${h - n}`,
   ].join(' ');
   return (
     <View style={[styles.frame, style]} onLayout={(e) => setBox(e.nativeEvent.layout)}>
       {w > 0 && (
         <Svg width={w} height={h} style={styles.layer} pointerEvents="none">
           <Rect x={0} y={0} width={w} height={h} fill={glass.tint} fillOpacity={glass.fillBottom} />
-          <Path d={d} stroke={glass.tint} strokeOpacity={glass.mark} strokeWidth={border.hairline} fill="none" />
+          <Path d={d} stroke={glass.tint} strokeOpacity={glass.mark} strokeWidth={border.hairline} strokeLinecap="round" fill="none" />
         </Svg>
       )}
       {children}

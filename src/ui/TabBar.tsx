@@ -69,6 +69,8 @@ export function TabBar({ activePath }: { activePath?: string } = {}) {
   const routerPath = usePathname();
   const pathname = activePath ?? routerPath;
   const insets = useSafeAreaInsets();
+  // the labels may sit over the top of the home-indicator area, so only part of the bottom inset is added under them
+  const below = Math.max(0, insets.bottom - t.spacing.lg);
 
   return (
     <View accessibilityRole="tablist">
@@ -79,7 +81,7 @@ export function TabBar({ activePath }: { activePath?: string } = {}) {
         return (
           <Pressable
             key={tab.path}
-            style={[styles.tab, home && styles.homeTab, { height: t.size.tabBar + insets.bottom, paddingBottom: insets.bottom }]}
+            style={[styles.tab, home && styles.homeTab, { height: t.size.tabBar + below, paddingBottom: below }]}
             onPress={() => {
               if (!active) router.replace(tab.path);
             }}
