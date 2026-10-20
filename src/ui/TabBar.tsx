@@ -6,6 +6,7 @@ import Svg, { Line, Polygon } from 'react-native-svg';
 
 import { Glass } from '../components/ui';
 import { makeStyles, useTheme } from '../design/styles';
+import { noteTabChange } from './tabTransition';
 
 // Garage and Store on the left, History and Settings on the right, and Race (the Home screen) in the middle on a trapezoid.
 const TABS = [
@@ -82,7 +83,9 @@ export function TabBar({ activePath }: { activePath?: string } = {}) {
             key={tab.path}
             style={[styles.tab, home && styles.homeTab, { height: t.size.tabBar + below, paddingBottom: below }]}
             onPress={() => {
-              if (!active) router.replace(tab.path);
+              if (active) return;
+              noteTabChange(TAB_PATHS.indexOf(pathname), TAB_PATHS.indexOf(tab.path));
+              router.replace(tab.path);
             }}
             accessibilityRole="tab"
             accessibilityState={{ selected: active }}

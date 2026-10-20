@@ -1,4 +1,4 @@
-import { DarkTheme, Stack, ThemeProvider, usePathname } from 'expo-router';
+import { DarkTheme, Stack, ThemeProvider, router, usePathname } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect } from 'react';
@@ -8,7 +8,9 @@ import { useAppFonts } from '../design/fonts';
 import { fonts, theme } from '../design/tokens';
 import { colors } from '../theme';
 import { AlertHost } from '../ui/AlertHost';
+import { BackButton } from '../ui/BackButton';
 import { TAB_PATHS, TabBar } from '../ui/TabBar';
+import { tabAnimation } from '../ui/tabTransition';
 
 // The navigator paints its own background behind every screen, so it needs the app's dark colors too (visible on web).
 const appTheme = {
@@ -16,8 +18,10 @@ const appTheme = {
   colors: { ...DarkTheme.colors, background: colors.background, card: colors.background, text: colors.text, border: colors.border },
 };
 
-// Home, Garage, Store, History and Settings are the tabs: top-level screens, so no back button on them.
+// Garage, Store, Race (Home), History and Settings are the tabs: top-level screens, so no back button on them. They slide in
+// from the side the tab is on (see tabTransition.ts); replacing a screen animates like a push so the direction is the one asked for.
 const topLevel = { headerBackVisible: false, headerLeft: () => null };
+const tabScreen = (title: string, extra: Record<string, unknown> = {}) => () => ({ title, ...extra, animation: tabAnimation(), animationTypeForReplace: 'push' as const });
 
 // keep the splash screen up until the fonts are ready
 void SplashScreen.preventAutoHideAsync();
@@ -44,14 +48,16 @@ export default function RootLayout() {
               headerTintColor: colors.text,
               headerTitleStyle: { fontFamily: fonts.semibold, fontSize: theme.typography.heading.fontSize },
               headerShadowVisible: false,
+              // the app's own back button instead of the system's round one
+              headerLeft: ({ canGoBack }: { canGoBack?: boolean }) => (canGoBack ? <BackButton onPress={() => router.back()} /> : null),
               contentStyle: { backgroundColor: colors.background },
             }}
           >
-            <Stack.Screen name="index" options={{ title: 'Home', headerShown: false }} />
-            <Stack.Screen name="history" options={{ title: 'History', ...topLevel }} />
-            <Stack.Screen name="garage" options={{ title: 'Garage', headerShown: false }} />
-            <Stack.Screen name="store" options={{ title: 'Store', ...topLevel }} />
-            <Stack.Screen name="settings" options={{ title: 'Settings', ...topLevel }} />
+            <Stack.Screen name="index" options={tabScreen('Race', { headerShown: false })} />
+            <Stack.Screen name="history" options={tabScreen('History', topLevel)} />
+            <Stack.Screen name="garage" options={tabScreen('Garage', { headerShown: false })} />
+            <Stack.Screen name="store" options={tabScreen('Store', topLevel)} />
+            <Stack.Screen name="settings" options={tabScreen('Settings', topLevel)} />
             <Stack.Screen name="livery" options={{ title: 'Livery' }} />
             <Stack.Screen name="dev/design-system" options={{ title: 'Design system' }} />
             <Stack.Screen name="compare" options={{ title: 'Compare generations' }} />
