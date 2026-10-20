@@ -7,7 +7,7 @@ const useStyles = makeStyles((t) => ({
   segment: { flex: 1, minHeight: t.size.touch, alignItems: 'center', justifyContent: 'center' },
   divided: { borderLeftWidth: t.border.hairline, borderLeftColor: t.colors.border },
   active: { backgroundColor: t.colors.raised },
-  underline: { position: 'absolute', left: 0, right: 0, bottom: 0, height: 2, backgroundColor: t.colors.accent },
+  underline: { position: 'absolute', left: 0, right: 0, bottom: 0, height: t.size.line, backgroundColor: t.colors.accent },
   label: { ...t.typography.button, color: t.colors.textMuted },
   labelActive: { color: t.colors.text },
 }));

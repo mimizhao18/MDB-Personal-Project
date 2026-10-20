@@ -1,6 +1,6 @@
 import { Pressable, Text } from 'react-native';
 
-import { makeStyles } from '../../design/styles';
+import { makeStyles, useTheme } from '../../design/styles';
 
 const useStyles = makeStyles((t) => ({
   chip: {
@@ -22,10 +22,11 @@ const useStyles = makeStyles((t) => ({
 /** A small filter option. Selected = lighter fill and an accent outline. The hit area is padded up to 44 px. */
 export function Chip({ label, selected, count, onPress }: { label: string; selected?: boolean; count?: string | number; onPress: () => void }) {
   const styles = useStyles();
+  const { spacing } = useTheme();
   return (
     <Pressable
       onPress={onPress}
-      hitSlop={{ top: 4, bottom: 4, left: 2, right: 2 }}
+      hitSlop={{ top: spacing.xs, bottom: spacing.xs, left: spacing.xxs, right: spacing.xxs }}
       accessibilityRole="button"
       accessibilityState={{ selected: !!selected }}
       accessibilityLabel={count !== undefined ? `${label}, ${count}` : label}

@@ -289,19 +289,17 @@ assert.equal(applySessionToStreak(demo.profile, '2026-10-05').currentStreak, 6);
 assert.equal(lifetimeStats(demo.sessions).races, 7);
 
 // design values
-assert.ok(theme.radius.lg <= 4, 'sharp corners: cards are nearly square');
-assert.ok(theme.radius.sm <= theme.radius.md && theme.radius.md <= theme.radius.lg && theme.radius.lg < theme.radius.pill, 'radius scale is ordered');
 const sp = theme.spacing;
-assert.ok(sp.xs < sp.sm && sp.sm < sp.md && sp.md < sp.lg && sp.lg < sp.xl, 'spacing scale is ordered');
+assert.ok(sp.xxs < sp.xs && sp.xs < sp.sm && sp.sm < sp.md && sp.md < sp.lg && sp.lg < sp.xl && sp.xl < sp.xxl, 'spacing scale is ordered');
 assert.ok(Object.values(sp).every((v) => Number.isInteger(v) && v > 0), 'spacing is whole numbers');
 assert.ok(Object.values(colors).every((c) => /^#[0-9A-Fa-f]{6}$/.test(c)), 'colors are #RRGGBB (the car and the credits coin shade them)');
 assert.equal(colors.accent, '#E10600'); // fixed F1 red
 assert.notEqual(colors.coin.toLowerCase(), colors.accent.toLowerCase());
-assert.ok(theme.type.label.textTransform === 'uppercase');
+assert.ok(theme.typography.label.textTransform === 'uppercase');
 
 // the new design system
 assert.ok(theme.radius.control <= 4 && theme.radius.panel <= 6 && theme.radius.control <= theme.radius.panel, 'corners: 4 px controls, 6 px panels at most');
-assert.ok(sp.screen === 16 && Object.values(sp).every((v) => v % 4 === 0), 'spacing sits on a 4 / 8 px grid and screens are padded 16');
+assert.ok(sp.screen === 16 && Object.values(sp).every((v) => v === sp.xxs || v % 4 === 0), 'spacing sits on a 4 / 8 px grid (2 only to stack text) and screens are padded 16');
 assert.ok(theme.size.touch >= 44 && theme.size.control >= 48, 'touch targets are at least 44 px, buttons 48');
 assert.ok(Object.values(fonts).every((f) => /(400Regular|500Medium|600SemiBold)$/.test(f)), 'only weights 400, 500 and 600');
 assert.ok(Object.values(theme.typography).every((ty) => !('fontWeight' in ty)), 'weight comes from the font, never fontWeight');

@@ -8,8 +8,8 @@ import type { AeroMode } from '../data/cars/spec';
 import { ERAS, getEra } from '../data/eras';
 import type { EraId } from '../data/eras';
 import { COMPARISON_LIVERIES } from '../data/liveries';
+import { Panel, SectionLabel, SegmentedControl } from '../components/ui';
 import { makeStyles } from '../design/styles';
-import { Card, SectionLabel, Segmented } from '../ui/kit';
 
 type Angle = 'front' | 'side' | 'top' | 'rear';
 type RenderCompare = (props: { era: EraId; angle: Angle; aero?: AeroMode; height: number }) => ReactElement;
@@ -72,7 +72,7 @@ function CarPanel({ era, base, angle, aero, wide }: { era: EraId; base: EraId; a
   const styles = useStyles();
   const render = load3D();
   return (
-    <Card style={[styles.panel, wide && styles.panelWide]}>
+    <Panel flush style={[styles.panel, wide && styles.panelWide]}>
       <View style={styles.view}>
         {render ? render({ era, angle, aero: era === 'gen2026' ? aero : 'corner', height: wide ? 300 : 250 }) : <Text style={styles.muted}>3D is not available on this device.</Text>}
         <Text style={styles.label}>{`${getEra(era).name} F1 Car`}</Text>
@@ -88,7 +88,7 @@ function CarPanel({ era, base, angle, aero, wide }: { era: EraId; base: EraId; a
           </View>
         ))}
       </View>
-    </Card>
+    </Panel>
   );
 }
 
@@ -107,13 +107,13 @@ export default function CompareScreen() {
   return (
     <ScrollView contentContainerStyle={styles.content} onLayout={(e) => setWidth(e.nativeEvent.layout.width)}>
       <SectionLabel>View</SectionLabel>
-      <Segmented options={ANGLES} value={angle} onChange={setAngle} labelFor={(a) => ANGLE_LABELS[a]} />
+      <SegmentedControl options={ANGLES} value={angle} onChange={setAngle} labelFor={(a) => ANGLE_LABELS[a]} />
       <SectionLabel>First car</SectionLabel>
-      <Segmented options={ERA_IDS} value={left} onChange={setLeft} labelFor={eraLabel} />
+      <SegmentedControl options={ERA_IDS} value={left} onChange={setLeft} labelFor={eraLabel} />
       <SectionLabel>Second car</SectionLabel>
-      <Segmented options={ERA_IDS} value={right} onChange={setRight} labelFor={eraLabel} />
+      <SegmentedControl options={ERA_IDS} value={right} onChange={setRight} labelFor={eraLabel} />
       <SectionLabel>2026 wings</SectionLabel>
-      <Segmented options={MODES} value={aero} onChange={setAero} labelFor={(m) => MODE_LABELS[m]} />
+      <SegmentedControl options={MODES} value={aero} onChange={setAero} labelFor={(m) => MODE_LABELS[m]} />
       <Text style={styles.muted}>Cornering is the high-downforce setting; on the straights the 2026 car flattens its front and rear wing flaps. Every other wing is fixed.</Text>
       <View style={[styles.panels, wide && styles.panelsWide]}>
         <CarPanel era={left} base={left} angle={angle} aero={aero} wide={wide} />
@@ -124,17 +124,17 @@ export default function CompareScreen() {
 }
 
 const useStyles = makeStyles((t) => ({
-  content: { padding: t.spacing.md, gap: t.spacing.sm },
-  muted: { ...t.type.caption, color: t.colors.textMuted },
+  content: { padding: t.spacing.screen, gap: t.spacing.sm },
+  muted: { ...t.typography.caption, color: t.colors.textMuted },
   panels: { gap: t.spacing.md, marginTop: t.spacing.sm },
   panelsWide: { flexDirection: 'row' },
-  panel: { gap: t.spacing.sm, padding: 0, overflow: 'hidden' },
+  panel: { gap: t.spacing.sm },
   panelWide: { flex: 1 },
   view: { alignItems: 'center', justifyContent: 'center' },
-  label: { position: 'absolute', top: t.spacing.sm, left: t.spacing.md, ...t.type.label, color: t.colors.textMuted },
-  rows: { paddingHorizontal: t.spacing.md, paddingBottom: t.spacing.md, gap: 6 },
+  label: { position: 'absolute', top: t.spacing.sm, left: t.spacing.md, ...t.typography.label, color: t.colors.textMuted },
+  rows: { paddingHorizontal: t.spacing.md, paddingBottom: t.spacing.md, gap: t.spacing.sm - 2 },
   row: { flexDirection: 'row', justifyContent: 'space-between', gap: t.spacing.sm },
-  rowLabel: { ...t.type.caption, color: t.colors.textMuted },
-  rowValue: { ...t.type.caption, color: t.colors.text, fontWeight: '600', textAlign: 'right', flexShrink: 1 },
-  delta: { color: t.colors.textMuted, fontWeight: '400' },
+  rowLabel: { ...t.typography.caption, color: t.colors.textMuted },
+  rowValue: { ...t.typography.caption, color: t.colors.text, fontFamily: t.typography.button.fontFamily, textAlign: 'right', flexShrink: 1 },
+  delta: { color: t.colors.textMuted, fontFamily: t.typography.caption.fontFamily },
 }));

@@ -16,7 +16,7 @@ const useStyles = makeStyles((t) => ({
   },
   last: { borderBottomWidth: 0 },
   pressed: { opacity: t.opacity.pressed },
-  text: { flex: 1, gap: 2 },
+  text: { flex: 1, gap: t.spacing.xxs },
   title: { ...t.typography.body, fontFamily: t.typography.heading.fontFamily, color: t.colors.text },
   destructive: { color: t.colors.accentOnDark },
   subtitle: { ...t.typography.caption, color: t.colors.textMuted },

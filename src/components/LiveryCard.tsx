@@ -19,7 +19,7 @@ const useStyles = makeStyles((t) => ({
     paddingBottom: t.spacing.sm,
     paddingHorizontal: t.spacing.sm,
     alignItems: 'center',
-    gap: 2,
+    gap: t.spacing.xxs,
   },
   cardPreviewing: { borderColor: t.colors.textSecondary },
   cardEquipped: { borderColor: t.colors.accent },
@@ -28,7 +28,7 @@ const useStyles = makeStyles((t) => ({
   iconArea: { alignSelf: 'stretch', alignItems: 'center', justifyContent: 'center', height: t.size.cardCar, overflow: 'hidden' },
   name: { ...t.typography.body, fontFamily: t.typography.heading.fontFamily, color: t.colors.text, textAlign: 'center' },
   era: { ...t.typography.caption, color: t.colors.textMuted },
-  statusRow: { minHeight: t.size.icon, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', marginTop: 2 },
+  statusRow: { minHeight: t.size.icon, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', marginTop: t.spacing.xxs },
   equipped: { ...t.typography.metaLabel, color: t.colors.accentOnDark },
 }));
 

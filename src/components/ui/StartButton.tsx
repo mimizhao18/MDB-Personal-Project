@@ -8,7 +8,7 @@ const useStyles = makeStyles((t) => ({
   button: { minHeight: t.size.primary, borderRadius: t.radius.control / 4, backgroundColor: t.colors.accent, alignItems: 'center', justifyContent: 'center' },
   pressed: { opacity: t.opacity.pressed },
   disabled: { opacity: t.opacity.disabled },
-  text: { ...t.typography.button, fontSize: 16, color: t.colors.accentText, textTransform: 'uppercase', letterSpacing: 1.5 },
+  text: { ...t.typography.cta, color: t.colors.accentText },
 }));
 
 /**

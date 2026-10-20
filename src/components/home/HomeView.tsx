@@ -20,9 +20,9 @@ const useStyles = makeStyles((t) => ({
   car: { flex: 1, marginHorizontal: -t.spacing.screen },
   // the stats are the quietest thing on screen: small figures in a corner-ticked strip
   strip: { flexDirection: 'row', paddingVertical: t.spacing.sm },
-  cell: { flex: 1, alignItems: 'center', gap: 2 },
+  cell: { flex: 1, alignItems: 'center', gap: t.spacing.xxs },
   divided: { borderLeftWidth: t.border.hairline, borderLeftColor: t.glass.divider },
-  statValue: { ...t.typography.metaValue, fontSize: 14, color: t.colors.text },
+  statValue: { ...t.typography.statSmall, color: t.colors.text },
 }));
 
 /**

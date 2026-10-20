@@ -70,6 +70,6 @@ export default function RootLayout() {
 
 // In a web browser the app is shown as a phone-sized column in the middle of the page.
 const styles = StyleSheet.create({
-  page: { flex: 1, alignItems: 'center', backgroundColor: Platform.OS === 'web' ? '#050505' : colors.background },
+  page: { flex: 1, alignItems: 'center', backgroundColor: Platform.OS === 'web' ? colors.backdrop : colors.background },
   app: { flex: 1, width: '100%', maxWidth: Platform.OS === 'web' ? 460 : undefined, backgroundColor: colors.background },
 });

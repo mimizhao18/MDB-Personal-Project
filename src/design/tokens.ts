@@ -1,9 +1,6 @@
 // The app's design values (no React), so they can be tested. Every screen reads them through useTheme() / makeStyles().
 // Direction: a "timing screen", refined. Dark and precise, one F1 red accent (primary action, active state, progress),
 // 4 px corners, hairline dividers, monospace numerals for every stat, timer, XP and credit amount.
-//
-// Entries marked "legacy" belong to the previous look. Screens that have not been rebuilt yet still use them,
-// and they are deleted in the cleanup stage.
 
 export const colors = {
   // four neutral steps, darkest to lightest
@@ -24,15 +21,9 @@ export const colors = {
   /** A dark red tint of the accent: the idle fill of the Home tab. */
   accentTint: '#2A1513',
   positive: '#3DDC84',
+  /** The letterbox around the phone-sized app column in a web browser. */
+  backdrop: '#050505',
 
-  /** legacy: the same grey as `raised`. */
-  surfaceRaised: '#202024',
-  /** legacy: a border that has to be seen (outlined buttons, the selected segment). */
-  borderStrong: '#3C3C43',
-  /** legacy: a dark red tint for quiet red highlights. */
-  accentSoft: '#2A1513',
-  /** legacy: the same red as `accentOnDark`. */
-  accentSoftText: '#FF6B63',
   /** The credits coin. */
   coin: '#F4F4F5',
 } as const;
@@ -70,8 +61,8 @@ export const glass = {
 export const theme = {
   colors,
   glass,
-  /** An 8 px grid (4 for tight gaps). Screens are padded by `screen`. */
-  spacing: { xs: 4, sm: 8, md: 16, lg: 24, xl: 32, xxl: 48, screen: 16 },
+  /** An 8 px grid (4 for tight gaps, 2 to stack a label on its number). Screens are padded by `screen`. */
+  spacing: { xxs: 2, xs: 4, sm: 8, md: 16, lg: 24, xl: 32, xxl: 48, screen: 16 },
   radius: {
     /** Buttons, chips, inputs and cards. */
     control: 4,
@@ -79,18 +70,10 @@ export const theme = {
     panel: 6,
     /** Dots and tiny badges only. */
     dot: 999,
-    /** legacy */
-    sm: 0,
-    /** legacy */
-    md: 2,
-    /** legacy */
-    lg: 2,
-    /** legacy */
-    pill: 999,
   },
   border: { hairline: 1, selected: 1.5 },
   /** Fixed sizes: every touch target is at least `touch`, buttons and rows are taller. */
-  size: { touch: 44, control: 48, row: 56, tabBar: 48, progress: 4, icon: 22, heroCompact: 176, hero: 260, dialog: 340, weekBar: 64, thumbWidth: 10, thumbHeight: 28, flag: 24, raceReserved: 400, raceReservedCompact: 330, iconCar: 180, cardCar: 76, cardCarWide: 170, primary: 56, tick: 8, tickRadius: 3 },
+  size: { touch: 44, control: 48, row: 56, tabBar: 48, progress: 4, icon: 22, heroCompact: 176, hero: 260, dialog: 340, weekBar: 64, thumbWidth: 10, thumbHeight: 28, flag: 24, raceReserved: 400, raceReservedCompact: 330, iconCar: 180, cardCar: 76, cardCarWide: 170, primary: 56, tick: 8, tickRadius: 3, line: 2 },
   opacity: { disabled: 0.4, dimmed: 0.5, unaffordable: 0.68, pressed: 0.85 },
   /** Text styles, ready to spread into a style object. Numbers (stats, timers, XP, credits) use the mono ones. */
   typography: {
@@ -106,20 +89,17 @@ export const theme = {
     /** The small text of Home's top bar and similar: labels and numbers share one size. */
     metaLabel: { fontFamily: fonts.medium, fontSize: 12, lineHeight: 16, letterSpacing: 1, textTransform: 'uppercase' },
     metaValue: { fontFamily: fonts.monoMedium, fontSize: 12, lineHeight: 16 },
+    /** Tiny captions, labels and numbers (tab labels, units, chart minutes). */
+    micro: { fontFamily: fonts.regular, fontSize: 11, lineHeight: 14 },
+    microLabel: { fontFamily: fonts.medium, fontSize: 10, lineHeight: 14, letterSpacing: 0.6, textTransform: 'uppercase' },
+    microMono: { fontFamily: fonts.monoMedium, fontSize: 11, lineHeight: 16 },
+    /** The label of the Race (Home) tab and the wording of the big call-to-action buttons. */
+    tabHome: { fontFamily: fonts.semibold, fontSize: 15, lineHeight: 20, letterSpacing: 0.8, textTransform: 'uppercase' },
+    cta: { fontFamily: fonts.semibold, fontSize: 16, lineHeight: 20, letterSpacing: 1.5, textTransform: 'uppercase' },
     button: { fontFamily: fonts.semibold, fontSize: 15, lineHeight: 20, letterSpacing: 0.2 },
     statLarge: { fontFamily: fonts.monoSemibold, fontSize: 32, lineHeight: 38, letterSpacing: -0.5 },
     stat: { fontFamily: fonts.monoMedium, fontSize: 20, lineHeight: 26 },
     statSmall: { fontFamily: fonts.monoMedium, fontSize: 14, lineHeight: 20 },
-  },
-  /** legacy: the previous text styles. */
-  type: {
-    title: { fontSize: 26, fontWeight: '800', letterSpacing: -0.3 },
-    heading: { fontSize: 17, fontWeight: '700' },
-    body: { fontSize: 15 },
-    caption: { fontSize: 13 },
-    /** Small uppercase labels above sections, like a telemetry screen. */
-    label: { fontSize: 12, fontWeight: '600', letterSpacing: 1.2, textTransform: 'uppercase' },
-    stat: { fontSize: 22, fontWeight: '700' },
   },
 } as const;
 

@@ -25,12 +25,11 @@ const useStyles = makeStyles((t) => ({
   tab: { flex: 1, alignItems: 'center', justifyContent: 'center' },
   homeTab: { flex: 1.3 },
   // the thin accent line over the active tab
-  indicator: { position: 'absolute', top: -t.border.hairline, left: t.spacing.md, right: t.spacing.md, height: 2, backgroundColor: t.colors.accent },
-  // a little smaller and tighter than the usual label so "SETTINGS" fits with room to spare
-  label: { ...t.typography.label, fontSize: 10, letterSpacing: 0.6, color: t.colors.textMuted },
+  indicator: { position: 'absolute', top: -t.border.hairline, left: t.spacing.md, right: t.spacing.md, height: t.size.line, backgroundColor: t.colors.accent },
+  label: { ...t.typography.microLabel, color: t.colors.textMuted },
   labelActive: { color: t.colors.accentOnDark },
   homeShape: { position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 },
-  homeLabel: { ...t.typography.label, fontFamily: t.typography.button.fontFamily, fontSize: 15, lineHeight: 20, letterSpacing: 0.8, color: t.colors.accentOnDark },
+  homeLabel: { ...t.typography.tabHome, color: t.colors.accentOnDark },
   homeLabelActive: { color: t.colors.accentText },
 }));
 

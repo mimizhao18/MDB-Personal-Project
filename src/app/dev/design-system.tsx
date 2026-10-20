@@ -1,10 +1,11 @@
 import { useState } from 'react';
 import { ScrollView, Text, View } from 'react-native';
 
-import { Button, Chip, Divider, ListRow, Panel, SectionLabel, SegmentedProgress, StatBlock } from '../../components/ui';
+import { BracketFrame, Button, Chip, Divider, Glass, ListRow, Panel, SectionLabel, SegmentedControl, SegmentedProgress, StartButton, StatBlock } from '../../components/ui';
 import { contrastRatio } from '../../design/contrast';
 import { makeStyles } from '../../design/styles';
 import { colors, theme } from '../../design/tokens';
+import { showAlert } from '../../ui/alert';
 
 const NEUTRALS = ['background', 'surface', 'raised', 'border'] as const;
 const TEXT_LEVELS = ['text', 'textSecondary', 'textMuted'] as const;
@@ -28,10 +29,10 @@ const useStyles = makeStyles((t) => ({
   swatch: { flex: 1, gap: t.spacing.xs },
   swatchColor: { height: 48, borderRadius: t.radius.control, borderWidth: t.border.hairline, borderColor: t.colors.border },
   swatchName: { ...t.typography.caption, color: t.colors.text },
-  swatchValue: { ...t.typography.statSmall, fontSize: 11, lineHeight: 16, color: t.colors.textMuted },
+  swatchValue: { ...t.typography.microMono, color: t.colors.textMuted },
   note: { ...t.typography.caption, color: t.colors.textMuted },
   typeRow: { gap: t.spacing.xs },
-  typeName: { ...t.typography.statSmall, fontSize: 11, lineHeight: 16, color: t.colors.textMuted },
+  typeName: { ...t.typography.microMono, color: t.colors.textMuted },
   typeSample: { color: t.colors.text },
   spaceRow: { flexDirection: 'row', alignItems: 'center', gap: t.spacing.md },
   spaceBar: { height: t.spacing.sm, backgroundColor: t.colors.textMuted },
@@ -50,6 +51,7 @@ const useStyles = makeStyles((t) => ({
 export default function DesignSystemScreen() {
   const styles = useStyles();
   const [chip, setChip] = useState('2022');
+  const [mode, setMode] = useState<'laps' | 'minutes'>('laps');
 
   return (
     <ScrollView contentContainerStyle={styles.content}>
@@ -135,8 +137,43 @@ export default function DesignSystemScreen() {
         <SectionLabel>Buttons</SectionLabel>
         <Button label="Start Race" onPress={() => {}} />
         <Button label="Buy for 450" variant="secondary" icon="cart-outline" onPress={() => {}} />
+        <Button label="Equip" variant="soft" onPress={() => {}} />
         <Button label="Cancel" variant="ghost" onPress={() => {}} />
         <Button label="Disabled" onPress={() => {}} disabled />
+      </View>
+
+      <View style={styles.section}>
+        <SectionLabel>Start button</SectionLabel>
+        <StartButton label="Start Race" frame onPress={() => {}} />
+        <StartButton label="Race again" onPress={() => {}} />
+      </View>
+
+      <View style={styles.section}>
+        <SectionLabel>Corner ticks and glass</SectionLabel>
+        <BracketFrame>
+          <StatBlock label="Distance" value="679" unit="km" />
+        </BracketFrame>
+        <Glass>
+          <StatBlock label="Streak" value="5" unit="days" />
+        </Glass>
+        <Glass corner="flat">
+          <StatBlock label="Flat glass strip" value="Tab bar" size="small" />
+        </Glass>
+      </View>
+
+      <View style={styles.section}>
+        <SectionLabel>Segmented control and dialog</SectionLabel>
+        <SegmentedControl options={['laps', 'minutes'] as const} value={mode} onChange={setMode} labelFor={(m) => (m === 'laps' ? 'Laps' : 'Minutes')} />
+        <Button
+          label="Show a dialog"
+          variant="secondary"
+          onPress={() =>
+            showAlert('End race early?', 'You keep the laps and focus time you have done so far.', [
+              { text: 'Keep racing', style: 'cancel' },
+              { text: 'End race', style: 'destructive' },
+            ])
+          }
+        />
       </View>
 
       <View style={styles.section}>
