@@ -32,7 +32,7 @@ export default function StoreScreen() {
   const groups = ERAS.map((era) => ({ era, liveries: forSale.filter((l) => l.era === era.id) })).filter((g) => g.liveries.length > 0);
 
   return (
-    <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
+    <SafeAreaView style={styles.container} edges={['bottom']}>
       <ScrollView contentContainerStyle={styles.content}>
         <View style={styles.top}>
           <Text style={styles.count}>{forSale.length === 0 ? 'Nothing left to buy' : `${forSale.length} liveries for sale`}</Text>

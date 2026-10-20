@@ -79,7 +79,7 @@ export function LiveryPreview({
           <Button label="Equip" variant="soft" onPress={onEquip} />
         ) : (
           <Button
-            label={canAfford ? `Buy for ${livery.price} credits` : `${livery.price} credits (need ${livery.price - credits} more)`}
+            label={`Buy for ${livery.price} credits`}
             variant={canAfford ? 'primary' : 'secondary'}
             onPress={onBuy}
           />

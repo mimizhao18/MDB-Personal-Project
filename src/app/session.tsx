@@ -3,9 +3,12 @@ import { useEffect, useRef, useState } from 'react';
 import { BackHandler, Text, useWindowDimensions, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { glowHexFor } from '../components/car3d/glow';
 import { TrackView } from '../components/TrackView';
+import { AmbientGlow, Button, SegmentedProgress, StartButton } from '../components/ui';
+import { getLivery } from '../data/liveries';
 import { TRACKS, isTrackId } from '../data/tracks';
-import { makeStyles } from '../design/styles';
+import { makeStyles, useTheme } from '../design/styles';
 import { useSessionTimer } from '../hooks/useSessionTimer';
 import { formatClock } from '../logic/lapProgress';
 import { buildSession } from '../logic/rewards';
@@ -13,7 +16,6 @@ import type { CarSettings, Track } from '../models/types';
 import { getProfile } from '../storage/profile';
 import { recordSession } from '../storage/sessions';
 import { showAlert } from '../ui/alert';
-import { Button, ProgressBar } from '../ui/kit';
 
 export default function SessionScreen() {
   const styles = useStyles();
@@ -36,6 +38,7 @@ export default function SessionScreen() {
 
 function Race({ track, laps, speed }: { track: Track; laps: number; speed: number }) {
   const styles = useStyles();
+  const t = useTheme();
   const timer = useSessionTimer(track, laps, speed);
   const { status, progress: p, startedAt, endedAt, start, pause, resume, end } = timer;
   const saved = useRef(false);
@@ -43,7 +46,7 @@ function Race({ track, laps, speed }: { track: Track; laps: number; speed: numbe
   const windowHeight = useWindowDimensions().height;
   const compact = windowHeight < 720;
   // The track takes whatever height is left after the text and buttons (never less than 100), so nothing is pushed off screen.
-  const trackHeight = Math.max(100, windowHeight - (compact ? 385 : 445));
+  const trackHeight = Math.max(100, windowHeight - (compact ? t.size.raceReservedCompact : t.size.raceReserved));
   const [car, setCar] = useState<CarSettings | undefined>(undefined);
 
   useEffect(() => {
@@ -96,55 +99,69 @@ function Race({ track, laps, speed }: { track: Track; laps: number; speed: numbe
   if (status === 'finished' || status === 'ended') {
     return (
       <View style={styles.center}>
-        <Text style={styles.title}>{status === 'finished' ? 'Chequered flag!' : 'Race ended'}</Text>
+        <Text style={styles.title}>{status === 'finished' ? 'Chequered flag' : 'Race ended'}</Text>
         <Text style={styles.muted}>Saving your race…</Text>
       </View>
     );
   }
 
+  const livery = car ? getLivery(car.liveryId) : undefined;
+  const paused = status === 'paused';
+
   return (
-    <SafeAreaView style={[styles.safe, compact && styles.safeCompact]} edges={['bottom']}>
-      <View style={styles.top}>
-        <Text style={styles.trackName}>{track.name}</Text>
-        <Text style={[styles.lap, compact && styles.lapCompact]}>
-          Lap {p.currentLap} / {laps}
-        </Text>
-      </View>
-
-      <View style={{ height: trackHeight }}>
-        <TrackView track={track} lapFraction={p.lapFraction} car={car} fill />
-      </View>
-
-      <View style={styles.middle}>
-        <View style={styles.progress}>
-          <ProgressBar fraction={p.totalFraction} />
+    <SafeAreaView style={styles.safe} edges={['bottom']}>
+      {livery && <AmbientGlow color={glowHexFor(livery.primary, livery.secondary)} focus={0.3} />}
+      <View style={[styles.content, compact && styles.contentCompact]}>
+        <View style={styles.top}>
+          <Text style={styles.trackName}>{track.name}</Text>
+          <View style={styles.lap} accessible accessibilityLabel={`Lap ${p.currentLap} of ${laps}`}>
+            <Text style={styles.trackName}>Lap </Text>
+            <Text style={styles.lapNumber}>{p.currentLap}</Text>
+            <Text style={styles.trackName}> / {laps}</Text>
+          </View>
         </View>
-        <Text style={[styles.clock, compact && styles.clockCompact]}>{formatClock(p.remainingSeconds)}</Text>
-        <Text style={styles.muted}>{status === 'paused' ? 'Paused' : 'remaining'}</Text>
-      </View>
 
-      <View style={styles.buttons}>
-        {status === 'running' && <Button label="Pause" onPress={pause} />}
-        {status === 'paused' && <Button label="Resume" onPress={resume} />}
-        {status === 'paused' && <Button label="End race" onPress={confirmEnd} variant="secondary" />}
+        <View style={{ height: trackHeight }}>
+          <TrackView track={track} lapFraction={p.lapFraction} car={car} fill />
+        </View>
+
+        <View style={styles.middle}>
+          <Text style={compact ? styles.clockCompact : styles.clock} numberOfLines={1} adjustsFontSizeToFit accessibilityLabel={`${formatClock(p.remainingSeconds)} remaining`}>
+            {formatClock(p.remainingSeconds)}
+          </Text>
+          <Text style={[styles.status, paused && styles.statusPaused]}>{paused ? 'Paused' : 'Remaining'}</Text>
+          <View style={styles.progress}>
+            <SegmentedProgress fraction={p.totalFraction} accessibilityLabel="Race progress" />
+          </View>
+        </View>
+
+        <View style={styles.buttons}>
+          {status === 'running' && <Button label="Pause" variant="secondary" onPress={pause} />}
+          {paused && <StartButton label="Resume" frame onPress={resume} />}
+          {paused && <Button label="End race" variant="ghost" onPress={confirmEnd} />}
+        </View>
       </View>
     </SafeAreaView>
   );
 }
 
 const useStyles = makeStyles((t) => ({
-  safe: { flex: 1, padding: t.spacing.md, justifyContent: 'space-between' },
-  safeCompact: { paddingVertical: t.spacing.sm },
-  center: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: t.spacing.md, padding: t.spacing.md },
-  top: { alignItems: 'center', gap: t.spacing.xs },
-  trackName: { ...t.type.label, color: t.colors.textMuted },
-  lap: { fontSize: 34, fontWeight: '800', color: t.colors.text, letterSpacing: -0.5 },
-  lapCompact: { fontSize: 26 },
+  safe: { flex: 1 },
+  content: { flex: 1, padding: t.spacing.screen, justifyContent: 'space-between' },
+  contentCompact: { paddingVertical: t.spacing.sm },
+  center: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: t.spacing.md, padding: t.spacing.screen },
+  top: { flexDirection: 'row', alignItems: 'baseline', justifyContent: 'space-between' },
+  trackName: { ...t.typography.metaLabel, color: t.colors.textMuted },
+  lap: { flexDirection: 'row', alignItems: 'baseline' },
+  lapNumber: { ...t.typography.metaValue, color: t.colors.text },
   middle: { alignItems: 'center', gap: t.spacing.xs },
-  progress: { width: '100%', marginBottom: t.spacing.sm },
-  clock: { fontSize: 64, fontWeight: '800', color: t.colors.text, fontVariant: ['tabular-nums'], letterSpacing: -1 },
-  clockCompact: { fontSize: 44 },
-  buttons: { gap: t.spacing.sm, minHeight: 112 }, // same height with one button or two, so nothing jumps when pausing
-  title: { ...t.type.heading, fontSize: 22, color: t.colors.text, textAlign: 'center' },
-  muted: { ...t.type.caption, color: t.colors.textMuted },
+  clock: { ...t.typography.timer, color: t.colors.text, alignSelf: 'stretch', textAlign: 'center' },
+  clockCompact: { ...t.typography.display, color: t.colors.text, alignSelf: 'stretch', textAlign: 'center' },
+  status: { ...t.typography.metaLabel, color: t.colors.textMuted },
+  statusPaused: { color: t.colors.accentOnDark },
+  progress: { alignSelf: 'stretch', marginTop: t.spacing.sm },
+  // room for two buttons, so nothing jumps when pausing
+  buttons: { gap: t.spacing.sm, minHeight: t.size.primary + t.size.control + t.spacing.xl },
+  title: { ...t.typography.title, color: t.colors.text, textAlign: 'center' },
+  muted: { ...t.typography.caption, color: t.colors.textMuted },
 }));

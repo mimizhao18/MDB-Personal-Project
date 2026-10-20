@@ -3,6 +3,7 @@ import { StyleSheet, View } from 'react-native';
 import Svg, { G, Line, Path } from 'react-native-svg';
 
 import { DEFAULT_LIVERY_ID } from '../data/liveries';
+import { colors } from '../design/tokens';
 import { positionOnTrack } from '../logic/trackPosition';
 import type { CarSettings, Track } from '../models/types';
 import { CarShape } from './CarIcon';
@@ -19,10 +20,12 @@ interface Props {
 }
 
 const DEFAULT_CAR: CarSettings = { liveryId: DEFAULT_LIVERY_ID, number: 1 };
-const ROAD_COLOR = '#E6E6E6';
+// a soft grey road (not pure white) so the track does not glare on the dark screen; every car color still shows on it
+const ROAD_COLOR = colors.textSecondary;
 const KERB_EXTRA = 4; // dark edge, split across both sides of the road
 const STANDARD_ROAD_WIDTH = 26; // the car is drawn for this road width and scaled for others
-const KERB_COLOR = '#2B2B2B';
+const KERB_COLOR = colors.raised;
+const CAR_SCALE = 1.35; // the car is drawn a little larger than the road is wide, so it is easy to follow
 
 /** The circuit with the car on it. Drawn in track coordinates and scaled to fit the width. */
 export function TrackView({ track, lapFraction, car = DEFAULT_CAR, showCar = true, fill = false }: Props) {
@@ -34,7 +37,7 @@ export function TrackView({ track, lapFraction, car = DEFAULT_CAR, showCar = tru
       <Svg width="100%" height="100%" viewBox={`0 0 ${width} ${height}`}>
         <TrackLayer track={track} />
         {showCar && (
-          <G transform={`translate(${pos.x} ${pos.y}) rotate(${pos.angleDeg}) scale(${track.roadWidth / STANDARD_ROAD_WIDTH})`}>
+          <G transform={`translate(${pos.x} ${pos.y}) rotate(${pos.angleDeg}) scale(${(track.roadWidth / STANDARD_ROAD_WIDTH) * CAR_SCALE})`}>
             <CarShape car={car} />
           </G>
         )}
@@ -50,8 +53,8 @@ const TrackLayer = memo(function TrackLayer({ track }: { track: Track }) {
     <>
       <Path d={track.path} stroke={KERB_COLOR} strokeWidth={track.roadWidth + KERB_EXTRA} strokeLinejoin="round" fill="none" />
       <Path d={track.path} stroke={ROAD_COLOR} strokeWidth={track.roadWidth} strokeLinejoin="round" fill="none" />
-      <Line x1={from.x} y1={from.y} x2={to.x} y2={to.y} stroke="#FFFFFF" strokeWidth={8} />
-      <Line x1={from.x} y1={from.y} x2={to.x} y2={to.y} stroke="#111111" strokeWidth={3} strokeDasharray="6 6" />
+      <Line x1={from.x} y1={from.y} x2={to.x} y2={to.y} stroke={colors.text} strokeWidth={8} />
+      <Line x1={from.x} y1={from.y} x2={to.x} y2={to.y} stroke={colors.background} strokeWidth={3} strokeDasharray="6 6" />
     </>
   );
 });

@@ -49,7 +49,7 @@ export default function RootLayout() {
             <Stack.Screen name="index" options={{ title: 'Home', headerShown: false }} />
             <Stack.Screen name="history" options={{ title: 'History', ...topLevel }} />
             <Stack.Screen name="garage" options={{ title: 'Garage', headerShown: false }} />
-            <Stack.Screen name="store" options={{ title: 'Store', headerShown: false }} />
+            <Stack.Screen name="store" options={{ title: 'Store', ...topLevel }} />
             <Stack.Screen name="settings" options={{ title: 'Settings', ...topLevel }} />
             <Stack.Screen name="livery" options={{ title: 'Livery' }} />
             <Stack.Screen name="dev/design-system" options={{ title: 'Design system' }} />
