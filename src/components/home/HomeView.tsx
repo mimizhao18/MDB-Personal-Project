@@ -4,70 +4,66 @@ import { getLivery } from '../../data/liveries';
 import { makeStyles } from '../../design/styles';
 import { glowHexFor } from '../car3d/glow';
 import { HeroCar } from '../HeroCar';
-import { AmbientGlow, ChamferButton, CreditAmount, Glass, SegmentedProgress, StatBlock } from '../ui';
+import { AmbientGlow, BracketFrame, CreditAmount, SegmentedProgress, StartButton } from '../ui';
 import type { HomeData } from './useHomeData';
 
 const useStyles = makeStyles((t) => ({
   screen: { flex: 1 },
   content: { flex: 1, padding: t.spacing.screen, gap: t.spacing.md },
-  // the top bar: every piece of text in it is the same 12 px; the level and credits are white, the rest muted
-  top: { gap: t.spacing.sm, paddingVertical: t.spacing.sm + t.spacing.xs },
+  // level, credits and the XP bar under them, all 12 px and the same width as everything else on the screen
+  top: { gap: t.spacing.sm },
   row: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
   pair: { flexDirection: 'row', alignItems: 'baseline', gap: t.spacing.sm },
   metaLabel: { ...t.typography.metaLabel, color: t.colors.textMuted },
-  metaValue: { ...t.typography.metaValue, color: t.colors.textMuted },
-  metaStrong: { color: t.colors.text },
+  metaValue: { ...t.typography.metaValue, color: t.colors.text },
   car: { flex: 1, marginHorizontal: -t.spacing.screen },
-  // the stats are the quietest thing on the screen: small figures in a thin panel
-  strip: { flexDirection: 'row', paddingHorizontal: 0, paddingVertical: t.spacing.sm },
-  cell: { flex: 1, alignItems: 'center' },
+  // the stats are the quietest thing on screen: small figures in a corner-ticked strip
+  strip: { flexDirection: 'row', paddingVertical: t.spacing.sm },
+  cell: { flex: 1, alignItems: 'center', gap: 2 },
   divided: { borderLeftWidth: t.border.hairline, borderLeftColor: t.glass.divider },
+  statValue: { ...t.typography.metaValue, fontSize: 14, color: t.colors.text },
 }));
 
 /**
- * Home, in order of importance: the car and the Start button, then a thin level bar on top and a thin stat strip below,
- * both as glass panels with cut corners over a soft glow in the car's color.
+ * Home, in order of importance: the car and the Start button, then the level line with a thin XP bar under it, and a
+ * corner-ticked strip of stats. A soft glow in the car's color sits behind everything.
  */
 export function HomeView({ data, onStart }: { data: HomeData; onStart: () => void }) {
   const styles = useStyles();
   const { profile, stats, level, streak } = data;
   const livery = getLivery(profile.car.liveryId);
+  const figures = [
+    { label: 'Streak', value: `${streak} ${streak === 1 ? 'day' : 'days'}` },
+    { label: 'Races', value: String(stats.races) },
+    { label: 'Distance', value: `${stats.distanceKm.toFixed(0)} km` },
+  ];
 
   return (
     <View style={styles.screen}>
       <AmbientGlow color={glowHexFor(livery.primary, livery.secondary)} />
       <View style={styles.content}>
-        <Glass corner="chamfer" style={styles.top}>
+        <View style={styles.top}>
           <View style={styles.row}>
             <View style={styles.pair} accessible accessibilityLabel={`Level ${level.level}`}>
               <Text style={styles.metaLabel}>Level</Text>
-              <Text style={[styles.metaValue, styles.metaStrong]}>{level.level}</Text>
+              <Text style={styles.metaValue}>{level.level}</Text>
             </View>
             <CreditAmount amount={profile.credits} small />
           </View>
-          <SegmentedProgress fraction={level.fraction} accessibilityLabel="XP to the next level" />
-          <View style={styles.row} accessible accessibilityLabel={`${level.xpIntoLevel} of ${level.xpForNextLevel} XP`}>
-            <Text style={styles.metaLabel}>XP</Text>
-            <Text style={styles.metaValue}>
-              {level.xpIntoLevel} / {level.xpForNextLevel}
-            </Text>
-          </View>
-        </Glass>
+          <SegmentedProgress fraction={level.fraction} accessibilityLabel={`XP: ${level.xpIntoLevel} of ${level.xpForNextLevel} to the next level`} />
+        </View>
         <View style={styles.car}>
           <HeroCar car={profile.car} autoSpin={false} background="transparent" zoom={0.88} />
         </View>
-        <Glass corner="chamfer" style={styles.strip}>
-          <View style={styles.cell}>
-            <StatBlock label="Streak" value={streak} unit={streak === 1 ? 'day' : 'days'} size="small" align="center" />
-          </View>
-          <View style={[styles.cell, styles.divided]}>
-            <StatBlock label="Races" value={stats.races} size="small" align="center" />
-          </View>
-          <View style={[styles.cell, styles.divided]}>
-            <StatBlock label="Distance" value={stats.distanceKm.toFixed(0)} unit="km" size="small" align="center" />
-          </View>
-        </Glass>
-        <ChamferButton label="Start Race" onPress={onStart} />
+        <BracketFrame style={styles.strip}>
+          {figures.map((f, i) => (
+            <View key={f.label} style={[styles.cell, i > 0 && styles.divided]} accessible accessibilityLabel={`${f.label}: ${f.value}`}>
+              <Text style={styles.metaLabel}>{f.label}</Text>
+              <Text style={styles.statValue}>{f.value}</Text>
+            </View>
+          ))}
+        </BracketFrame>
+        <StartButton label="Start Race" onPress={onStart} frame />
       </View>
     </View>
   );

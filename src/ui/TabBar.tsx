@@ -2,7 +2,7 @@ import { router, usePathname } from 'expo-router';
 import { useState } from 'react';
 import { Pressable, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import Svg, { Polygon } from 'react-native-svg';
+import Svg, { Line, Polygon } from 'react-native-svg';
 
 import { Glass } from '../components/ui';
 import { makeStyles, useTheme } from '../design/styles';
@@ -34,24 +34,28 @@ const useStyles = makeStyles((t) => ({
   homeLabelActive: { color: t.colors.accentText },
 }));
 
-/** The Home tab's backdrop: a trapezoid, wider at the bottom, dark red when idle and solid red on Home. */
+/**
+ * The Home tab's backdrop: a trapezoid, wider at the bottom, with a thin red line outside each slanted side (the same
+ * double outline as the Start Race button). The shape inside is dark red when idle and solid red on Home.
+ */
 function HomeShape({ active }: { active: boolean }) {
   const styles = useStyles();
   const t = useTheme();
   const [size, setSize] = useState({ width: 0, height: 0 });
   const { width, height } = size;
   const slant = t.spacing.md;
+  const gap = t.spacing.xs;
+  const o = t.border.hairline / 2;
   return (
     <View style={styles.homeShape} pointerEvents="none" onLayout={(e) => setSize(e.nativeEvent.layout)}>
       {width > 0 && (
         <Svg width={width} height={height}>
           <Polygon
-            points={`${slant},0 ${width - slant},0 ${width},${height} 0,${height}`}
+            points={`${slant + gap},0 ${width - slant - gap},0 ${width - gap},${height} ${gap},${height}`}
             fill={active ? t.colors.accent : t.colors.accentTint}
-            stroke={t.colors.accent}
-            strokeWidth={active ? 0 : t.border.hairline}
-            strokeOpacity={t.opacity.dimmed}
           />
+          <Line x1={slant} y1={0} x2={o} y2={height} stroke={t.colors.accent} strokeOpacity={t.opacity.dimmed} strokeWidth={t.border.hairline} />
+          <Line x1={width - slant} y1={0} x2={width - o} y2={height} stroke={t.colors.accent} strokeOpacity={t.opacity.dimmed} strokeWidth={t.border.hairline} />
         </Svg>
       )}
     </View>
@@ -68,7 +72,7 @@ export function TabBar({ activePath }: { activePath?: string } = {}) {
 
   return (
     <View accessibilityRole="tablist">
-      <Glass corner="square" style={styles.bar}>
+      <Glass corner="flat" style={styles.bar}>
       {TABS.map((tab) => {
         const active = pathname === tab.path;
         const home = 'home' in tab;

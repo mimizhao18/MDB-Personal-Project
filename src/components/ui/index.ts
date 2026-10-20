@@ -1,8 +1,8 @@
 // The shared building blocks of the new design. Screens import everything from here.
 export { AmbientGlow } from './AmbientGlow';
+export { BracketFrame } from './BracketFrame';
 export { Button } from './Button';
 export type { IconName } from './Button';
-export { ChamferButton } from './ChamferButton';
 export { Chip } from './Chip';
 export { CreditAmount } from './CreditAmount';
 export { Glass } from './Glass';
