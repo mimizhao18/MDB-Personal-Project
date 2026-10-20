@@ -1,7 +1,10 @@
 import { DarkTheme, Stack, ThemeProvider, usePathname } from 'expo-router';
+import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
+import { useEffect } from 'react';
 import { Platform, StyleSheet, View } from 'react-native';
 
+import { useAppFonts } from '../design/fonts';
 import { colors } from '../theme';
 import { TAB_PATHS, TabBar } from '../ui/TabBar';
 
@@ -14,8 +17,19 @@ const appTheme = {
 // Home, Garage, Store, History and Settings are the tabs: top-level screens, so no back button on them.
 const topLevel = { headerBackVisible: false, headerLeft: () => null };
 
+// keep the splash screen up until the fonts are ready
+void SplashScreen.preventAutoHideAsync();
+
 export default function RootLayout() {
   const pathname = usePathname();
+  const [fontsLoaded, fontsError] = useAppFonts();
+  const ready = fontsLoaded || !!fontsError;
+
+  useEffect(() => {
+    if (ready) void SplashScreen.hideAsync();
+  }, [ready]);
+
+  if (!ready) return null;
 
   return (
     <ThemeProvider value={appTheme}>
@@ -38,6 +52,7 @@ export default function RootLayout() {
             <Stack.Screen name="settings" options={{ title: 'Settings', ...topLevel }} />
             <Stack.Screen name="livery" options={{ title: 'Livery' }} />
             <Stack.Screen name="home-stats" options={{ title: 'Home stats' }} />
+            <Stack.Screen name="dev/design-system" options={{ title: 'Design system' }} />
             <Stack.Screen name="compare" options={{ title: 'Compare generations' }} />
             {/* Swipe-back is off here because dragging the race-length slider to the right looks like a back swipe. */}
             <Stack.Screen name="create-session" options={{ title: 'New Race', gestureEnabled: false }} />

@@ -79,6 +79,7 @@ export default function SettingsScreen() {
           <SectionLabel>Development only</SectionLabel>
           <ListGroup>
             <ListRow title="Load demo data" subtitle="A week of example races, a 5-day streak and credits to spend. Reset all data clears it." onPress={confirmDemo} />
+            <ListRow title="Design system" subtitle="Every color, text style and shared component on one page." chevron onPress={() => router.push('/dev/design-system')} />
           </ListGroup>
         </View>
       )}

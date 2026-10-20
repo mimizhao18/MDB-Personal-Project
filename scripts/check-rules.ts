@@ -24,7 +24,8 @@ import { specFor, GEN2022, GEN2026 } from '../src/data/cars/index.ts';
 import { specFacts } from '../src/data/cars/spec.ts';
 import { recentDays } from '../src/logic/history.ts';
 import { buildDemoData } from '../src/logic/demo.ts';
-import { colors, theme } from '../src/design/tokens.ts';
+import { colors, fonts, theme } from '../src/design/tokens.ts';
+import { contrastRatio } from '../src/design/contrast.ts';
 import { glowHexFor, hexToRgb255 } from '../src/components/car3d/glow.ts';
 import { TRACK_LIST } from '../src/data/tracks/index.ts';
 import { applySessionToStreak, daysBetween, displayedStreak } from '../src/logic/streak.ts';
@@ -297,6 +298,20 @@ assert.ok(Object.values(colors).every((c) => /^#[0-9A-Fa-f]{6}$/.test(c)), 'colo
 assert.equal(colors.accent, '#E10600'); // fixed F1 red
 assert.notEqual(colors.coin.toLowerCase(), colors.accent.toLowerCase());
 assert.ok(theme.type.label.textTransform === 'uppercase');
+
+// the new design system
+assert.ok(theme.radius.control <= 4 && theme.radius.panel <= 6 && theme.radius.control <= theme.radius.panel, 'corners: 4 px controls, 6 px panels at most');
+assert.ok(sp.screen === 16 && Object.values(sp).every((v) => v % 4 === 0), 'spacing sits on a 4 / 8 px grid and screens are padded 16');
+assert.ok(theme.size.touch >= 44 && theme.size.control >= 48, 'touch targets are at least 44 px, buttons 48');
+assert.ok(Object.values(fonts).every((f) => /(400Regular|500Medium|600SemiBold)$/.test(f)), 'only weights 400, 500 and 600');
+assert.ok(Object.values(theme.typography).every((ty) => !('fontWeight' in ty)), 'weight comes from the font, never fontWeight');
+for (const text of ['text', 'textSecondary', 'textMuted', 'accentOnDark', 'positive']) {
+  for (const surface of ['background', 'surface', 'raised']) {
+    assert.ok(contrastRatio(colors[text], colors[surface]) >= 4.5, `${text} on ${surface} passes WCAG AA`);
+  }
+}
+assert.ok(contrastRatio(colors.accentText, colors.accent) >= 4.5, 'white on the accent passes WCAG AA');
+assert.ok(contrastRatio(colors.accent, colors.background) >= 3, 'the accent is visible enough for icons and lines');
 
 // 3D car glow follows the livery
 for (const livery of LIVERIES) {
