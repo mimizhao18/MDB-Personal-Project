@@ -6,7 +6,6 @@ export type TrackId =
   | 'china'
   | 'japan'
   | 'bahrain'
-  | 'saudi-arabia'
   | 'miami'
   | 'canada'
   | 'barcelona'
@@ -25,7 +24,7 @@ export type TrackId =
   | 'abu-dhabi';
 
 /** Which flag to show (see src/components/Flag.tsx). */
-export type CountryCode = 'GB' | 'MC' | 'BE' | 'AU' | 'CN' | 'JP' | 'BH' | 'SA' | 'US' | 'CA' | 'ES' | 'AT' | 'HU' | 'NL' | 'IT' | 'AZ' | 'SG' | 'MX' | 'BR' | 'QA' | 'AE';
+export type CountryCode = 'GB' | 'MC' | 'BE' | 'AU' | 'CN' | 'JP' | 'BH' | 'US' | 'CA' | 'ES' | 'AT' | 'HU' | 'NL' | 'IT' | 'AZ' | 'SG' | 'MX' | 'BR' | 'QA' | 'AE';
 
 export interface Track {
   id: TrackId;
@@ -39,8 +38,8 @@ export interface Track {
   raceDistanceKm: number;
   /** Seconds one lap takes in the app: the lap record rounded to the nearest 10 s. */
   lapTimeSeconds: number;
-  /** Total XP you need before this track opens (0 for the free tracks). */
-  unlockXp: number;
+  /** The player level you need before this track opens (1 for the free tracks). */
+  unlockLevel: number;
   viewBox: { width: number; height: number };
   /** Drawn road width in viewBox units (narrower on tracks whose strands run close together). */
   roadWidth: number;

@@ -298,13 +298,13 @@ assert.equal(colors.accent, '#E10600'); // fixed F1 red
 assert.notEqual(colors.coin.toLowerCase(), colors.accent.toLowerCase());
 assert.ok(theme.typography.label.textTransform === 'uppercase');
 
-// the 2026 calendar: three free tracks, the other 21 open with XP in race order
-assert.equal(TRACK_LIST.length, 24);
-assert.equal(new Set(TRACK_LIST.map((t) => t.id)).size, 24, 'track ids are unique');
-assert.deepEqual(TRACK_LIST.slice(0, 3).map((t) => [t.id, t.unlockXp]), [['silverstone', 0], ['spa', 0], ['monaco', 0]]);
+// the 2026 calendar (without Jeddah for now): three free tracks, the other 20 open at a player level in race order
+assert.equal(TRACK_LIST.length, 23);
+assert.equal(new Set(TRACK_LIST.map((t) => t.id)).size, 23, 'track ids are unique');
+assert.deepEqual(TRACK_LIST.slice(0, 3).map((t) => [t.id, t.unlockLevel]), [['silverstone', 1], ['spa', 1], ['monaco', 1]]);
 for (let i = 3; i < TRACK_LIST.length; i++) {
-  assert.ok(TRACK_LIST[i].unlockXp >= 100, `${TRACK_LIST[i].id} costs XP`);
-  if (i > 3) assert.ok(TRACK_LIST[i].unlockXp > TRACK_LIST[i - 1].unlockXp, 'tracks open one after another');
+  assert.ok(TRACK_LIST[i].unlockLevel >= 2, `${TRACK_LIST[i].id} needs a level`);
+  if (i > 3) assert.ok(TRACK_LIST[i].unlockLevel >= TRACK_LIST[i - 1].unlockLevel, 'tracks open one after another');
 }
 for (const t of TRACK_LIST) {
   assert.equal(t.points.length, 360, `${t.id} has 360 points`);
@@ -315,9 +315,11 @@ for (const t of TRACK_LIST) {
   assert.ok(Math.abs(t.raceLaps * t.lapLengthKm - t.raceDistanceKm) < 1, `${t.id} race distance matches laps times lap length`);
   assert.ok(t.raceDistanceKm >= 260 && t.raceDistanceKm <= 315, `${t.id} race distance is a real Grand Prix distance`);
 }
-assert.equal(isTrackUnlocked(TRACK_LIST[3], 99), false);
-assert.equal(isTrackUnlocked(TRACK_LIST[3], 100), true);
-assert.equal(isTrackUnlocked(TRACK_LIST[0], 0), true);
+assert.equal(isTrackUnlocked(TRACK_LIST[3], 1), false);
+assert.equal(isTrackUnlocked(TRACK_LIST[3], 2), true);
+assert.equal(isTrackUnlocked(TRACK_LIST[0], 1), true);
+assert.equal(TRACK_LIST[TRACK_LIST.length - 1].unlockLevel, 12);
+assert.ok(levelForXp(6050) === 12 && levelForXp(6049) === 11, 'level 12 is 6050 XP');
 
 // leaving the app mid-race: 5 s track limits warning, 30 s yellow flag, 3 min crash; a pause excuses 5 minutes
 assert.equal(classifyAway(0), 'none');

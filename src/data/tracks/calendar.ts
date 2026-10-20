@@ -14,14 +14,14 @@ interface Facts {
   lapTimeSeconds: number;
 }
 
-// The 2026 calendar, in race order, without the three circuits that are free and hand-traced (Silverstone, Spa, Monaco).
+// The 2026 calendar, in race order, without the three circuits that are free and hand-traced (Silverstone, Spa, Monaco)
+// and without Jeddah, which is left out for now.
 // Lap lengths and race laps are the published 2026 figures; lap records are the official ones (Madring is new, so its time is an estimate).
 const FACTS: readonly Facts[] = [
   { id: 'australia', name: 'Albert Park', country: 'Australia', countryCode: 'AU', raceLaps: 58, lapLengthKm: 5.278, lapTimeSeconds: 80 }, // 1:19.813
   { id: 'china', name: 'Shanghai', country: 'China', countryCode: 'CN', raceLaps: 56, lapLengthKm: 5.451, lapTimeSeconds: 90 }, // 1:32.238
   { id: 'japan', name: 'Suzuka', country: 'Japan', countryCode: 'JP', raceLaps: 53, lapLengthKm: 5.807, lapTimeSeconds: 90 }, // 1:30.983
   { id: 'bahrain', name: 'Bahrain', country: 'Bahrain', countryCode: 'BH', raceLaps: 57, lapLengthKm: 5.412, lapTimeSeconds: 90 }, // 1:31.447
-  { id: 'saudi-arabia', name: 'Jeddah', country: 'Saudi Arabia', countryCode: 'SA', raceLaps: 50, lapLengthKm: 6.174, lapTimeSeconds: 90 }, // 1:30.734
   { id: 'miami', name: 'Miami', country: 'United States', countryCode: 'US', raceLaps: 57, lapLengthKm: 5.412, lapTimeSeconds: 90 }, // 1:29.708
   { id: 'canada', name: 'Montreal', country: 'Canada', countryCode: 'CA', raceLaps: 70, lapLengthKm: 4.361, lapTimeSeconds: 70 }, // 1:13.078
   { id: 'barcelona', name: 'Barcelona-Catalunya', country: 'Spain', countryCode: 'ES', raceLaps: 66, lapLengthKm: 4.657, lapTimeSeconds: 80 }, // 1:16.330
@@ -41,14 +41,14 @@ const FACTS: readonly Facts[] = [
 ];
 
 /**
- * XP you need in total before each of these tracks opens, in the order above: the season, race by race.
- * (Level 2 is 50 XP, level 5 is 800 XP, level 10 is 4050 XP.)
+ * The player level you need before each of these tracks opens, in the order above: the season, race by race, two tracks
+ * to a level. (Level 2 is 50 XP, level 5 is 800 XP, level 10 is 4050 XP, level 12 is 6050 XP.)
  */
-const UNLOCK_XP: readonly number[] = [100, 200, 350, 500, 700, 900, 1150, 1400, 1700, 2000, 2350, 2700, 3100, 3500, 3950, 4400, 4900, 5400, 5950, 6500, 7100];
+const UNLOCK_LEVEL: readonly number[] = [2, 2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8, 8, 9, 9, 10, 10, 11, 12];
 
 const pathFromPoints = (points: readonly (readonly [number, number])[]) => `M${points.map(([x, y]) => `${x} ${y}`).join(' L')}`;
 
-function toTrack(facts: Facts, unlockXp: number): Track {
+function toTrack(facts: Facts, unlockLevel: number): Track {
   const shape = CALENDAR_SHAPES[facts.id];
   return {
     id: facts.id,
@@ -59,7 +59,7 @@ function toTrack(facts: Facts, unlockXp: number): Track {
     lapLengthKm: facts.lapLengthKm,
     raceDistanceKm: Math.round(facts.raceLaps * facts.lapLengthKm * 1000) / 1000,
     lapTimeSeconds: facts.lapTimeSeconds,
-    unlockXp,
+    unlockLevel,
     viewBox: shape.viewBox,
     roadWidth: shape.roadWidth,
     startFinish: shape.startFinish,
@@ -68,5 +68,5 @@ function toTrack(facts: Facts, unlockXp: number): Track {
   };
 }
 
-/** The tracks that have to be unlocked with XP, in the order they open. */
-export const CALENDAR_TRACKS: readonly Track[] = FACTS.map((facts, i) => toTrack(facts, UNLOCK_XP[i]));
+/** The tracks that have to be unlocked by reaching a level, in the order they open. */
+export const CALENDAR_TRACKS: readonly Track[] = FACTS.map((facts, i) => toTrack(facts, UNLOCK_LEVEL[i]));

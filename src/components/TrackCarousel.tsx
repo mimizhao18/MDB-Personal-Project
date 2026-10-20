@@ -8,12 +8,12 @@ import { formatClock } from '../logic/lapProgress';
 import type { Track, TrackId } from '../models/types';
 import { Flag } from './Flag';
 import { TrackView } from './TrackView';
-import { BracketFrame, SegmentedProgress } from './ui';
+import { BracketFrame } from './ui';
 
 interface Props {
   tracks: readonly Track[];
-  /** The player's total XP: tracks that need more than this are shown locked. */
-  totalXp: number;
+  /** The player's level: tracks that need a higher level are shown locked. */
+  level: number;
   selectedId: TrackId;
   onSelect: (id: TrackId) => void;
 }
@@ -41,9 +41,8 @@ const useStyles = makeStyles((t) => ({
   preview: { justifyContent: 'center' },
   previewTrack: { position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 },
   // the drawing of a locked track stops above the note about its XP
-  previewTrackLocked: { bottom: t.spacing.lg + t.spacing.xs, opacity: t.opacity.unaffordable },
-  lock: { position: 'absolute', left: 0, right: 0, bottom: 0, gap: t.spacing.xs, paddingVertical: t.spacing.xs },
-  lockRow: { flexDirection: 'row', alignItems: 'baseline', justifyContent: 'space-between', gap: t.spacing.sm },
+  previewTrackLocked: { bottom: t.spacing.lg, opacity: t.opacity.unaffordable },
+  lock: { position: 'absolute', left: 0, right: 0, bottom: 0, flexDirection: 'row', alignItems: 'baseline', justifyContent: 'space-between', gap: t.spacing.sm, paddingVertical: t.spacing.xs },
   lockLabel: { ...t.typography.metaLabel, color: t.colors.accentOnDark },
   lockText: { ...t.typography.metaValue, color: t.colors.textSecondary },
   arrow: { width: t.size.touch, height: t.size.touch, alignItems: 'center', justifyContent: 'center' },
@@ -52,7 +51,7 @@ const useStyles = makeStyles((t) => ({
 }));
 
 /** Tracks side by side: swipe sideways (or use the arrows) and the track in view is the selected one. */
-export function TrackCarousel({ tracks, totalXp, selectedId, onSelect }: Props) {
+export function TrackCarousel({ tracks, level, selectedId, onSelect }: Props) {
   const styles = useStyles();
   const theme = useTheme();
   const gap = theme.spacing.md;
@@ -85,7 +84,14 @@ export function TrackCarousel({ tracks, totalXp, selectedId, onSelect }: Props) 
 
   return (
     <View style={styles.container}>
-      <View onLayout={(e) => setMeasured(Math.round(e.nativeEvent.layout.width))}>
+      <View
+        onLayout={(e) => {
+          const measuredWidth = Math.round(e.nativeEvent.layout.width);
+          setMeasured(measuredWidth);
+          // whenever the width is (re)measured, put the list exactly on the selected card
+          listRef.current?.scrollTo({ x: selectedIndex * (measuredWidth + gap), animated: false });
+        }}
+      >
         <ScrollView
           ref={listRef}
           horizontal
@@ -98,7 +104,7 @@ export function TrackCarousel({ tracks, totalXp, selectedId, onSelect }: Props) 
           contentContainerStyle={styles.row}
         >
           {tracks.map((track) => (
-            <TrackCard key={track.id} track={track} width={width} previewHeight={previewHeight} totalXp={totalXp} />
+            <TrackCard key={track.id} track={track} width={width} previewHeight={previewHeight} level={level} />
           ))}
         </ScrollView>
       </View>
@@ -114,11 +120,11 @@ export function TrackCarousel({ tracks, totalXp, selectedId, onSelect }: Props) 
   );
 }
 
-/** One track: its name and flag, its outline, and its four numbers. A track you have not unlocked yet is dimmed and says how much XP it needs. */
-const TrackCard = memo(function TrackCard({ track, width, previewHeight, totalXp }: { track: Track; width: number; previewHeight: number; totalXp: number }) {
+/** One track: its name and flag, its outline, and its four numbers. A track you have not unlocked yet is dimmed and says which level it needs. */
+const TrackCard = memo(function TrackCard({ track, width, previewHeight, level }: { track: Track; width: number; previewHeight: number; level: number }) {
   const styles = useStyles();
   const theme = useTheme();
-  const locked = !isTrackUnlocked(track, totalXp);
+  const locked = !isTrackUnlocked(track, level);
   return (
     <BracketFrame style={[styles.card, { width }]}>
       <View style={[styles.header, locked && styles.dimmed]}>
@@ -136,14 +142,9 @@ const TrackCard = memo(function TrackCard({ track, width, previewHeight, totalXp
           <TrackView track={track} lapFraction={0} showCar={false} fill />
         </View>
         {locked && (
-          <View style={styles.lock} accessible accessibilityLabel={`Locked. Reach ${track.unlockXp} XP to unlock. You have ${totalXp}.`}>
-            <View style={styles.lockRow}>
-              <Text style={styles.lockLabel}>Locked</Text>
-              <Text style={styles.lockText}>
-                {totalXp} / {track.unlockXp} XP to unlock
-              </Text>
-            </View>
-            <SegmentedProgress fraction={totalXp / track.unlockXp} />
+          <View style={styles.lock} accessible accessibilityLabel={`Locked. Reach level ${track.unlockLevel} to unlock. You are level ${level}.`}>
+            <Text style={styles.lockLabel}>Locked</Text>
+            <Text style={styles.lockText}>Reach level {track.unlockLevel} to unlock</Text>
           </View>
         )}
       </View>

@@ -17,13 +17,13 @@ const MIN_ROAD_WIDTH = 5;
 
 // our track id -> the circuit's id in the data, and whether the data runs the lap the wrong way round
 const TRACKS = {
+  // Jeddah (sa-2021) is left out for now.
   australia: { id: 'au-1953' },
   china: { id: 'cn-2004' },
   japan: { id: 'jp-1962', fixedWidth: 14 }, // the track crosses itself on a bridge, so the strands are meant to touch there
   bahrain: { id: 'bh-2002' },
-  'saudi-arabia': { id: 'sa-2021' },
   miami: { id: 'us-2022' },
-  canada: { id: 'ca-1978' },
+  canada: { id: 'ca-1978', maxRoadWidth: 11 }, // a narrow road, so the hairpin and the chicanes keep their real shape
   barcelona: { id: 'es-1991' },
   austria: { id: 'at-1969' },
   hungary: { id: 'hu-1986' },
@@ -83,7 +83,7 @@ function resample(loop, count) {
   return out;
 }
 
-function build(feature, reverse, fixedWidth) {
+function build(feature, reverse, fixedWidth, maxRoadWidth) {
   let coords = feature.geometry.coordinates.slice(0, -1); // the last point repeats the first
   if (reverse) coords = [coords[0], ...coords.slice(1).reverse()];
   const lat0 = coords.reduce((s, c) => s + c[1], 0) / coords.length;
@@ -170,21 +170,24 @@ function build(feature, reverse, fixedWidth) {
     return resample(current, POINTS);
   };
 
-  let roadWidth = Number.isFinite(fixedWidth) ? fixedWidth : MAX_ROAD_WIDTH;
-  if (!Number.isFinite(fixedWidth)) {
-    while (roadWidth >= 18 && !fits(points, roadWidth)) roadWidth--;
-    if (roadWidth < 18) {
-      // too cramped: try narrower roads, spreading the strands apart as little as needed
-      for (const w of [18, 16, 14, 12, 10, 8, 7, 6, 5]) {
-        const spread = spreadOut(points, w);
-        const moved = Math.max(...spread.map((p, i) => dist(p, points[i])));
-        if (process.env.DEBUG) console.log('  try', w, 'moved', moved.toFixed(1), 'radius', tightestRadius(spread).toFixed(1), 'crowded', crowded(spread, w).length);
-        if (fits(spread, w) && moved < 45) {
-          points = spread;
-          roadWidth = w;
-          break;
-        }
-        roadWidth = MIN_ROAD_WIDTH;
+  let roadWidth = MIN_ROAD_WIDTH;
+  if (Number.isFinite(fixedWidth)) {
+    roadWidth = fixedWidth;
+  } else {
+    // the widest road that fits, with the strands moved apart as little as needed (a wide road may move them, up to 18 units wide)
+    for (let w = Math.min(MAX_ROAD_WIDTH, maxRoadWidth ?? MAX_ROAD_WIDTH); w >= MIN_ROAD_WIDTH; w--) {
+      if (fits(points, w)) {
+        roadWidth = w;
+        break;
+      }
+      if (w > 18) continue;
+      const spread = spreadOut(points, w);
+      const moved = Math.max(...spread.map((p, i) => dist(p, points[i])));
+      if (process.env.DEBUG) console.log('  try', w, 'moved', moved.toFixed(1), 'radius', tightestRadius(spread).toFixed(1), 'crowded', crowded(spread, w).length);
+      if (fits(spread, w) && moved < 45) {
+        points = spread;
+        roadWidth = w;
+        break;
       }
     }
   }
@@ -217,10 +220,10 @@ export interface CalendarShape {
 
 export const CALENDAR_SHAPES: Record<string, CalendarShape> = {
 `;
-for (const [trackId, { id, reverse, fixedWidth }] of Object.entries(TRACKS)) {
+for (const [trackId, { id, reverse, fixedWidth, maxRoadWidth }] of Object.entries(TRACKS)) {
   const feature = features.get(id);
   if (!feature) throw new Error(`Circuit ${id} is not in the data`);
-  const shape = build(feature, reverse, fixedWidth);
+  const shape = build(feature, reverse, fixedWidth, maxRoadWidth);
   ts += `  '${trackId}': {\n    viewBox: { width: ${shape.viewBox.width}, height: ${shape.viewBox.height} },\n    roadWidth: ${shape.roadWidth},\n`;
   ts += `    startFinish: { from: { x: ${shape.startFinish.from.x}, y: ${shape.startFinish.from.y} }, to: { x: ${shape.startFinish.to.x}, y: ${shape.startFinish.to.y} } },\n`;
   ts += `    points: [${shape.points.map(([x, y]) => `[${x}, ${y}]`).join(', ')}],\n  },\n`;

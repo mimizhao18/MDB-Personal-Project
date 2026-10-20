@@ -87,14 +87,6 @@ export function Flag({ code, width = 36 }: { code: CountryCode; width?: number }
             <Polygon points={serrated(16, 5, 8)} fill="#FFFFFF" />
           </>
         )}
-        {code === 'SA' && (
-          <>
-            <Rect width={60} height={40} fill="#006C35" />
-            <Path d="M14,15 H46 M18,20 H42 M22,25 H38" stroke="#FFFFFF" strokeWidth={2.4} strokeLinecap="round" />
-            <Path d="M14,31 H46" stroke="#FFFFFF" strokeWidth={2} />
-            <Path d="M14,31 L10,29 M14,31 L10,33" stroke="#FFFFFF" strokeWidth={1.4} />
-          </>
-        )}
         {code === 'US' && (
           <>
             <Rect width={60} height={40} fill="#FFFFFF" />
