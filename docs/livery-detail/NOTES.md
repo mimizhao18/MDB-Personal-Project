@@ -57,3 +57,34 @@ A running log of the pass, with the decisions taken along the way. The summary i
 - Mirrored text on the inner faces of the end plates (the plate is one double-sided mesh with one picture): the
   outer faces read correctly on both sides of the car, the inner faces show the mirror image. Not fixed (it needs
   the plate geometry split into two faces).
+- Mistake: the pilot commit (`checkpoint-livery-pilot`, 8cc12b1) went in with `npm run check` failing (an old rule
+  required every livery shape to be a polygon; a grep in my command hid the failure). Fixed in the next commit,
+  tagged `checkpoint-livery-pilot-fixed`; roll back to that tag, not the first. Commits now go through a script that
+  stops on any lint, type or check failure.
+
+## 2022, all ten (checkpoint-livery-2022)
+
+Pictures: docs/livery-detail/gen2022/before.jpg and after.jpg (contact sheets), <id>.jpg (side, top and three-quarter,
+large). The side-by-side comparisons with the photos contain the Commons photos, so they are kept out of git, under
+reference/compare/gen2022/.
+
+| Livery | Before | After | What changed |
+|---|---|---|---|
+| ferrari-2022 | 7.5 | 8 | Shell pecten with its white keyline, Ceva with the triangle A, Ray-Ban script, Santander flame, aws smile, Scuderia shield, louvres as darker red slats, curved floor edge, 16 in yellow with a black edge |
+| mercedes-2022 | 7.5 | 8 | Petronas drop and wide name, three-pointed star, the red airbox with INEOS, curved teal stripe, TeamViewer box, AMD arrow, 44 in neon yellow |
+| redbull-2022 | 7 | 7.5 | charging bulls on the nose and cover, yellow-to-orange airbox gradient, ORACLE, BYBIT with its yellow bar, TAG Heuer shield, "Red" "Bull" across the front wing |
+| mclaren-2022 | 7 | 7.5 | the papaya panel tapering back over the blue swoosh, anthracite cover, VELO with chevrons, android with the robot, Gulf roundel, OKX squares, DeWalt box |
+| alpine-2022 | 7 | 8 | halftone dot fade from blue to black, the pink panel with BWT outlined in white, Castrol box, Mapfre box, Alpine A, Microsoft squares, pink rear flap |
+| astonmartin-2022 | 7 | 7.5 | green-to-dark gradient, lime lines along the floor edge and cover, lowercase aramco and cognizant, the wings, Peroni, JCB box, black end plates |
+| alphatauri-2022 | 7 | 8 | white upper body with the navy bull's-head swirl, white pinstripes, ALPHA/TAURI in two weights, TAURI across the front wing |
+| alfaromeo-2022 | 7 | 7.5 | Orlen eagle, Alfa Romeo script and quadrifoglio, white pods with a curved red boundary, red halo (as in the Austria photo) |
+| haas-2022 | 7 | 7.5 | the red sweep from the nose under HAAS and up the engine cover, slanted HAAS, 1&1 box, 47 |
+| williams-2022 | 6.5 | 7.5 | faceted blue panels cut by the long diagonal over the black body, light blue and red accent lines, the W |
+
+Average after: 7.7. Parts colors changed where the photos show them: Alpine's rear flap is pink, Aston Martin's end
+plates black (front and rear), the Alfa Romeo halo red, McLaren's front end plates papaya, Mercedes' front end plates
+red. Numbers are the race drivers' (Leclerc 16, Hamilton 44, Verstappen 1, Norris 4, Ocon 31, Vettel 5, Tsunoda 22,
+Bottas 77, Schumacher 47, Latifi 6).
+
+Paint time (Node, best of 3, `scripts/bench-paint.ts`): the rebuilt 2022 liveries paint in about the same time as
+before (0.98x): logos replaced thousands of stroke-font polygons.

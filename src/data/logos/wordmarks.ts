@@ -27,5 +27,27 @@ export const WORDMARK_LOGOS: readonly Logo[] = [
     slots: { main: W },
     shapes: [text('RICHARD MILLE', 0, 100, 100, 'main', { weight: 400, tracking: 8 })],
   },
+  // ---- 2022 McLaren ----
+  wordmark('hilton', 'Hilton', 'Hilton', W, { weight: 600 }),
+  wordmark('artura', 'McLaren Artura', 'ARTURA', '#1E1E1E', { weight: 800, tracking: 10, condense: 1.1 }),
+  wordmark('castore', 'Castore', 'CASTORE', W, { weight: 600, tracking: 12 }),
+  wordmark('dell', 'Dell Technologies', 'DELL', W, { weight: 900, condense: 1.1 }),
+  // ---- 2022 Alpine ----
+  wordmark('alpine', 'Alpine (name)', 'ALPINE', W, { weight: 400, condense: 1.4, tracking: 22 }),
+  wordmark('mandiant', 'Mandiant', 'MANDIANT', W, { weight: 800, tracking: 6 }),
+  // ---- 2022 Aston Martin ----
+  wordmark('aramco', 'Aramco', 'aramco', W, { weight: 600, tracking: 2 }),
+  wordmark('cognizant', 'Cognizant', 'cognizant', W, { weight: 600 }),
+  wordmark('aston-martin', 'Aston Martin (name)', 'ASTON MARTIN', '#CEDC00', { weight: 800, tracking: 6 }),
+  wordmark('sentinelone', 'SentinelOne', 'SentinelOne', W, { weight: 800 }),
+  wordmark('bombardier', 'Bombardier', 'BOMBARDIER', W, { weight: 800, slant: 8, tracking: 4 }),
+  wordmark('epos', 'EPOS', 'EPOS', W, { weight: 600, tracking: 8 }),
+  wordmark('boss', 'BOSS', 'BOSS', W, { weight: 800, tracking: 10, condense: 1.1 }),
+  wordmark('juniper', 'Juniper Networks', 'JUNIPER', W, { weight: 800 }),
+  // ---- 2022 AlphaTauri ----
+  wordmark('icm', 'ICM.com', 'ICM', W, { weight: 900, tracking: 6 }),
+  wordmark('rapidapi', 'RapidAPI', 'RapidAPI', W, { weight: 800 }),
+  wordmark('epicor', 'Epicor', 'EPICOR', W, { weight: 800, tracking: 4 }),
+  wordmark('fashion-meets-function', 'Fashion meets function', 'FASHION MEETS FUNCTION', W, { weight: 800, tracking: 6 }),
 ];
 

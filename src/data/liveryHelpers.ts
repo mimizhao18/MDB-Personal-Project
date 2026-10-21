@@ -121,3 +121,37 @@ export function layout(era: EraId) {
     airboxTop: Math.max(...spec.airbox.top),
   };
 }
+
+/**
+ * A halftone fade: dots on a staggered grid over a rectangle (along the car from x0 to x1, and y0 to y1), their size
+ * going from `r0` at x0 to `r1` at x1 (0 for none), so one color fades into the paint around it, as on the 2022
+ * Alpine's engine cover. `clip` keeps only the dots whose middle is inside it (a path test is not needed: a polygon).
+ */
+export function halftone(color: string, x0: number, x1: number, y0: number, y1: number, spacing: number, r0: number, r1: number, clip?: readonly Point[]): LiveryLayer {
+  const inside = (x: number, y: number) => {
+    if (!clip) return true;
+    let c = false;
+    for (let i = 0, j = clip.length - 1; i < clip.length; j = i++) {
+      const [xi, yi] = clip[i];
+      const [xj, yj] = clip[j];
+      if (yi > y !== yj > y && x < ((xj - xi) * (y - yi)) / (yj - yi) + xi) c = !c;
+    }
+    return c;
+  };
+  const f = (n: number) => (Math.round(n * 10000) / 10000).toString();
+  let d = '';
+  const cols = Math.round(Math.abs(x1 - x0) / spacing);
+  const rows = Math.round(Math.abs(y1 - y0) / spacing);
+  for (let i = 0; i <= cols; i++) {
+    const t = i / cols;
+    const r = r0 + (r1 - r0) * t;
+    if (r <= 0.0005) continue;
+    const x = x0 + (x1 - x0) * t;
+    for (let j = 0; j <= rows; j++) {
+      const y = y0 + (y1 - y0) * (j / rows) + (i % 2 ? spacing / 2 : 0);
+      if (!inside(x, y)) continue;
+      d += `M${f(x - r)} ${f(y)}A${f(r)} ${f(r)} 0 1 0 ${f(x + r)} ${f(y)}A${f(r)} ${f(r)} 0 1 0 ${f(x - r)} ${f(y)}Z`;
+    }
+  }
+  return { color, path: d || 'M0 0Z' };
+}

@@ -3,6 +3,7 @@
 // sponsor names the app already uses: they would need clearing before any public release.
 
 import { FUEL_LOGOS } from './fuel';
+import { LOGOS_2022 } from './gen2022';
 import { TEAM_MARKS } from './marks';
 import { SPONSOR_LOGOS } from './sponsors';
 import type { Logo } from './types';
@@ -12,7 +13,7 @@ export type { Logo, LogoColor, LogoPath, LogoShape, LogoText } from './types';
 export { isLogoText } from './types';
 
 /** Every logo, in the order the /dev/logos page shows them. */
-export const LOGOS: readonly Logo[] = [...TEAM_MARKS, ...FUEL_LOGOS, ...SPONSOR_LOGOS, ...WORDMARK_LOGOS];
+export const LOGOS: readonly Logo[] = [...TEAM_MARKS, ...FUEL_LOGOS, ...SPONSOR_LOGOS, ...WORDMARK_LOGOS, ...LOGOS_2022];
 
 let byId: Map<string, Logo> | null = null;
 

@@ -42,3 +42,6 @@ yarn-error.*
 
 # F1 reference graphics (copyrighted, tracing reference only)
 reference/
+
+# livery-detail work-in-progress renders (the kept pictures are in the generation folders)
+docs/livery-detail/wip/
