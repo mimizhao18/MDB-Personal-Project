@@ -1,111 +1,127 @@
-import { BLACK, CARBON, WHITE, both, ellipse, flank, noseCapShape, plateText, podBand, sideText, stripe, topText, wingText, layout } from '../liveryHelpers';
-import type { Livery } from '../liveryTypes';
+import { halftone, BLACK, CARBON, WHITE } from '../liveryHelpers';
+import type { Livery, LiveryLayer } from '../liveryTypes';
 
 // 2014 (the first V6 turbo-hybrid season): the best-known liveries, drawn from the 2014 photos in
 // reference/gen2014/liveries/. Shapes are in the car's own measurements (see src/data/cars/gen2014.ts): nose 2.75,
-// front axle 1.8, sidepods 1.0 to -2.1, rear axle -1.8, tail -2.3; floor edge 0.06 to 0.17, sidepod top about 0.6,
-// airbox top 0.94. The ids are the save keys and never change; `renault-2014` is the Renault-engined Lotus E22.
+// front axle 1.8, sidepods 1.0 to -2.1 (their top 0.6 at the front, 0.38 at -1.2), rear axle -1.8, tail -2.3;
+// floor edge 0.06 to 0.17, airbox top 1.0. The ids are the save keys and never change; `renault-2014` is the
+// Renault-engined Lotus E22. Logos come from src/data/logos; numbers are the race drivers'.
 
-const L = layout('gen2014');
 const parts = (wing: string, flap = wing, endplate = wing) => ({ wing, flap, endplate, floor: CARBON });
-const AIRBOX = [0.06, -1.4] as const;
-const ABOX_Y = [0.62, 0.96] as const;
-/** The black lower sidepod and floor edge most teams run (bare carbon). */
-const lowerPod = (top = 0.2, color = BLACK) => ({ color, points: flank(L.podFront, L.podRear, 0.06, top) });
-/** The engine cover flank from the airbox back to the tail. */
-const coverFlank = (color: string, y0 = 0.6) => ({ color, points: [[0.1, y0], [0.1, 0.96], [-0.7, 0.94], [-1.2, 0.86], [-2.2, 0.56], [-2.3, 0.46], [-1.3, y0]] as const });
+/** The black floor edge under the sidepod. */
+const floorEdge = (top = 0.16, color = BLACK): LiveryLayer => ({ color, path: `M1.0 0.06 L1.0 ${top} C0.4 ${top} -0.8 ${top} -2.1 ${top + 0.06} L-2.1 0.06 Z` });
+/** A number on the engine cover and on the nose. */
+const numbers = (n: string, side: { x: number; y: number; h: number; color: string }, top: { x?: number; color: string }, more: { slant?: number; outline?: { color: string; width: number } } = {}) => [
+  { view: 'side' as const, text: n, x: side.x, y: side.y, height: side.h, color: side.color, font: 'sans' as const, weight: 900 as const, slant: more.slant, outline: more.outline, align: 'center' as const },
+  { view: 'top' as const, text: n, x: top.x ?? 1.55, y: 0, height: 0.1, color: top.color, font: 'sans' as const, weight: 900 as const, slant: more.slant, outline: more.outline, align: 'center' as const },
+];
 
+const F_RED = '#DC0000';
 const FERRARI: Livery = {
   id: 'ferrari-2014',
   name: 'Ferrari',
   era: 'gen2014',
   team: 'Scuderia Ferrari',
   price: 50,
-  primary: '#DC0000',
+  primary: F_RED,
   secondary: '#FFFFFF',
   sidepod: 'hybrid',
   finish: 'gloss',
   helmet: '#E8E8E8',
-  parts: parts(BLACK, BLACK, '#DC0000'),
-  frontParts: { wing: '#DC0000', flap: BLACK, endplate: BLACK },
+  parts: parts(BLACK, BLACK, F_RED),
+  frontParts: { wing: F_RED, flap: BLACK, endplate: BLACK },
   top: [
-    // the white panel on the rear of the engine cover with the shield, a black tail, the shield on the nose
-    { color: WHITE, points: [[-1.0, 0.16], [-1.0, -0.16], [-1.6, -0.1], [-1.6, 0.1]] },
-    { color: BLACK, points: stripe(-1.9, L.tail - 0.05, 0.1) },
-    { color: '#FFD800', points: ellipse(2.3, 0, 0.05, 0.035) },
+    // the white wedge on the rear of the engine cover, a black tail
+    { color: WHITE, path: 'M-0.95 0.17 C-1.2 0.16 -1.45 0.12 -1.7 0.08 L-1.7 -0.08 C-1.45 -0.12 -1.2 -0.16 -0.95 -0.17 Z' },
+    { color: BLACK, path: 'M-1.9 0.1 C-2.1 0.08 -2.25 0.05 -2.3 0.03 L-2.3 -0.03 C-2.25 -0.05 -2.1 -0.08 -1.9 -0.1 Z' },
   ],
   side: [
-    // black floor edge, the white Santander flashes on the nose and the sidepod, the Shell roundel, the UPS box, the white cover panel
-    lowerPod(0.18),
-    { color: WHITE, points: [[2.1, 0.3], [2.1, 0.4], [1.3, 0.46], [1.3, 0.34]] },
-    { color: WHITE, points: [[0.95, 0.2], [0.95, 0.32], [0.55, 0.32], [0.5, 0.2]] },
-    { color: '#FFD800', points: ellipse(0.3, 0.34, 0.14, 0.12) },
-    { color: '#5A3A1E', points: flank(-0.2, -0.5, 0.26, 0.42) },
-    { color: WHITE, points: [[-0.9, 0.9], [-0.9, 0.68], [-1.7, 0.6], [-1.7, 0.8]] },
-    { color: '#FFD800', points: ellipse(-1.05, 0.78, 0.05, 0.065) },
+    floorEdge(0.17),
+    // the white wedge on the engine cover that carries the Scuderia Ferrari name, pointing back
+    { color: WHITE, path: 'M-0.85 0.9 L-0.85 0.66 C-1.2 0.62 -1.5 0.6 -1.75 0.58 C-1.5 0.68 -1.2 0.8 -0.85 0.9 Z' },
+    // the white Santander box low on the front of the sidepod
+    { color: WHITE, path: 'M0.95 0.2 L0.95 0.3 L0.55 0.3 L0.5 0.2 Z' },
   ],
-  texts: [
-    sideText('SANTANDER', 1.7, 0.38, 0.045, '#DC0000'),
-    sideText('SANTANDER', 0.72, 0.26, 0.035, '#DC0000'),
-    sideText('SHELL', 0.3, 0.34, 0.045, '#DC0000'),
-    sideText('UPS', -0.35, 0.34, 0.055, '#FFB500'),
-    sideText('HUBLOT', 0.65, 0.56, 0.035, WHITE),
-    sideText('WEICHAI', -0.85, 0.34, 0.035, WHITE),
-    sideText('FIAT', -1.95, 0.6, 0.045, WHITE),
-    sideText('SCUDERIA FERRARI', -1.3, 0.66, 0.03, '#DC0000'),
-    sideText('KASPERSKY', 2.4, 0.26, 0.028, WHITE),
-    sideText('7', 2.0, 0.26, 0.07, WHITE),
-    sideText('INFOR', 0.1, 0.12, 0.035, WHITE),
-    topText('SANTANDER', 1.9, 0, 0.045, WHITE),
-    topText('7', 2.35, 0, 0.06, WHITE),
-    wingText('V-POWER', -2.35, 0, 0.06, WHITE),
-    wingText('SANTANDER', 2.7, 0.45, 0.05, WHITE, 'front'),
-    wingText('SANTANDER', 2.7, -0.45, 0.05, WHITE, 'front'),
+  decals: [
+    { view: 'side', logo: 'shell', x: 0.3, y: 0.38, height: 0.2, colors: { key: WHITE } },
+    { view: 'side', logo: 'ups', x: -0.3, y: 0.36, height: 0.13 },
+    { view: 'side', logo: 'santander', x: 1.75, y: 0.4, height: 0.045 },
+    { view: 'side', logo: 'santander', x: 0.73, y: 0.25, height: 0.035, colors: { main: F_RED, mark: F_RED } },
+    { view: 'side', logo: 'ferrari-shield', x: 0.85, y: 0.55, height: 0.08 },
+    { view: 'side', logo: 'scuderia-ferrari', x: -1.18, y: 0.71, height: 0.028 },
+    { view: 'side', logo: 'hublot', x: 0.55, y: 0.6, height: 0.025 },
+    { view: 'side', logo: 'weichai', x: -0.8, y: 0.34, height: 0.03 },
+    { view: 'side', logo: 'kaspersky', x: 2.3, y: 0.3, height: 0.025 },
+    { view: 'side', logo: 'infor', x: 0.0, y: 0.1, height: 0.03 },
+    { view: 'side', logo: 'fiat', x: -1.95, y: 0.55, height: 0.04 },
+    // on top: the shield and Santander on the nose, the pecten, Santander across the wings
+    { view: 'top', logo: 'ferrari-shield', x: 2.4, y: 0, height: 0.06, rotate: 90 },
+    { view: 'top', logo: 'santander', x: 2.0, y: 0, height: 0.04, rotate: 180 },
+    { view: 'top', logo: 'shell', x: 1.2, y: 0, height: 0.12, rotate: 90 },
+    { view: 'top', logo: 'santander', x: -2.35, y: 0, height: 0.055, orient: 'across-rear' },
+    { view: 'top', logo: 'santander', x: 2.7, y: 0.45, height: 0.045, orient: 'across-front' },
+    { view: 'top', logo: 'santander', x: 2.7, y: -0.45, height: 0.045, orient: 'across-front' },
   ],
-  plateTexts: { rear: [plateText('V-POWER', -2.35, 0.82, 0.07, WHITE), plateText('SANTANDER', -2.35, 0.66, 0.05, WHITE)], front: [plateText('SANTANDER', 2.5, 0.26, 0.045, WHITE)] },
+  texts: numbers('7', { x: 2.05, y: 0.32, h: 0.07, color: WHITE }, { x: 1.6, color: WHITE }),
+  plateDecals: {
+    rear: [
+      { view: 'side', logo: 'shell-vpower', x: -2.35, y: 0.82, height: 0.05 },
+      { view: 'side', logo: 'santander', x: -2.35, y: 0.68, height: 0.04 },
+    ],
+    front: [{ view: 'side', logo: 'santander', x: 2.5, y: 0.26, height: 0.035 }],
+  },
 };
 
+const M_SILVER = '#C5C9CD';
+const M_TEAL = '#00A19C';
 const MERCEDES: Livery = {
   id: 'mercedes-2014',
   name: 'Mercedes',
   era: 'gen2014',
   team: 'Mercedes AMG Petronas F1 Team',
   price: 80,
-  primary: '#C5C9CD',
+  primary: M_SILVER,
   secondary: '#00D2BE',
   glow: '#00D2BE',
   sidepod: 'hybrid',
   finish: 'gloss',
   helmet: '#FFD500',
-  parts: parts('#C5C9CD', '#C5C9CD', '#C5C9CD'),
-  frontParts: { wing: '#C5C9CD', flap: '#00D2BE', endplate: '#C5C9CD' },
+  parts: parts(M_SILVER, M_SILVER, M_SILVER),
+  frontParts: { wing: M_SILVER, flap: M_TEAL, endplate: M_SILVER },
   top: [
-    // silver with the teal Petronas sweep over the sidepods and down the engine cover sides
-    ...both('#00D2BE', [[0.9, 0.42], [0.3, 0.6], [-0.4, 0.66], [-1.2, 0.5], [-1.2, 0.44], [-0.4, 0.6], [0.3, 0.52], [0.9, 0.36]]),
-    { color: '#00D2BE', points: stripe(-0.5, -2.0, 0.015) },
+    // silver, with the teal sweep over the sidepods and a teal line down the engine cover
+    { color: M_TEAL, symmetric: true, path: 'M0.95 0.4 C0.5 0.58 0.0 0.68 -0.5 0.64 C-0.9 0.6 -1.15 0.52 -1.25 0.46 L-1.2 0.42 C-1.0 0.5 -0.6 0.57 -0.3 0.58 C0.2 0.58 0.6 0.48 0.92 0.35 Z' },
+    { color: M_TEAL, path: 'M-0.5 0.012 L-2.0 0.008 L-2.0 -0.008 L-0.5 -0.012 Z' },
   ],
   side: [
-    // black floor edge, the teal sweep rising from the floor along the sidepod to the engine cover, a teal line on the nose
-    lowerPod(0.14),
-    { color: '#00D2BE', points: [[1.0, 0.14], [1.0, 0.3], [0.3, 0.44], [-0.6, 0.5], [-1.3, 0.56], [-1.9, 0.52], [-1.9, 0.44], [-1.3, 0.46], [-0.6, 0.38], [0.3, 0.26]] },
-    { color: '#00D2BE', points: [[1.3, 0.48], [1.3, 0.5], [2.5, 0.32], [2.5, 0.3]] },
+    floorEdge(0.14),
+    // the teal sweep rising from the floor along the sidepod to the engine cover, a teal line along the nose
+    { color: M_TEAL, path: 'M1.0 0.14 C1.0 0.24 0.8 0.34 0.3 0.42 C-0.4 0.48 -1.2 0.54 -1.9 0.5 L-1.9 0.44 C-1.2 0.46 -0.4 0.38 0.3 0.28 C0.6 0.22 0.8 0.17 0.85 0.14 Z' },
+    { color: M_TEAL, path: 'M1.2 0.5 C1.6 0.45 2.1 0.38 2.6 0.28 L2.6 0.3 C2.1 0.4 1.6 0.47 1.2 0.52 Z' },
   ],
-  texts: [
-    sideText('PETRONAS', -0.4, 0.3, 0.09, WHITE),
-    sideText('BLACKBERRY', 0.75, 0.5, 0.04, BLACK),
-    sideText('PETRONAS PRIMAX', -1.55, 0.62, 0.028, BLACK),
-    sideText('AMG', -0.9, 0.74, 0.04, BLACK),
-    sideText('44', 1.65, 0.46, 0.09, '#D40000'),
-    sideText('SWISSQUOTE', 2.0, 0.38, 0.026, BLACK),
-    sideText('PETRONAS', 2.3, 0.32, 0.028, '#00D2BE'),
-    sideText('IWC', 0.6, 0.6, 0.035, BLACK),
-    topText('PETRONAS', 2.0, 0, 0.045, '#00D2BE'),
-    topText('44', 1.5, 0, 0.1, '#D40000'),
-    wingText('PETRONAS', -2.35, 0, 0.065, '#00D2BE'),
-    wingText('PETRONAS', 2.7, 0.45, 0.05, '#00D2BE', 'front'),
-    wingText('PETRONAS', 2.7, -0.45, 0.05, '#00D2BE', 'front'),
+  decals: [
+    { view: 'side', logo: 'petronas', x: -0.35, y: 0.34, height: 0.075, colors: { main: WHITE, mark: WHITE, inner: M_TEAL } },
+    { view: 'side', logo: 'blackberry', x: 0.75, y: 0.5, height: 0.035 },
+    { view: 'side', logo: 'mercedes-star', x: 1.6, y: 0.42, height: 0.08, colors: { main: '#2A2C30', shade: '#55595F' } },
+    { view: 'side', logo: 'petronas-primax', x: -1.5, y: 0.62, height: 0.02 },
+    { view: 'side', logo: 'amg', x: -0.9, y: 0.72, height: 0.035, colors: { main: '#111111' } },
+    { view: 'side', logo: 'swissquote', x: 2.05, y: 0.36, height: 0.02 },
+    { view: 'side', logo: 'iwc', x: 0.55, y: 0.6, height: 0.03 },
+    // on top: the star at the nose, Petronas along it, Petronas across the wings
+    { view: 'top', logo: 'mercedes-star', x: 2.45, y: 0, height: 0.09 },
+    { view: 'top', logo: 'petronas-word', x: 2.0, y: 0, height: 0.04, rotate: 180 },
+    { view: 'top', logo: 'petronas-word', x: -2.35, y: 0, height: 0.06, orient: 'across-rear' },
+    { view: 'top', logo: 'petronas-word', x: 2.7, y: 0.45, height: 0.045, orient: 'across-front' },
+    { view: 'top', logo: 'petronas-word', x: 2.7, y: -0.45, height: 0.045, orient: 'across-front' },
   ],
-  plateTexts: { rear: [plateText('SWISSQUOTE', -2.35, 0.8, 0.045, BLACK), plateText('PETRONAS', -2.35, 0.64, 0.045, '#00D2BE')], front: [plateText('PETRONAS', 2.5, 0.26, 0.045, '#00D2BE')] },
+  texts: numbers('44', { x: 1.25, y: 0.46, h: 0.08, color: '#D40000' }, { color: '#D40000' }),
+  plateDecals: {
+    rear: [
+      { view: 'side', logo: 'swissquote', x: -2.35, y: 0.8, height: 0.03 },
+      { view: 'side', logo: 'petronas-word', x: -2.35, y: 0.66, height: 0.035 },
+    ],
+    front: [{ view: 'side', logo: 'petronas-word', x: 2.5, y: 0.26, height: 0.035 }],
+  },
 };
 
 const MCLAREN: Livery = {
@@ -122,84 +138,99 @@ const MCLAREN: Livery = {
   helmet: '#FFD500',
   parts: parts(BLACK, BLACK, BLACK),
   top: [
-    // chrome body with the black engine cover and tail, black rear halves of the sidepods, a red nose flash
-    { color: BLACK, points: stripe(-0.4, L.tail - 0.05, 0.22) },
-    ...podBand(BLACK, -0.6, -2.1, 0.16, 0.7),
-    { color: '#E10600', points: stripe(1.9, 2.2, 0.08) },
+    // chrome fading into black toward the tail and the sidepod edges
+    { path: 'M2.9 0.8 L-2.4 0.8 L-2.4 -0.8 L2.9 -0.8 Z', gradient: { from: [0.6, 0], to: [-1.6, 0], stops: [[0, '#C3C7CC'], [0.55, '#6A6E74'], [1, BLACK]] } },
   ],
   side: [
-    // the black lower body and rear, the black engine cover flank with Johnnie Walker, the red Santander band
-    lowerPod(0.22),
-    coverFlank(BLACK, 0.6),
-    { color: BLACK, points: [[-0.5, 0.22], [-0.5, 0.6], [-2.1, 0.5], [-2.1, 0.22]] },
-    { color: '#E10600', points: flank(1.0, 0.1, 0.22, 0.3) },
-    { color: '#E10600', points: flank(2.2, 1.9, 0.26, 0.44) },
+    // the chrome running down into black: the lower body and the rear are black, the top and the nose silver
+    { path: 'M2.9 0.06 L2.9 1.0 L-2.4 1.0 L-2.4 0.06 Z', gradient: { from: [0.3, 0.75], to: [-0.4, 0.15], stops: [[0, '#C3C7CC'], [0.5, '#7A7E84'], [1, BLACK]] } },
+    halftone(BLACK, -0.55, -1.25, 0.06, 1.0, 0.03, 0, 0.022),
+    { color: BLACK, path: 'M-1.2 1.0 L-2.4 1.0 L-2.4 0.06 L-1.2 0.06 Z' },
+    { color: '#E10600', path: 'M2.2 0.27 L2.2 0.4 L1.95 0.43 L1.95 0.3 Z' },
   ],
-  texts: [
-    sideText('JOHNNIE WALKER', -0.7, 0.78, 0.045, WHITE),
-    sideText('SANTANDER', 0.55, 0.26, 0.045, WHITE),
-    sideText('MOBIL 1', 0.4, 0.46, 0.05, BLACK),
-    sideText('GSK', -1.2, 0.4, 0.045, WHITE),
-    sideText('HUGO BOSS', -0.3, 0.6, 0.032, BLACK),
-    sideText('22', 2.05, 0.35, 0.08, WHITE),
-    sideText('SAP', 1.35, 0.5, 0.04, BLACK),
-    topText('MOBIL 1', 1.5, 0, 0.05, BLACK),
-    topText('22', 2.05, 0, 0.06, WHITE),
-    wingText('ASOS', -2.35, 0, 0.08, WHITE),
-    wingText('MOBIL 1', 2.7, 0.45, 0.05, WHITE, 'front'),
-    wingText('MOBIL 1', 2.7, -0.45, 0.05, WHITE, 'front'),
+  decals: [
+    { view: 'side', logo: 'sap', x: -0.1, y: 0.36, height: 0.12 },
+    { view: 'side', logo: 'johnnie-walker', x: -0.95, y: 0.66, height: 0.09 },
+    { view: 'side', logo: 'mobil1', x: 0.6, y: 0.5, height: 0.035, colors: { main: '#111111' } },
+    { view: 'side', logo: 'gsk', x: -1.25, y: 0.4, height: 0.03 },
+    { view: 'side', logo: 'hugo-boss', x: 0.2, y: 0.62, height: 0.022 },
+    { view: 'side', logo: 'santander', x: 1.4, y: 0.47, height: 0.03, colors: { main: '#E10600', mark: '#E10600' } },
+    // on top: Mobil 1 on the nose, Johnnie Walker on the rear wing, asos across the front flaps
+    { view: 'top', logo: 'mobil1', x: 1.9, y: 0, height: 0.04, rotate: 180, colors: { main: '#111111' } },
+    { view: 'top', logo: 'johnnie-walker', x: -2.35, y: 0, height: 0.07, orient: 'across-rear' },
+    { view: 'top', logo: 'asos', x: 2.7, y: 0.45, height: 0.04, orient: 'across-front' },
+    { view: 'top', logo: 'asos', x: 2.7, y: -0.45, height: 0.04, orient: 'across-front' },
   ],
-  plateTexts: { rear: [plateText('JOHNNIE WALKER', -2.35, 0.8, 0.04, WHITE), plateText('ASOS', -2.35, 0.64, 0.06, WHITE)], front: [plateText('SANTANDER', 2.5, 0.26, 0.045, WHITE)] },
+  texts: numbers('22', { x: 2.05, y: 0.33, h: 0.07, color: WHITE }, { x: 1.6, color: '#111111' }),
+  plateDecals: {
+    rear: [
+      { view: 'side', logo: 'johnnie-walker', x: -2.35, y: 0.8, height: 0.05 },
+      { view: 'side', logo: 'asos', x: -2.35, y: 0.64, height: 0.035 },
+    ],
+    front: [{ view: 'side', logo: 'santander', x: 2.5, y: 0.26, height: 0.035 }],
+  },
 };
 
+const RB_NAVY = '#1C1F4F';
+const RB_RED = '#E4002B';
+const RB_YELLOW = '#FFC500';
 const REDBULL: Livery = {
   id: 'redbull-2014',
   name: 'Red Bull',
   era: 'gen2014',
   team: 'Infiniti Red Bull Racing',
   price: 140,
-  primary: '#1C1F4F',
-  secondary: '#E4002B',
-  glow: '#E4002B',
+  primary: RB_NAVY,
+  secondary: RB_RED,
+  glow: RB_RED,
   sidepod: 'hybrid',
   finish: 'matte',
-  helmet: '#1C1F4F',
-  parts: parts('#1C1F4F', '#1C1F4F', '#E4002B'),
-  frontParts: { wing: '#1C1F4F', flap: '#1C1F4F', endplate: '#E4002B' },
+  helmet: RB_NAVY,
+  parts: parts(RB_NAVY, RB_NAVY, RB_RED),
+  frontParts: { wing: RB_NAVY, flap: RB_NAVY, endplate: RB_RED },
   top: [
-    // the yellow nose and airbox with the red bulls charging back over the engine cover, red flames on the sidepods
-    { color: '#FFC500', points: noseCapShape(1.6, 2.75, 0.12) },
-    { color: '#FFC500', points: stripe(0.06, -0.5, 0.14) },
-    { color: '#E4002B', points: ellipse(-0.4, 0, 0.35, 0.09) },
-    { color: '#E4002B', points: ellipse(2.1, 0, 0.18, 0.045) },
+    // the purple sheen over the navy, the yellow nose and airbox, the bulls over the engine cover
+    { path: 'M2.9 0.8 L-2.4 0.8 L-2.4 -0.8 L2.9 -0.8 Z', gradient: { from: [1.0, 0], to: [-1.8, 0], stops: [[0, RB_NAVY], [0.5, '#3A2A6E'], [1, RB_NAVY]] } },
+    { path: 'M2.75 0.03 C2.4 0.07 2.0 0.1 1.6 0.11 C1.5 0.08 1.5 -0.08 1.6 -0.11 C2.0 -0.1 2.4 -0.07 2.75 -0.03 Z', gradient: { from: [2.75, 0], to: [1.55, 0], stops: [[0, '#FFD21A'], [1, '#FFB100']] } },
+    { path: 'M0.06 0.13 C-0.1 0.15 -0.35 0.14 -0.5 0.08 L-0.5 -0.08 C-0.35 -0.14 -0.1 -0.15 0.06 -0.13 Z', gradient: { from: [0.05, 0], to: [-0.5, 0], stops: [[0, RB_YELLOW], [1, '#F39200']] } },
   ],
   side: [
-    // the yellow airbox and the red bull across the engine cover, the yellow nose flank with its bull, a red stripe along the pod
-    { color: '#FFC500', points: flank(AIRBOX[0], -0.5, 0.8, ABOX_Y[1]) },
-    { color: '#E4002B', points: ellipse(-0.6, 0.78, 0.35, 0.09) },
-    { color: '#FFC500', points: [[1.6, 0.3], [1.6, 0.44], [2.75, 0.3], [2.75, 0.24]] },
-    { color: '#E4002B', points: ellipse(2.15, 0.33, 0.22, 0.05) },
-    { color: '#E4002B', points: flank(L.podFront, -1.0, 0.44, 0.48) },
-    { color: '#E4002B', points: flank(L.podFront, L.podRear, 0.06, 0.1) },
+    // the navy body with its purple sheen, the yellow airbox and nose, the red stripe along the pod and floor edge
+    { path: 'M2.9 0.06 L2.9 1.0 L-2.4 1.0 L-2.4 0.06 Z', gradient: { from: [0.5, 0.2], to: [-1.0, 0.8], stops: [[0, RB_NAVY], [0.6, '#3A2A6E'], [1, RB_NAVY]] } },
+    { path: 'M0.06 0.74 L0.06 0.99 L-0.5 0.98 C-0.6 0.88 -0.7 0.8 -0.8 0.74 Z', gradient: { from: [0.05, 0.9], to: [-0.8, 0.75], stops: [[0, RB_YELLOW], [1, '#F39200']] } },
+    { path: 'M2.73 0.24 L2.73 0.3 C2.4 0.36 2.0 0.42 1.6 0.46 C1.55 0.4 1.55 0.32 1.6 0.28 C2.0 0.27 2.4 0.25 2.73 0.24 Z', gradient: { from: [2.7, 0], to: [1.6, 0], stops: [[0, '#FFD21A'], [1, '#FFB100']] } },
+    { color: RB_RED, path: 'M1.0 0.44 C0.4 0.52 -0.4 0.5 -1.0 0.42 L-1.0 0.4 C-0.4 0.48 0.4 0.5 1.0 0.42 Z' },
+    { color: RB_RED, path: 'M1.0 0.075 L-2.1 0.075 L-2.1 0.1 L1.0 0.1 Z' },
   ],
-  texts: [
-    sideText('INFINITI', -0.3, 0.32, 0.08, WHITE),
-    sideText('RED BULL', -0.6, 0.66, 0.045, '#E4002B'),
-    sideText('RENAULT', -1.4, 0.56, 0.045, WHITE),
-    sideText('RAUCH', 0.55, 0.26, 0.04, '#FF7A00'),
-    sideText('PEPE JEANS', 0.6, 0.54, 0.032, WHITE),
-    sideText('CASIO', -1.3, 0.4, 0.035, WHITE),
-    sideText('1', 1.3, 0.5, 0.08, WHITE),
-    sideText('TOTAL', 1.9, 0.26, 0.035, WHITE),
-    topText('RED BULL', 1.4, 0, 0.055, '#E4002B'),
-    topText('1', 1.0, 0, 0.09, WHITE),
-    wingText('INFINITI', -2.35, 0, 0.07, WHITE),
-    wingText('RED BULL', 2.7, 0.45, 0.055, '#E4002B', 'front'),
-    wingText('RED BULL', 2.7, -0.45, 0.055, '#E4002B', 'front'),
+  decals: [
+    { view: 'side', logo: 'redbull', x: -0.95, y: 0.66, width: 0.45 },
+    { view: 'side', logo: 'redbull-bull', x: 2.15, y: 0.34, width: 0.36, mirror: true },
+    { view: 'side', logo: 'infiniti', x: -0.3, y: 0.42, height: 0.19 },
+    { view: 'side', logo: 'renault-diamond', x: -1.45, y: 0.5, height: 0.06 },
+    { view: 'side', logo: 'casio', x: 0.55, y: 0.36, height: 0.025 },
+    { view: 'side', logo: 'pepe-jeans', x: 0.6, y: 0.56, height: 0.025 },
+    { view: 'side', logo: 'rauch', x: 1.15, y: 0.4, height: 0.03 },
+    { view: 'side', logo: 'total', x: 1.95, y: 0.24, height: 0.035 },
+    // on top: the bull along the nose, the bulls on the cover, Infiniti on the rear wing, TOTAL on the front flaps
+    { view: 'top', logo: 'redbull-bull', x: 2.15, y: 0, width: 0.38, mirror: true },
+    { view: 'top', logo: 'redbull', x: -0.95, y: 0, width: 0.3, rotate: 90 },
+    { view: 'top', logo: 'infiniti', x: -2.35, y: 0, height: 0.07, orient: 'across-rear' },
+    { view: 'top', logo: 'total', x: 2.7, y: 0.45, height: 0.05, orient: 'across-front' },
+    { view: 'top', logo: 'total', x: 2.7, y: -0.45, height: 0.05, orient: 'across-front' },
   ],
-  plateTexts: { rear: [plateText('TOTAL', -2.35, 0.8, 0.07, WHITE), plateText('INFINITI', -2.35, 0.64, 0.045, WHITE)], front: [plateText('TOTAL', 2.5, 0.26, 0.055, WHITE)] },
+  texts: numbers('1', { x: 1.3, y: 0.52, h: 0.08, color: RB_RED }, { x: 1.2, color: RB_RED }, { slant: 10 }),
+  plateDecals: {
+    rear: [
+      { view: 'side', logo: 'total', x: -2.35, y: 0.82, height: 0.06 },
+      { view: 'side', logo: 'infiniti', x: -2.35, y: 0.62, height: 0.07 },
+    ],
+    front: [{ view: 'side', logo: 'total', x: 2.5, y: 0.26, height: 0.05 }],
+  },
 };
 
+const FI_SAFFRON = '#F08A1D';
+const FI_GREEN = '#1A8A4A';
+const FI_SILVER = '#E6E8EA';
 const FORCEINDIA: Livery = {
   id: 'forceindia-2014',
   name: 'Force India',
@@ -207,43 +238,53 @@ const FORCEINDIA: Livery = {
   team: 'Sahara Force India F1 Team',
   price: 170,
   primary: '#111114',
-  secondary: '#F08A1D',
-  glow: '#F08A1D',
+  secondary: FI_SAFFRON,
+  glow: FI_SAFFRON,
   sidepod: 'hybrid',
   finish: 'gloss',
   helmet: '#E8E8E8',
   parts: parts(BLACK, BLACK, BLACK),
-  frontParts: { wing: BLACK, flap: '#E6E8EA', endplate: BLACK },
+  frontParts: { wing: BLACK, flap: FI_SILVER, endplate: BLACK },
   top: [
-    // the silver-white nose and chassis top, saffron sidepod tops behind the inlets, a green band ahead of the rear wing
-    { color: '#E6E8EA', points: noseCapShape(0.4, 2.75, 0.24) },
-    ...podBand('#F08A1D', 0.9, -0.9, 0.2, 0.7),
-    { color: '#1A8A4A', points: stripe(-1.4, -1.9, 0.14) },
+    // the silver nose and chassis top, a saffron airbox top, a green band at the back of the engine cover
+    { color: FI_SILVER, path: 'M2.75 0.08 C2.2 0.16 1.4 0.22 0.4 0.24 L0.4 -0.24 C1.4 -0.22 2.2 -0.16 2.75 -0.08 Z' },
+    { color: FI_SAFFRON, path: 'M0.06 0.12 C-0.1 0.14 -0.35 0.13 -0.5 0.08 L-0.5 -0.08 C-0.35 -0.13 -0.1 -0.14 0.06 -0.12 Z' },
+    { color: FI_GREEN, path: 'M-1.3 0.16 C-1.5 0.15 -1.7 0.13 -1.9 0.1 L-1.9 -0.1 C-1.7 -0.13 -1.5 -0.15 -1.3 -0.16 Z' },
   ],
   side: [
-    // the silver-white nose flank, the saffron sidepod with Sahara, a green stripe along the cover, black everywhere else
-    { color: '#E6E8EA', points: [[1.0, 0.3], [1.0, 0.62], [0.2, 0.64], [2.75, 0.34], [2.75, 0.22], [1.3, 0.3]] },
-    { color: '#F08A1D', points: [[1.0, 0.2], [1.0, 0.56], [-0.2, 0.58], [-1.0, 0.44], [-1.0, 0.2]] },
-    { color: '#1A8A4A', points: [[-1.0, 0.58], [-0.4, 0.64], [-2.2, 0.56], [-2.2, 0.5]] },
-    { color: '#E6E8EA', points: flank(AIRBOX[0], -0.6, 0.84, ABOX_Y[1]) },
+    // the silver nose and chassis, its edge sweeping down to the front of the sidepod
+    { color: FI_SILVER, path: 'M2.75 0.2 L2.75 0.36 C2.0 0.5 1.3 0.62 0.6 0.66 C0.6 0.5 0.8 0.36 1.0 0.3 C1.6 0.26 2.2 0.22 2.75 0.2 Z' },
+    // the saffron and green sweeps along the sidepod (the Indian tricolor, white being the silver)
+    { color: FI_SAFFRON, path: 'M1.0 0.48 C0.5 0.62 -0.3 0.66 -1.0 0.62 L-1.0 0.56 C-0.3 0.6 0.5 0.56 1.0 0.42 Z' },
+    { color: FI_GREEN, path: 'M1.0 0.2 C0.5 0.22 -0.3 0.24 -1.6 0.3 L-1.6 0.25 C-0.3 0.19 0.5 0.17 1.0 0.15 Z' },
+    { color: FI_GREEN, path: 'M-0.9 0.62 C-1.3 0.6 -1.8 0.54 -2.2 0.48 L-2.2 0.44 C-1.8 0.5 -1.3 0.56 -0.9 0.58 Z' },
   ],
-  texts: [
-    sideText('SAHARA', 0.2, 0.4, 0.085, WHITE),
-    sideText('FORCE INDIA', 0.3, 0.28, 0.035, WHITE),
-    sideText('KINGFISHER', -0.6, 0.72, 0.04, WHITE),
-    sideText('SMIRNOFF', -1.5, 0.36, 0.04, WHITE),
-    sideText('CLARO', 1.9, 0.42, 0.04, BLACK),
-    sideText('11', 1.5, 0.5, 0.08, BLACK),
-    sideText('WHYTE & MACKAY', -0.6, 0.9, 0.028, BLACK),
-    topText('SAHARA', 1.9, 0, 0.05, BLACK),
-    topText('11', 1.4, 0, 0.09, BLACK),
-    wingText('SMIRNOFF', -2.35, 0, 0.065, WHITE),
-    wingText('CLARO', 2.7, 0.45, 0.055, BLACK, 'front'),
-    wingText('CLARO', 2.7, -0.45, 0.055, BLACK, 'front'),
+  decals: [
+    { view: 'side', logo: 'sahara', x: -0.3, y: 0.37, height: 0.11 },
+    { view: 'side', logo: 'royal-challenge', x: 0.62, y: 0.38, height: 0.06 },
+    { view: 'side', logo: 'kingfisher', x: -0.75, y: 0.72, height: 0.03 },
+    { view: 'side', logo: 'claro', x: 1.8, y: 0.42, height: 0.035, colors: { main: '#111111' } },
+    { view: 'side', logo: 'smirnoff', x: -1.45, y: 0.4, height: 0.025 },
+    { view: 'side', logo: 'whyte-mackay', x: -0.4, y: 0.88, height: 0.018 },
+    { view: 'side', logo: 'astana', x: 2.3, y: 0.3, height: 0.022 },
+    // on top: Sahara on the nose, Smirnoff on the rear wing, Claro across the front flaps
+    { view: 'top', logo: 'sahara', x: 1.95, y: 0, height: 0.045, rotate: 180, colors: { main: '#111111' } },
+    { view: 'top', logo: 'smirnoff', x: -2.35, y: 0, height: 0.055, orient: 'across-rear' },
+    { view: 'top', logo: 'claro', x: 2.7, y: 0.45, height: 0.05, orient: 'across-front' },
+    { view: 'top', logo: 'claro', x: 2.7, y: -0.45, height: 0.05, orient: 'across-front' },
   ],
-  plateTexts: { rear: [plateText('KINGFISHER', -2.35, 0.8, 0.045, WHITE), plateText('SAHARA', -2.35, 0.64, 0.05, '#F08A1D')], front: [plateText('CLARO', 2.5, 0.26, 0.05, WHITE)] },
+  texts: numbers('11', { x: 1.5, y: 0.48, h: 0.07, color: '#111111' }, { x: 1.45, color: '#111111' }),
+  plateDecals: {
+    rear: [
+      { view: 'side', logo: 'roshfrans', x: -2.35, y: 0.8, height: 0.04, colors: { main: FI_SAFFRON } },
+      { view: 'side', logo: 'kingfisher', x: -2.35, y: 0.66, height: 0.035 },
+    ],
+    front: [{ view: 'side', logo: 'royal-challenge', x: 2.5, y: 0.26, height: 0.05 }],
+  },
 };
 
+const LOTUS_GOLD = '#C9A227';
+const LOTUS_RED = '#C8102E';
 const LOTUS: Livery = {
   id: 'renault-2014', // the save key from before this livery was drawn as the Lotus E22 (Renault-engined); never renamed
   name: 'Lotus',
@@ -251,44 +292,65 @@ const LOTUS: Livery = {
   team: 'Lotus F1 Team',
   price: 200,
   primary: '#111111',
-  secondary: '#C9A227',
-  glow: '#C9A227',
+  secondary: LOTUS_GOLD,
+  glow: LOTUS_GOLD,
   sidepod: 'hybrid',
   finish: 'gloss',
   helmet: '#E10600',
-  parts: parts(BLACK, BLACK, '#C8102E'),
-  frontParts: { wing: BLACK, flap: '#C8102E', endplate: BLACK },
+  parts: parts(BLACK, BLACK, LOTUS_RED),
+  frontParts: { wing: BLACK, flap: LOTUS_RED, endplate: BLACK },
   top: [
-    // black with gold pinstripes along the nose and over the sidepods, the red airbox top
-    { color: '#C9A227', points: stripe(0.3, 2.75, 0.02) },
-    ...podBand('#C9A227', 0.9, -1.2, 0.5, 0.53),
-    { color: '#C8102E', points: stripe(0.06, -0.4, 0.12) },
+    // black with gold pinstripes along the nose and the sidepods, the red airbox top
+    { color: LOTUS_GOLD, path: 'M2.75 0.012 L0.3 0.012 L0.3 -0.012 L2.75 -0.012 Z' },
+    { color: LOTUS_GOLD, symmetric: true, path: 'M0.9 0.48 C0.4 0.56 -0.4 0.58 -1.2 0.48 L-1.2 0.465 C-0.4 0.565 0.4 0.545 0.9 0.465 Z' },
+    { color: LOTUS_RED, path: 'M0.06 0.12 C-0.1 0.14 -0.3 0.13 -0.42 0.08 L-0.42 -0.08 C-0.3 -0.13 -0.1 -0.14 0.06 -0.12 Z' },
   ],
   side: [
-    // gold lines along the nose and the lower sidepod, the red airbox and the red PDVSA flash on the engine cover
-    { color: '#C9A227', points: [[1.0, 0.44], [1.0, 0.47], [2.75, 0.32], [2.75, 0.29]] },
-    { color: '#C9A227', points: flank(L.podFront, L.podRear, 0.2, 0.225) },
-    { color: '#C8102E', points: flank(AIRBOX[0], -0.4, 0.78, ABOX_Y[1]) },
-    { color: '#C8102E', points: [[-0.5, 0.7], [-0.5, 0.78], [-1.2, 0.7], [-1.2, 0.62]] },
+    // the gold pinstripes along the nose and the lower sidepod, the gold swoosh on the engine cover, the red airbox
+    { color: LOTUS_GOLD, path: 'M2.73 0.29 C2.2 0.36 1.6 0.42 1.0 0.46 L1.0 0.475 C1.6 0.435 2.2 0.375 2.73 0.305 Z' },
+    { color: LOTUS_GOLD, path: 'M1.0 0.21 C0.4 0.215 -0.8 0.225 -2.1 0.27 L-2.1 0.28 C-0.8 0.235 0.4 0.225 1.0 0.22 Z' },
+    { stroke: { color: LOTUS_GOLD, width: 0.012 }, path: 'M-0.3 0.84 C-0.5 0.72 -0.8 0.64 -1.45 0.62' },
+    { stroke: { color: LOTUS_GOLD, width: 0.008 }, path: 'M-0.38 0.58 C-0.6 0.6 -0.9 0.6 -1.4 0.58' },
+    { color: LOTUS_RED, path: 'M0.06 0.76 L0.06 0.99 L-0.4 0.98 C-0.42 0.9 -0.44 0.82 -0.46 0.76 Z' },
   ],
-  texts: [
-    sideText('EMC', -0.3, 0.36, 0.1, WHITE),
-    sideText('BURN', 0.55, 0.5, 0.045, WHITE),
-    sideText('PDVSA', -0.85, 0.7, 0.04, WHITE),
-    sideText('TOTAL', 0.6, 0.32, 0.035, WHITE),
-    sideText('RICHARD MILLE', 1.5, 0.4, 0.03, WHITE),
-    sideText('8', 2.0, 0.3, 0.07, WHITE),
-    sideText('RENAULT', -1.3, 0.56, 0.04, '#C9A227'),
-    sideText('MICROSOFT', -1.5, 0.4, 0.03, WHITE),
-    topText('EMC', 1.7, 0, 0.055, WHITE),
-    topText('8', 2.2, 0, 0.06, WHITE),
-    wingText('PDVSA', -2.35, 0, 0.08, WHITE),
-    wingText('BURN', 2.7, 0.45, 0.05, WHITE, 'front'),
-    wingText('BURN', 2.7, -0.45, 0.05, WHITE, 'front'),
+  decals: [
+    { view: 'side', logo: 'emc', x: -0.25, y: 0.36, height: 0.1 },
+    { view: 'side', logo: 'sure', x: -0.85, y: 0.66, height: 0.05 },
+    { view: 'side', logo: 'saxo-bank', x: -0.95, y: 0.36, height: 0.085 },
+    { view: 'side', logo: 'renault', x: -1.45, y: 0.52, height: 0.03, colors: { main: LOTUS_GOLD } },
+    { view: 'side', logo: 'microsoft', x: -1.6, y: 0.4, height: 0.022 },
+    { view: 'side', logo: 'emaar', x: 0.55, y: 0.56, height: 0.022 },
+    { view: 'side', logo: 'richard-mille', x: 1.45, y: 0.42, height: 0.02 },
+    { view: 'side', logo: 'total', x: 0.6, y: 0.3, height: 0.03 },
+    { view: 'side', logo: 'burn', x: 1.85, y: 0.34, height: 0.025 },
+    // on top: the roundel and EMC on the nose, PDVSA on the rear wing, Burn across the front flaps
+    { view: 'top', logo: 'lotus-roundel', x: 2.45, y: 0, height: 0.07 },
+    { view: 'top', logo: 'emc', x: 1.85, y: 0, height: 0.05, rotate: 180 },
+    { view: 'top', logo: 'pdvsa', x: -2.35, y: 0, height: 0.07, orient: 'across-rear' },
+    { view: 'top', logo: 'burn', x: 2.7, y: 0.45, height: 0.045, orient: 'across-front' },
+    { view: 'top', logo: 'burn', x: 2.7, y: -0.45, height: 0.045, orient: 'across-front' },
   ],
-  plateTexts: { rear: [plateText('PDVSA', -2.35, 0.8, 0.07, WHITE), plateText('MICROSOFT', -2.35, 0.64, 0.04, WHITE)], front: [plateText('TOTAL', 2.5, 0.26, 0.05, WHITE)] },
+  texts: numbers('8', { x: 1.95, y: 0.32, h: 0.07, color: WHITE }, { x: 1.4, color: WHITE }),
+  plateDecals: {
+    rear: [
+      { view: 'side', logo: 'pdvsa', x: -2.35, y: 0.8, height: 0.06 },
+      { view: 'side', logo: 'microsoft', x: -2.35, y: 0.64, height: 0.03 },
+    ],
+    front: [{ view: 'side', logo: 'total', x: 2.5, y: 0.26, height: 0.045 }],
+  },
 };
 
+const MARTINI_LIGHT = '#58B4F0';
+const MARTINI_NAVY = '#0B3D91';
+const MARTINI_RED = '#E10600';
+/** The Martini stripes: light blue, navy, red, navy, light blue, as bands of a path (along the car, from a centre line). */
+function martiniStripes(points: (w: number) => string): LiveryLayer[] {
+  return [
+    { color: MARTINI_LIGHT, path: points(1) },
+    { color: MARTINI_NAVY, path: points(0.62) },
+    { color: MARTINI_RED, path: points(0.28) },
+  ];
+}
 const WILLIAMS: Livery = {
   id: 'williams-2014',
   name: 'Williams',
@@ -302,39 +364,43 @@ const WILLIAMS: Livery = {
   helmet: '#E8E8E8',
   parts: parts(BLACK, BLACK, BLACK),
   top: [
-    // the Martini stripes down the middle of the car from nose to tail: light blue, navy, red, navy, light blue
-    { color: '#58B4F0', points: stripe(L.tail, L.nose, 0.07) },
-    { color: '#0B3D91', points: stripe(L.tail, L.nose, 0.05) },
-    { color: '#E10600', points: stripe(L.tail, L.nose, 0.02) },
+    // the Martini stripes down the middle of the car from the nose to the tail
+    ...martiniStripes((w) => `M2.75 ${0.06 * w} L-2.3 ${0.06 * w} L-2.3 ${-0.06 * w} L2.75 ${-0.06 * w} Z`),
   ],
   side: [
-    // the stripes over the engine cover seen from the side, and along the top of the nose
-    { color: '#58B4F0', points: [[-0.5, 0.94], [-1.2, 0.86], [-2.2, 0.56], [-2.2, 0.5], [-1.2, 0.8], [-0.5, 0.88]] },
-    { color: '#0B3D91', points: [[-0.5, 0.9], [-1.2, 0.83], [-2.2, 0.53], [-2.2, 0.51], [-1.2, 0.81], [-0.5, 0.88]] },
-    { color: '#E10600', points: [[-0.5, 0.92], [-1.2, 0.845], [-2.2, 0.545], [-2.2, 0.535], [-1.2, 0.835], [-0.5, 0.91]] },
-    { color: '#58B4F0', points: [[1.3, 0.5], [1.3, 0.54], [2.75, 0.34], [2.75, 0.3]] },
-    { color: '#E10600', points: [[1.3, 0.515], [1.3, 0.525], [2.75, 0.325], [2.75, 0.315]] },
+    // the stripes over the engine cover seen from the side, and along the top of the nose and the sidepod
+    ...martiniStripes((w) => `M-0.5 ${0.915 + 0.025 * w} C-1.0 ${0.86 + 0.025 * w} -1.6 ${0.7 + 0.025 * w} -2.25 ${0.51 + 0.025 * w} L-2.25 ${0.51 - 0.025 * w} C-1.6 ${0.7 - 0.025 * w} -1.0 ${0.86 - 0.025 * w} -0.5 ${0.915 - 0.025 * w} Z`),
+    ...martiniStripes((w) => `M2.73 ${0.32 + 0.022 * w} C2.0 ${0.42 + 0.022 * w} 1.0 ${0.5 + 0.022 * w} 0.0 ${0.52 + 0.022 * w} C-0.6 ${0.5 + 0.022 * w} -1.2 ${0.38 + 0.022 * w} -2.0 ${0.28 + 0.022 * w} L-2.0 ${0.28 - 0.022 * w} C-1.2 ${0.38 - 0.022 * w} -0.6 ${0.5 - 0.022 * w} 0.0 ${0.52 - 0.022 * w} C1.0 ${0.5 - 0.022 * w} 2.0 ${0.42 - 0.022 * w} 2.73 ${0.32 - 0.022 * w} Z`),
+    floorEdge(0.14),
   ],
-  texts: [
-    sideText('MARTINI', -0.5, 0.32, 0.09, '#0B3D91'),
-    sideText('PDVSA', -1.4, 0.56, 0.045, '#E10600'),
-    sideText('RANDSTAD', 0.5, 0.56, 0.035, '#0B3D91'),
-    sideText('EXPERIAN', 1.7, 0.4, 0.035, '#0B3D91'),
-    sideText('ORIS', 2.2, 0.28, 0.04, '#0B3D91'),
-    sideText('19', 1.3, 0.5, 0.08, '#0B3D91'),
-    sideText('PETROBRAS', 0.4, 0.14, 0.035, '#0B3D91'),
-    topText('MARTINI', 1.0, 0.1, 0.04, '#0B3D91'),
-    topText('19', 1.5, 0.12, 0.07, '#0B3D91'),
-    wingText('MARTINI', -2.35, 0, 0.09, WHITE),
-    wingText('MARTINI', 2.7, 0.45, 0.055, '#0B3D91', 'front'),
-    wingText('MARTINI', 2.7, -0.45, 0.055, '#0B3D91', 'front'),
+  decals: [
+    { view: 'side', logo: 'martini', x: -0.8, y: 0.66, height: 0.11 },
+    { view: 'side', logo: 'petrobras', x: -0.25, y: 0.36, height: 0.045 },
+    { view: 'side', logo: 'randstad', x: 0.55, y: 0.6, height: 0.028 },
+    { view: 'side', logo: 'experian', x: 0.55, y: 0.4, height: 0.035 },
+    { view: 'side', logo: 'genworth', x: -1.2, y: 0.25, height: 0.025 },
+    { view: 'side', logo: 'wihuri', x: -1.5, y: 0.46, height: 0.025 },
+    { view: 'side', logo: 'oris', x: 1.9, y: 0.3, height: 0.035 },
+    // on top: Oris and Experian on the nose, MARTINI on the rear wing and across the front flaps
+    { view: 'top', logo: 'oris', x: 2.2, y: 0.15, height: 0.035, rotate: 180 },
+    { view: 'top', logo: 'experian', x: 1.7, y: 0.15, height: 0.03, rotate: 180 },
+    { view: 'top', logo: 'martini', x: -2.35, y: 0, height: 0.07, orient: 'across-rear' },
+    { view: 'top', logo: 'martini', x: 2.7, y: 0.45, height: 0.05, orient: 'across-front' },
+    { view: 'top', logo: 'martini', x: 2.7, y: -0.45, height: 0.05, orient: 'across-front' },
   ],
+  texts: numbers('19', { x: 1.3, y: 0.44, h: 0.07, color: MARTINI_NAVY }, { x: 1.4, color: MARTINI_NAVY }),
   wingTop: [
-    { color: '#58B4F0', points: [[-2.44, -0.37], [-2.44, 0.37], [-2.47, 0.37], [-2.47, -0.37]] },
-    { color: '#E10600', points: [[-2.47, -0.37], [-2.47, 0.37], [-2.5, 0.37], [-2.5, -0.37]] },
-    { color: '#0B3D91', points: [[-2.5, -0.37], [-2.5, 0.37], [-2.52, 0.37], [-2.52, -0.37]] },
+    { color: MARTINI_LIGHT, points: [[-2.44, -0.37], [-2.44, 0.37], [-2.47, 0.37], [-2.47, -0.37]] },
+    { color: MARTINI_RED, points: [[-2.47, -0.37], [-2.47, 0.37], [-2.5, 0.37], [-2.5, -0.37]] },
+    { color: MARTINI_NAVY, points: [[-2.5, -0.37], [-2.5, 0.37], [-2.52, 0.37], [-2.52, -0.37]] },
   ],
-  plateTexts: { rear: [plateText('MARTINI', -2.35, 0.8, 0.06, WHITE), plateText('PDVSA', -2.35, 0.64, 0.05, '#E10600')], front: [plateText('RANDSTAD', 2.5, 0.26, 0.04, WHITE)] },
+  plateDecals: {
+    rear: [
+      { view: 'side', logo: 'martini', x: -2.35, y: 0.8, height: 0.06 },
+      { view: 'side', logo: 'genworth', x: -2.35, y: 0.66, height: 0.025, colors: { main: WHITE } },
+    ],
+    front: [{ view: 'side', logo: 'randstad', x: 2.5, y: 0.26, height: 0.03, colors: { main: WHITE } }],
+  },
 };
 
 export const LIVERIES_GEN2014: readonly Livery[] = [FERRARI, MERCEDES, MCLAREN, REDBULL, FORCEINDIA, LOTUS, WILLIAMS];

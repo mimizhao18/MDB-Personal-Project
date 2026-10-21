@@ -110,3 +110,19 @@ sizes); a third for the Cadillac (TWG straddled the sidepod crease).
 
 Average after: 7.6. Numbers are the drivers in the reference photos or the 2026 race numbers (Leclerc 16, Russell 63,
 Piastri 81, Verstappen 3, Lawson 30, Colapinto 43, Alonso 14, Albon 23, Bearman 87, Hulkenberg 27, Bottas 77).
+
+## 2014, all seven (checkpoint-livery-2014)
+
+Pictures: docs/livery-detail/gen2014/before.jpg, after.jpg, <id>.jpg. Two rounds each, three for Red Bull and Lotus.
+
+| Livery | Before | After | What changed |
+|---|---|---|---|
+| ferrari-2014 (F14 T) | 7 | 7.5 | pecten with white keyline, UPS shield, the white Scuderia Ferrari wedge, white Santander box low on the pod, Fiat badge, Kaspersky, Weichai |
+| mercedes-2014 (W05) | 7.5 | 7.5 | curved teal sweep, Petronas with its drop, BlackBerry keys, the star, 44 in red |
+| mclaren-2014 (MP4-29) | 7 | 7.5 | the late-season chrome fading through halftone dots into black, SAP box, Johnnie Walker's striding man, asos.com |
+| redbull-2014 (RB10) | 7 | 7.5 | purple sheen over the navy, the Red Bull logo on the cover, INFINITI with its oval, TOTAL boxes, the Renault diamond |
+| forceindia-2014 (VJM07) | 7 | 7.5 | silver front sweeping down to the pod, saffron and green sweeps, SAHARA with the forceindia script, Royal Challenge, Roshfrans |
+| renault-2014 (Lotus E22) | 7 | 7.5 | gold pinstripes along the nose, pod and cover, red airbox, EMC, Sure, Saxo Bank box, PDVSA boxes on the rear wing |
+| williams-2014 (FW36) | 7.5 | 8 | Martini stripes along the nose, the pod and the cover, the Martini ball and bar, Petrobras, Experian, Oris |
+
+Average after: 7.6.
