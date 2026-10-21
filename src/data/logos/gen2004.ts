@@ -7,7 +7,7 @@ const W = '#FFFFFF';
 
 /** Vodafone: the red disc with the white speech mark, and the name. */
 function vodafone(withName: boolean): Logo {
-  const w = withName ? measure('vodafone', { weight: 600 }) : 0;
+  const w = withName ? measure('vodafone', { weight: 600, size: 64 }) : 0;
   return {
     id: withName ? 'vodafone' : 'vodafone-mark',
     name: withName ? 'Vodafone' : 'Vodafone (mark)',
@@ -36,7 +36,7 @@ function bridgestone(): Logo {
 
 /** West: the name with the zigzag W (the tobacco brand on the 2004 McLaren). */
 function west(): Logo {
-  const w = measure('est', { weight: 900 });
+  const w = measure('est', { weight: 900, size: 76 });
   return {
     id: 'west',
     name: 'West',
@@ -84,7 +84,7 @@ const BMW: Logo = {
 
 /** Mild Seven: the blue swoosh in a white disc, and the name. */
 function mildSeven(): Logo {
-  const w = measure('MILD SEVEN', { weight: 800 });
+  const w = measure('MILD SEVEN', { weight: 800, size: 64 });
   return {
     id: 'mild-seven',
     name: 'Mild Seven',
@@ -140,7 +140,7 @@ function hsbc(withName: boolean): Logo {
 
 /** AT&T: the striped globe and the name. */
 function att(): Logo {
-  const w = measure('AT&T', { weight: 800 });
+  const w = measure('AT&T', { weight: 800, size: 62 });
   return {
     id: 'att-globe',
     name: 'AT&T (globe)',
@@ -170,7 +170,7 @@ const JAGUAR_LEAPER: Logo = {
 
 /** Toyota: the three ellipses, and the name. */
 function toyota(withName: boolean): Logo {
-  const w = withName ? measure('TOYOTA', { weight: 800, tracking: 6 }) : 0;
+  const w = withName ? measure('TOYOTA', { weight: 800, tracking: 6, size: 56 }) : 0;
   return {
     id: withName ? 'toyota' : 'toyota-emblem',
     name: withName ? 'Toyota' : 'Toyota (emblem)',

@@ -126,3 +126,19 @@ Pictures: docs/livery-detail/gen2014/before.jpg, after.jpg, <id>.jpg. Two rounds
 | williams-2014 (FW36) | 7.5 | 8 | Martini stripes along the nose, the pod and the cover, the Martini ball and bar, Petrobras, Experian, Oris |
 
 Average after: 7.6.
+
+## 2004, all seven (checkpoint-livery-2004)
+
+Pictures: docs/livery-detail/gen2004/before.jpg, after.jpg, <id>.jpg. Two rounds each, three for Ferrari and BAR.
+
+| Livery | Before | After | What changed |
+|---|---|---|---|
+| ferrari-2004 (F2004) | 7.5 | 8 | the white Vodafone roundel with the red speech mark, Shell pecten, the white engine cover wedge and lower front pod panel with its red line, the shield; V-Power, Bridgestone, AMD and Vodafone on the rear plates |
+| mclaren-2004 (MP4-19) | 7 | 7.5 | darker metallic silver shading, black rear with a red line, West with its zigzag W, Siemens, SAP box and Mobil 1 down the nose, the star at its tip |
+| williams-2004 (FW26) | 7.5 | 7.5 | navy pods and lower nose, white HP disc, Castrol box, Budweiser, Reuters and Hamleys on the nose, FedEx and HP boxes on the front wing, BMW roundel |
+| renault-2004 (R24) | 7.5 | 7.5 | yellow nose and pod fronts, Mild Seven with its swoosh, elf triangle, the Renault diamond, Telefonica on the rear wing |
+| bar-2004 (006) | 7 | 7.5 | the Lucky Strike target roundel, red airbox, khaki Intercond band, black rear cover, red Honda, Ray-Ban script |
+| jaguar-2004 (R5) | 7 | 7.5 | the HSBC hexagon big on the pod, the leaping cat, AT&T globe, silver lower body with its red line, Beck's |
+| toyota-2004 (TF104) | 7 | 7.5 | the red brush strokes with rough edges over the pod and along the nose, Panasonic, the three-ellipse emblem, Denso, Esso |
+
+Average after: 7.6.
