@@ -17,7 +17,7 @@ disappears or a generation's livery count changes. Lint, typecheck and the rule 
 |---|---|---|---|
 | 2022 | done | 7.5 | `checkpoint-2022-liveries` (model: `checkpoint-2022-model`) |
 | 2026 | done | 7.5 | `checkpoint-2026-liveries` (model: `checkpoint-2026-model`) |
-| 2014 | done | 7 | `checkpoint-2014` |
+| 2014 | done (redone as the 2014 cars in the morning) | 7 | `checkpoint-2014-v2` (the 2018 version: `checkpoint-2014`) |
 | 2004 | done | 7 | `checkpoint-2004` |
 | 1980s | done | 7 | `checkpoint-1980s` |
 
@@ -65,14 +65,16 @@ Drawn to the 2026 rules (3400 mm wheelbase, 1900 wide, tyres 25 / 30 mm narrower
 and a flat rear deck, a slim engine cover with a fin, a three-element rear wing on one pillar. Still weak: the
 active flap sections have slightly wide gaps; the pod inlet is a plain dark ellipse.
 
-### 2014 (reference: 2018 Mercedes W09)
+### 2014 (reference: Mercedes F1 W05 Hybrid)
 
 Done. Final score 7. [gen2014/before.jpg](gen2014/before.jpg), [gen2014/final-model.jpg](gen2014/final-model.jpg),
 [gen2014/liveries-final.jpg](gen2014/liveries-final.jpg).
 
-Open-spoke 13-inch wheels with tall sidewalls (they were covered), the 1.8 m front wing, a wider floor, the T-wing
-removed (banned in 2018), a low shark fin, the rear wing shrunk into its 950 x 950 mm box on a single pillar, the halo
-on the halo slot. Still weak: the bargeboards are a stack of flat plates; the thumb nose is simpler than the real one.
+Redone in the morning as the real 2014 car after the overnight pass had drawn it as the 2018 W09: no halo, the low
+finger nose on pylons, the 1.65 m front wing, the 750 mm rear wing with no beam wing, 245 / 325 tyres on open-spoke
+13-inch wheels, a 1.8 m car, small turning vanes, no shark fin, a single central exhaust. The 2018 version stays in git
+at `checkpoint-2014` and in gen2014/as-2018/. Still weak: the sidepod inlets are plain; the nose tip is a smooth
+taper rather than the W05's stepped finger.
 
 ### 2004 (reference: Ferrari F2004)
 
@@ -110,13 +112,13 @@ Before and after scores (of 10) against the photos in reference/<generation>/liv
 | haas-2022 | 6 | 7 | haas-2026 | 5 | 7 |
 | williams-2022 | 5 | 6.5 | audi-2026 | 4 | 7 |
 | | | | cadillac-2026 | 4 | 7 |
-| ferrari-2014 | 6 | 7 | ferrari-2004 | 6 | 7.5 |
-| mercedes-2014 | 4 | 7.5 | mclaren-2004 | 5 | 7 |
-| mclaren-2014 | 5 | 7 | williams-2004 | 5 | 7.5 |
-| redbull-2014 | 6 | 7 | renault-2004 | 5 | 7.5 |
-| forceindia-2014 | 5 | 7 | bar-2004 | 5 | 7 |
-| renault-2014 | 5 | 7 | jaguar-2004 | 5 | 7 |
-| williams-2014 | 5 | 7.5 | toyota-2004 | 5 | 7 |
+| ferrari-2014 (F14 T) | 6 | 7 | ferrari-2004 | 6 | 7.5 |
+| mercedes-2014 (W05) | 4 | 7.5 | mclaren-2004 | 5 | 7 |
+| mclaren-2014 (MP4-29) | 5 | 7 | williams-2004 | 5 | 7.5 |
+| redbull-2014 (RB10) | 6 | 7 | renault-2004 | 5 | 7.5 |
+| forceindia-2014 (VJM07) | 5 | 7 | bar-2004 | 5 | 7 |
+| renault-2014 (Lotus E22) | 5 | 7 | jaguar-2004 | 5 | 7 |
+| williams-2014 (FW36) | 5 | 7.5 | toyota-2004 | 5 | 7 |
 | ferrari-1980s | 5 | 7 | benetton-1980s | 3 | 7 |
 | mclaren-1980s | 6 | 8 | lotuscamel-1980s | 6 | 7.5 |
 | lotus-1980s | 6 | 7 | brabham-1980s | 3 | 7 |
@@ -144,9 +146,10 @@ Every livery keeps its id, name, team, era and price.
 
 ## Decisions taken on your behalf
 
-- **2014 is drawn as the 2018 W09, not the 2014 W05.** This generation's liveries are the 2018 ones (BWT Force India,
-  Williams Martini, Aston Martin Red Bull, papaya McLaren) and its model has a halo, so a 2014 car would not fit them.
-  The real wheelbase (3.73 m) is kept at 3.6 so the comparison screen stays honest against the 2022 car.
+- **2014 is the real 2014 car with 2014 liveries** (your morning instruction; the overnight pass had used the 2018
+  W09 and 2018 liveries because the generation's model carried a halo). The livery ids are unchanged; `renault-2014`
+  now draws the Renault-engined Lotus E22, since Renault had no works team in 2014. The era label reads "First V6
+  turbo-hybrid season".
 - **2026 front wing has three elements, not two.** The 2026 Chinese GP photos show three; the rule check was updated
   from "two elements" to "fewer than the 2022 car's four". The 2022-vs-2026 front wing width check was corrected from
   240 mm to the regulation 100 mm.

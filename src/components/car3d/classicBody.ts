@@ -12,8 +12,8 @@ import { arm, box, loftGeometry, plateGeometry, rod } from './parts';
 //    windscreen, tall box radiator pods with upright inlets, a blade of a roll hoop and a narrow tall engine cover.
 //  - 2004: a slim, high-nosed cigar with a very narrow tail, a tall periscope airbox, round pillow sidepods with
 //    big scoop inlets high beside the driver, and an open cockpit with the helmet showing.
-//  - 2014: a wide, busy car with a halo, a thick hammer-head nose, huge sidepod mouths over a deep undercut,
-//    a narrow engine cover, and floor-edge fences and winglets everywhere.
+//  - 2014: a wide car with a low finger nose on pylons, big sidepod mouths over a deep undercut, a plain engine
+//    cover with a single exhaust in the tail, small turning vanes and floor-edge fences, no halo.
 
 type Mat = THREE.Material;
 
@@ -234,14 +234,14 @@ function body2004(c: BodyContext) {
 function body2014(c: BodyContext) {
   const { car, m, paint, spec } = c;
 
-  // a thick, high nose with a hammer-head tip, dropping into the wide monocoque
+  // the low 2014 nose: a slim finger tip ahead of the pylons, rising into the wide monocoque
   car.add(
     loft(
       {
-        x: [2.82, 2.72, 2.52, 2.2, 1.85, 1.5, 1.1, 0.8, 0.45, 0.15, -0.15],
-        hw: [0.09, 0.12, 0.135, 0.15, 0.165, 0.185, 0.205, 0.235, 0.25, 0.26, 0.22],
-        bottom: [0.34, 0.33, 0.3, 0.26, 0.22, 0.18, 0.14, 0.12, 0.1, 0.1, 0.1],
-        top: [0.44, 0.48, 0.5, 0.53, 0.56, 0.6, 0.63, 0.66, 0.68, 0.72, 0.74],
+        x: [2.75, 2.65, 2.45, 2.2, 1.85, 1.5, 1.1, 0.8, 0.45, 0.15, -0.15],
+        hw: [0.05, 0.08, 0.11, 0.14, 0.16, 0.18, 0.2, 0.23, 0.25, 0.26, 0.22],
+        bottom: [0.17, 0.18, 0.2, 0.2, 0.19, 0.17, 0.14, 0.12, 0.1, 0.1, 0.1],
+        top: [0.25, 0.29, 0.36, 0.44, 0.5, 0.56, 0.61, 0.65, 0.68, 0.72, 0.74],
         squareness: [0.9, 0.85, 0.8, 0.75, 0.72, 0.7, 0.66, 0.64, 0.64, 0.66, 0.7],
       },
       paint,
@@ -249,8 +249,6 @@ function body2014(c: BodyContext) {
       32,
     ),
   );
-  // the thumb: the drooping tip of the nose
-  car.add(ellipsoid(0.16, 0.06, 0.1, paint, 2.78, 0.38, 0));
   // the cockpit, the dark seat and the steering wheel; the driver's helmet just shows
   car.add(ellipsoid(spec.details.cockpit.rx, 0.045, spec.details.cockpit.rz, m.dark, spec.details.cockpit.x, spec.details.cockpit.y + 0.06, 0));
   addRim(c, spec.details.cockpit.x, spec.details.cockpit.y + 0.07, spec.details.cockpit.rimRx, spec.details.cockpit.rimRz);
@@ -288,7 +286,8 @@ function body2014(c: BodyContext) {
   );
   car.add(ellipsoid(0.04, 0.09, 0.075, m.dark, 0.04, 0.88, 0));
 
-  // the halo: a pillar up from the front of the cockpit and two arms back to the airbox
+  // the halo, only on generations that have one (2018 on)
+  if (spec.halo) {
   const haloMaterial = m.halo ?? m.carbon;
   const front = new THREE.CatmullRomCurve3([new THREE.Vector3(0.98, 0.68, 0), new THREE.Vector3(0.94, 0.8, 0), new THREE.Vector3(0.86, 0.9, 0)]);
   car.add(new THREE.Mesh(new THREE.TubeGeometry(front, 16, 0.032, 10), haloMaterial));
@@ -301,6 +300,7 @@ function body2014(c: BodyContext) {
       new THREE.Vector3(-0.3, 0.76, 0.2 * side),
     ]);
     car.add(new THREE.Mesh(new THREE.TubeGeometry(arc, 36, 0.03, 10), haloMaterial));
+  }
   }
 
   // wide sidepods: a huge oval mouth in the front, and a deep undercut from the inlet back

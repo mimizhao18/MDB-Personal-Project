@@ -222,3 +222,32 @@ Liveries (reference/gen1980s/liveries/<id>/, two or three photos each, all seven
 | benetton-1980s | 3 | 7 | it was blue: now the turquoise B186 with the white rear and coloured streaks, Sisley, Riello, black wings |
 | lotuscamel-1980s | 6 | 7.5 | Camel in blue on the pods, DeLonghi box, Honda, 12, elf on the rear wing |
 | brabham-1980s | 3 | 7 | it was white with a navy nose: now the navy BT52 with the white upper nose and cockpit, parmalat, Santal front wing |
+
+## 2014 generation, redone as the 2014 cars (checkpoint-2014-v2)
+
+Asked for in the morning: no halo, a 2014 car, 2014 liveries. The 2018 version is kept in git (checkpoint-2014) and
+its pictures in gen2014/as-2018/; its references moved to reference/gen2014-as-2018/.
+
+References: reference/gen2014/ (eight Commons photos of the Mercedes F1 W05 Hybrid) and dimensions.md (width 1800,
+height 950, front wing 1650, rear wing 750, no beam wing, 245 / 325 tyres on 13-inch rims, a low nose).
+
+Model: halo removed (classicBody only builds it when the spec says so), the low finger nose, the 1.65 m front wing,
+the 750 mm rear wing with no beam wing, a narrower floor, 2014 tyre widths on a 1.8 m car, three small turning vanes
+instead of the 2017 bargeboards, the shark fin gone, a single central exhaust.
+
+| Round | Proportions | Silhouette | Materials | Lighting |
+|---|---|---|---|---|
+| 1 (final) | 7 | 7 | 7 | 7.5 |
+
+Liveries (reference/gen2014/liveries/<id>/, three 2014 photos each). The save keys are unchanged; `renault-2014`
+now draws the Renault-engined Lotus E22 (Lotus F1 Team), since Renault had no works team in 2014.
+
+| Livery | Car | After | Notes |
+|---|---|---|---|
+| ferrari-2014 | Ferrari F14 T | 7 | Santander flashes, Shell roundel, UPS box, white cover panel with the shield, black rear wing |
+| mercedes-2014 | Mercedes W05 | 7.5 | silver with the teal Petronas sweep, BlackBerry, 44 in red |
+| mclaren-2014 | McLaren MP4-29 | 7 | chrome with the black engine cover and rear, red Santander bands, Johnnie Walker, asos rear wing |
+| redbull-2014 | Red Bull RB10 | 7 | yellow nose and airbox with the bulls, Infiniti, red Total end plates |
+| forceindia-2014 | Force India VJM07 | 7 | silver-white nose, saffron sidepods with Sahara, green band, black rear |
+| renault-2014 | Lotus E22 | 7 | black with gold pinstripes, red airbox, EMC, burn, red PDVSA rear wing end plates |
+| williams-2014 | Williams FW36 | 7.5 | white with the Martini stripes down the middle, Martini on the pods, striped rear wing |
