@@ -1,11 +1,14 @@
 // Dev only: a tiny local server that saves pictures (PNG or JPEG) posted by the /dev/car-views page (its "capture" mode) into
-// docs/car-realism/. Run with `node tools/shot-sink.mjs` while the web preview is open; it listens on port 8787.
-// It only writes files whose names are plain (letters, digits, dashes, underscores and slashes) under docs/car-realism.
+// docs/car-realism/ (or the docs folder named by SHOT_SINK_DIR, e.g. `SHOT_SINK_DIR=livery-detail`). Run with
+// `node tools/shot-sink.mjs` while the web preview is open; it listens on port 8787.
+// It only writes files whose names are plain (letters, digits, dashes, underscores and slashes) under that folder.
 import { createServer } from 'node:http';
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 
-const ROOT = resolve(process.cwd(), 'docs', 'car-realism');
+const DIR = process.env.SHOT_SINK_DIR ?? 'car-realism';
+if (!/^[A-Za-z0-9_-]+$/.test(DIR)) throw new Error('SHOT_SINK_DIR must be a plain folder name under docs/');
+const ROOT = resolve(process.cwd(), 'docs', DIR);
 const PORT = Number(process.env.SHOT_SINK_PORT ?? 8787);
 
 const server = createServer((req, res) => {
