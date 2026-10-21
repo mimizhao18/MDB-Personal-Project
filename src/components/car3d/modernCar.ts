@@ -194,7 +194,7 @@ export function buildModernCar(spec: CarSpec, livery: Livery, options: CarOption
       clearcoatRoughness: carbon ? 0.4 : matte ? 0.5 : 0.12,
       side: THREE.DoubleSide,
     });
-    applyLiveryPaint(material, pictures, carbon);
+    applyLiveryPaint(material, pictures, carbon, true);
     return material;
   };
   const wingMaterials = { wing: wingPaint(lightness(livery.parts.wing) < 0.12), flap: wingPaint(lightness(livery.parts.flap) < 0.12) };

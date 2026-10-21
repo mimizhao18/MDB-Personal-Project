@@ -359,6 +359,7 @@ export function drawLogo(pic: Picture, logo: Logo, m: Affine, colors?: Readonly<
       drawLogoText(pic, logo, s, m, colors, alpha);
       continue;
     }
+    if (s.when && !colors?.[s.when]) continue;
     const segs = transformSegs(parsePath(s.d), m);
     const a = alpha * (s.opacity ?? 1);
     const g = s.gradient;

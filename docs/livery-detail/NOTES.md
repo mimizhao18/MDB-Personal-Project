@@ -37,3 +37,23 @@ A running log of the pass, with the decisions taken along the way. The summary i
   livery uses the new tools. Budget from the brief: about 465 ms average.
 - Cache: the painted pixels of the last 3 liveries are kept (paint.ts), so going back to a car does not repaint it.
 - The 2D race icon (CarIcon.tsx) draws path layers too (gradients as their first color; outlines left out).
+
+## Step 3 and pilot: logo library and the 2022 Ferrari, Mercedes and Red Bull (checkpoint-livery-pilot)
+
+- Logo library in src/data/logos: `marks.ts` (team marks: Ferrari shield and horse, Mercedes star, Red Bull bulls),
+  `fuel.ts` (Shell pecten, V-Power), `sponsors.ts` (sponsors with a drawn mark), `wordmarks.ts` (lettering-only
+  sponsors in the Inter weight closest to the real typeface). `draw.ts` has the helpers (`wordmark()` sizes the box
+  to the text). A logo shape can be drawn only when a decal sets a slot (`when`), used for the Shell keyline.
+- `/dev/logos` paints every logo with the livery painter on light and dark; `&save=` posts a sheet to the sink.
+- `/dev/car-views?views=side,top,three-quarter&shoot=<folder>&queue=a,b` shoots livery after livery unattended;
+  `tools/compare.py` puts the renders beside a reference photo.
+- Shader: the wing elements now take their paint from the top picture only (`topOnly`). Their steep flap faces used
+  to pick up the side picture (the yellow Red Bull nose flank painted the inner front flaps).
+- The side projection paints every surface by its (x, y): a side decal that reaches above a crease (sidepod top,
+  cover shoulder) spreads onto the inner surfaces there, so side logos are kept below the crease lines.
+- Pilot scores (photo against render, three angles): Ferrari 8 (was 7.5), Mercedes 7.5 (7.5), Red Bull 7.5 (7).
+  Average 7.7: the gate (7.5) is passed. Weakest: the prancing horse and the bulls are hand-drawn silhouettes,
+  recognisable but simpler than the real art.
+- Mirrored text on the inner faces of the end plates (the plate is one double-sided mesh with one picture): the
+  outer faces read correctly on both sides of the car, the inner faces show the mirror image. Not fixed (it needs
+  the plate geometry split into two faces).

@@ -1,5 +1,5 @@
-import { grille, BLACK, CARBON, WHITE, both, ellipse, flank, noseCapShape, plateText, podBand, sideText, stripe, topText, wingText, layout } from '../liveryHelpers';
-import type { Livery } from '../liveryTypes';
+import { grille, BLACK, CARBON, WHITE, ellipse, flank, noseCapShape, plateText, podBand, sideText, stripe, topText, wingText, layout } from '../liveryHelpers';
+import type { Livery, LiveryLayer } from '../liveryTypes';
 
 // 2022 (ground effect): every team on the grid, drawn from photos of the real cars (reference/gen2022/liveries/).
 // Shapes are in the car's own measurements (see src/data/cars/gen2022.ts): x along the car (nose 2.95, front axle
@@ -29,42 +29,63 @@ const FERRARI: Livery = {
   parts: parts(CARBON),
   frontParts: { wing: CARBON, flap: '#D40000', endplate: CARBON },
   top: [
-    // cooling louvres on the engine cover behind the airbox, the yellow shield on the nose, a white Santander flag
-    ...podBand(BLACK, -0.25, -0.7, 0.16, 0.26),
-    { color: '#FFD200', points: ellipse(2.62, 0, 0.05, 0.035) },
-    { color: WHITE, points: stripe(2.2, 2.32, 0.1) },
+    // the louvres on the engine cover behind the airbox: darker red slats, not holes
+    ...Array.from({ length: 6 }, (_, i): LiveryLayer => ({ color: '#A80000', symmetric: true, path: `M${-0.28 - i * 0.075} 0.17 C${-0.3 - i * 0.075} 0.21 ${-0.3 - i * 0.075} 0.24 ${-0.29 - i * 0.075} 0.27 L${-0.31 - i * 0.075} 0.27 C${-0.32 - i * 0.075} 0.24 ${-0.32 - i * 0.075} 0.21 ${-0.3 - i * 0.075} 0.17 Z` })),
   ],
   side: [
-    ...grille(-0.7, -0.25, 0.7, 0.8, 4),
-    // the black floor edge, and the big yellow Shell roundel on the sidepod
-    lowerPod(0.2),
-    { color: '#FFD200', points: ellipse(0.15, 0.37, 0.17, 0.14) },
-    // small Italian flag on the airbox
+    // the black floor edge under the sidepod, rising a little toward the back
+    { color: BLACK, path: 'M1.0 0.06 L1.0 0.19 C0.6 0.2 0.0 0.19 -0.8 0.2 C-1.3 0.21 -1.7 0.25 -1.95 0.3 L-1.95 0.06 Z' },
+    // the Italian flag on the airbox
     { color: '#009246', points: flank(-0.32, -0.36, 0.78, 0.83) },
     { color: WHITE, points: flank(-0.36, -0.4, 0.78, 0.83) },
     { color: '#CE2B37', points: flank(-0.4, -0.44, 0.78, 0.83) },
   ],
-  texts: [
-    sideText('SHELL', 0.15, 0.37, 0.055, '#D40000'),
-    sideText('CEVA', -0.35, 0.36, 0.075, WHITE),
-    sideText('RAY-BAN', -0.85, 0.36, 0.06, WHITE),
-    sideText('SANTANDER', -1.05, 0.66, 0.06, WHITE),
-    sideText('VELAS', -0.15, 0.86, 0.04, WHITE),
-    sideText('AWS', 0.72, 0.52, 0.04, WHITE),
-    sideText('RICHARD MILLE', 1.25, 0.43, 0.035, WHITE),
-    sideText('SNAPDRAGON', -0.35, 0.13, 0.045, WHITE),
-    sideText('SANTANDER', 2.05, 0.3, 0.03, WHITE),
-    sideText('MAHLE', 2.4, 0.26, 0.028, WHITE),
-    topText('SANTANDER', 2.26, 0, 0.04, '#D40000'),
-    topText('AWS', 1.5, 0, 0.05, WHITE),
-    wingText('V-POWER', -2.26, 0, 0.065, WHITE),
-    wingText('VELAS', -2.06, 0, 0.05, WHITE),
-    wingText('AWS', 2.75, 0.55, 0.06, WHITE, 'front'),
-    wingText('AWS', 2.75, -0.55, 0.06, WHITE, 'front'),
+  decals: [
+    // the sidepod: the Shell pecten with its white keyline, Ceva, the Ray-Ban script
+    { view: 'side', logo: 'shell', x: 0.32, y: 0.38, height: 0.32, colors: { key: WHITE } },
+    { view: 'side', logo: 'ceva', x: -0.17, y: 0.44, height: 0.08 },
+    { view: 'side', logo: 'ray-ban', x: -0.64, y: 0.4, width: 0.4 },
+    // the engine cover: Santander, aws; the floor edge: Snapdragon and the small suppliers
+    { view: 'side', logo: 'santander', x: -1.1, y: 0.6, height: 0.072 },
+    { view: 'side', logo: 'aws', x: 0.42, y: 0.8, height: 0.09 },
+    { view: 'side', logo: 'snapdragon', x: 0.9, y: 0.13, height: 0.06 },
+    { view: 'side', logo: 'vistajet', x: 0.12, y: 0.13, height: 0.025 },
+    { view: 'side', logo: 'skf', x: -0.12, y: 0.13, height: 0.03 },
+    { view: 'side', logo: 'ngk', x: -0.28, y: 0.135, height: 0.04 },
+    { view: 'side', logo: 'brembo', x: -0.45, y: 0.13, height: 0.03 },
+    // the shield on the side of the chassis, Richard Mille ahead of the sidepod, Santander and Mahle on the nose
+    { view: 'side', logo: 'ferrari-shield', x: 1.38, y: 0.6, height: 0.16 },
+    { view: 'side', logo: 'richard-mille', x: 1.27, y: 0.5, height: 0.028 },
+    { view: 'side', logo: 'santander', x: 2.05, y: 0.31, height: 0.032 },
+    { view: 'side', logo: 'mahle', x: 2.42, y: 0.25, height: 0.026 },
+    // on top: the shield near the tip of the nose, Santander, aws and the pecten along the nose, Velas before the cockpit
+    { view: 'top', logo: 'ferrari-shield', x: 2.62, y: 0, height: 0.07, rotate: 90 },
+    { view: 'top', logo: 'mahle', x: 2.42, y: 0, height: 0.03, rotate: 180 },
+    { view: 'top', logo: 'santander', x: 2.2, y: 0, height: 0.035, rotate: 180 },
+    { view: 'top', logo: 'aws', x: 1.95, y: 0, height: 0.07, rotate: 90 },
+    { view: 'top', logo: 'shell', x: 1.72, y: 0, height: 0.17, rotate: 90 },
+    { view: 'top', logo: 'velas', x: 1.22, y: 0, height: 0.03, rotate: 90 },
+    { view: 'top', logo: 'shell-vpower', x: -2.26, y: 0, height: 0.07, orient: 'across-rear', colors: { key: WHITE } },
+    { view: 'top', logo: 'velas', x: -2.07, y: 0, height: 0.04, orient: 'across-rear' },
+    { view: 'top', logo: 'aws', x: 2.75, y: 0.55, height: 0.075, orient: 'across-front' },
+    { view: 'top', logo: 'aws', x: 2.75, y: -0.55, height: 0.075, orient: 'across-front' },
   ],
-  plateTexts: { front: [plateText('AWS', 2.62, 0.22, 0.06, WHITE)], rear: [plateText('V-POWER', -2.2, 0.8, 0.06, WHITE), plateText('VELAS', -2.2, 0.68, 0.05, WHITE)] },
+  texts: [
+    // the race number: yellow with a black outline, on the engine cover and the nose
+    { view: 'side', text: '16', x: -0.72, y: 0.7, height: 0.12, color: '#FFD200', font: 'sans', weight: 900, align: 'center', outline: { color: BLACK, width: 0.008 } },
+    { view: 'top', text: '16', x: 1.42, y: 0, height: 0.12, color: '#FFD200', font: 'sans', weight: 900, align: 'center', outline: { color: BLACK, width: 0.007 } },
+  ],
+  plateDecals: {
+    front: [{ view: 'side', logo: 'aws', x: 2.62, y: 0.22, height: 0.08 }],
+    rear: [
+      { view: 'side', logo: 'shell-vpower', x: -2.2, y: 0.8, height: 0.06, colors: { key: WHITE } },
+      { view: 'side', logo: 'velas', x: -2.2, y: 0.68, height: 0.035 },
+    ],
+  },
 };
 
+const MERC_TEAL = '#00A19C';
+const MERC_RED = '#A3192A';
 const MERCEDES: Livery = {
   id: 'mercedes-2022',
   name: 'Mercedes',
@@ -78,32 +99,50 @@ const MERCEDES: Livery = {
   finish: 'gloss',
   helmet: '#FFD500',
   parts: parts(BLACK),
-  frontParts: { wing: '#C4C7CB', flap: BLACK, endplate: '#C4C7CB' },
+  frontParts: { wing: '#C4C7CB', flap: BLACK, endplate: MERC_RED },
   top: [
-    // silver all over with a black tail; the teal lines run along the edges of the narrow sidepods
-    { color: BLACK, points: stripe(-1.7, L.tail - 0.05, 0.16) },
-    ...both('#00D2BE', [[0.98, 0.3], [0.7, 0.42], [0.3, 0.48], [-0.2, 0.46], [-0.7, 0.4], [-1.3, 0.3], [-1.3, 0.26], [-0.7, 0.35], [-0.2, 0.41], [0.3, 0.43], [0.7, 0.37], [0.98, 0.26]]),
+    // silver all over with a black tail; teal lines along the edges of the narrow sidepods; the red airbox top
+    { color: BLACK, path: 'M-1.6 0.17 C-1.9 0.17 -2.2 0.15 -2.3 0.1 L-2.3 -0.1 C-2.2 -0.15 -1.9 -0.17 -1.6 -0.17 Z' },
+    { color: MERC_TEAL, symmetric: true, path: 'M0.98 0.3 C0.6 0.43 0.0 0.48 -0.7 0.4 C-1.0 0.36 -1.2 0.31 -1.3 0.28 L-1.3 0.255 C-1.0 0.33 -0.6 0.37 0.0 0.44 C0.5 0.41 0.8 0.33 0.98 0.27 Z' },
+    { color: MERC_RED, path: 'M0.12 0.13 C0.0 0.15 -0.3 0.14 -0.45 0.1 L-0.45 -0.1 C-0.3 -0.14 0.0 -0.15 0.12 -0.13 Z' },
   ],
   side: [
-    // black floor edge, the teal swoosh sweeping up along the sidepod, black lower engine cover at the back
-    lowerPod(0.2),
-    { color: '#00D2BE', points: [[0.98, 0.2], [0.98, 0.27], [-0.2, 0.31], [-1.9, 0.38], [-1.9, 0.32], [-0.2, 0.25]] },
-    { color: BLACK, points: [[-1.3, 0.2], [-2.25, 0.2], [-2.25, 0.5], [-1.3, 0.38]] },
+    // the black floor edge, the teal stripe sweeping along the bottom of the sidepod, the black rear of the cover
+    { color: BLACK, path: 'M1.0 0.06 L1.0 0.2 C0.5 0.2 -0.4 0.17 -1.95 0.2 L-1.95 0.06 Z' },
+    { color: MERC_TEAL, path: 'M0.98 0.29 C0.6 0.26 0.2 0.24 -0.3 0.24 C-0.9 0.24 -1.5 0.28 -1.95 0.32 L-1.95 0.285 C-1.5 0.245 -0.9 0.205 -0.3 0.205 C0.2 0.205 0.6 0.22 0.98 0.25 Z' },
+    { color: BLACK, path: 'M-1.35 0.2 C-1.6 0.3 -1.9 0.42 -2.25 0.5 L-2.25 0.2 Z' },
+    // the red airbox (its intake and the roll hoop) with INEOS on it
+    { color: MERC_RED, path: 'M0.12 0.82 L0.12 0.99 L-0.4 0.97 C-0.3 0.9 -0.2 0.85 -0.05 0.8 Z' },
+  ],
+  decals: [
+    { view: 'side', logo: 'petronas', x: -0.22, y: 0.325, height: 0.075, colors: { main: '#1D1F22', mark: MERC_TEAL } },
+    { view: 'side', logo: 'teamviewer', x: 0.25, y: 0.53, height: 0.045 },
+    { view: 'side', logo: 'amd', x: 0.72, y: 0.55, height: 0.03 },
+    { view: 'side', logo: 'ineos', x: -0.08, y: 0.9, height: 0.05 },
+    { view: 'side', logo: 'iwc', x: 2.3, y: 0.31, height: 0.05 },
+    { view: 'side', logo: 'crowdstrike', x: 1.1, y: 0.56, height: 0.025 },
+    { view: 'side', logo: 'mercedes-star', x: 1.55, y: 0.4, height: 0.08, colors: { main: '#2A2C30', shade: '#55595F' } },
+    // on top: the star at the tip of the nose, Petronas along it, INEOS on the front wing, Petronas on the rear wing
+    { view: 'top', logo: 'mercedes-star', x: 2.66, y: 0, height: 0.1 },
+    { view: 'top', logo: 'petronas-word', x: 2.05, y: 0, height: 0.045, rotate: 180, colors: { main: MERC_TEAL } },
+    { view: 'top', logo: 'ineos', x: -0.15, y: 0, height: 0.05, rotate: 180 },
+    { view: 'top', logo: 'petronas-word', x: -2.26, y: 0, height: 0.07, orient: 'across-rear', colors: { main: MERC_TEAL } },
+    { view: 'top', logo: 'ineos', x: 2.75, y: 0.55, height: 0.06, orient: 'across-front', colors: { main: MERC_RED } },
+    { view: 'top', logo: 'ineos', x: 2.75, y: -0.55, height: 0.06, orient: 'across-front', colors: { main: MERC_RED } },
   ],
   texts: [
-    sideText('PETRONAS', -0.35, 0.4, 0.085, '#00D2BE'),
-    sideText('INEOS', -0.4, 0.8, 0.07, '#D40000'),
-    sideText('TEAMVIEWER', 0.55, 0.52, 0.04, BLACK),
-    sideText('AMD', 0.75, 0.6, 0.035, BLACK),
-    sideText('IWC', 1.55, 0.36, 0.05, BLACK),
-    sideText('CROWDSTRIKE', 1.0, 0.6, 0.028, BLACK),
-    sideText('PETRONAS', -1.65, 0.3, 0.035, WHITE),
-    topText('PETRONAS', 1.9, 0, 0.05, '#00D2BE'),
-    wingText('PETRONAS', -2.26, 0, 0.065, '#00D2BE'),
-    wingText('INEOS', 2.75, 0.55, 0.06, '#D40000', 'front'),
-    wingText('INEOS', 2.75, -0.55, 0.06, '#D40000', 'front'),
+    // Hamilton's 44 in neon yellow with a dark edge on the engine cover, Petronas Primax beside it
+    { view: 'side', text: '44', x: -1.0, y: 0.6, height: 0.11, color: '#D7F205', font: 'sans', weight: 900, slant: 8, align: 'center', outline: { color: '#1D1F22', width: 0.006 } },
+    { view: 'side', text: 'PETRONAS\nPRIMAX', x: -1.0, y: 0.76, height: 0.02, color: '#1D1F22', font: 'sans', weight: 800, align: 'center' },
+    { view: 'top', text: '44', x: 1.45, y: 0, height: 0.1, color: '#D7F205', font: 'sans', weight: 900, slant: 8, align: 'center', outline: { color: '#1D1F22', width: 0.006 } },
   ],
-  plateTexts: { front: [plateText('INEOS', 2.62, 0.22, 0.06, '#D40000')], rear: [plateText('PETRONAS', -2.2, 0.76, 0.055, '#00D2BE')] },
+  plateDecals: {
+    front: [{ view: 'side', logo: 'ineos', x: 2.62, y: 0.22, height: 0.055 }],
+    rear: [
+      { view: 'side', logo: 'petronas-word', x: -2.2, y: 0.78, height: 0.045, colors: { main: MERC_TEAL } },
+      { view: 'side', logo: 'crowdstrike', x: -2.2, y: 0.64, height: 0.03, colors: { main: WHITE } },
+    ],
+  },
 };
 
 const MCLAREN: Livery = {
@@ -151,48 +190,72 @@ const MCLAREN: Livery = {
   plateTexts: { front: [plateText('VELO', 2.62, 0.22, 0.07, WHITE)], rear: [plateText('OKX', -2.2, 0.76, 0.08, WHITE), plateText('HILTON', -2.2, 0.6, 0.045, WHITE)] },
 };
 
+const RB_NAVY = '#1C2340';
+const RB_RED = '#E4002B';
+const RB_YELLOW = '#FFC906';
 const REDBULL: Livery = {
   id: 'redbull-2022',
   name: 'Red Bull',
   era: 'gen2022',
   team: 'Oracle Red Bull Racing',
   price: 100,
-  primary: '#1C2340',
-  secondary: '#E4002B',
-  glow: '#E4002B',
+  primary: RB_NAVY,
+  secondary: RB_RED,
+  glow: RB_RED,
   sidepod: 'downwash',
   finish: 'matte',
   helmet: '#FF8A00',
-  parts: parts('#1C2340', '#1C2340', '#1C2340', '#1C2340'),
+  parts: parts(RB_NAVY, RB_NAVY, RB_NAVY, RB_NAVY),
   top: [
-    // the yellow nose with the red bulls on it, a red stripe along the top of the engine cover
-    { color: '#FFC500', points: noseCapShape(1.35, 2.95, 0.14) },
-    { color: '#E4002B', points: ellipse(2.1, 0, 0.2, 0.05) },
-    { color: '#E4002B', points: stripe(-0.4, -1.6, 0.03) },
+    // the yellow nose, the yellow-to-orange airbox, a red stripe down the engine cover
+    { path: 'M2.95 0.02 C2.7 0.05 2.2 0.085 1.75 0.11 C1.6 0.09 1.6 -0.09 1.75 -0.11 C2.2 -0.085 2.7 -0.05 2.95 -0.02 Z', gradient: { from: [2.95, 0], to: [1.7, 0], stops: [[0, '#FFD21A'], [1, '#FFB100']] } },
+    { path: 'M0.12 0.12 C0.0 0.14 -0.4 0.14 -0.62 0.06 L-0.62 -0.06 C-0.4 -0.14 0.0 -0.14 0.12 -0.12 Z', gradient: { from: [0.1, 0], to: [-0.6, 0], stops: [[0, RB_YELLOW], [1, '#F39200']] } },
+    { color: RB_RED, path: 'M-0.62 0.025 L-1.7 0.012 L-1.7 -0.012 L-0.62 -0.025 Z' },
   ],
   side: [
-    // the yellow nose flank with the red bull, the Red Bull badge on the engine cover, a red floor edge
-    { color: '#FFC500', points: [[1.3, 0.16], [1.3, 0.42], [2.92, 0.24], [2.92, 0.13]] },
-    { color: '#E4002B', points: ellipse(2.05, 0.28, 0.26, 0.06) },
-    { color: '#E4002B', points: ellipse(-0.65, 0.76, 0.3, 0.075) },
-    { color: '#FFC500', points: ellipse(-0.3, 0.78, 0.085, 0.085) },
-    { color: '#E4002B', points: flank(L.podFront, L.podRear, 0.06, 0.1) },
+    // the yellow nose flank, the yellow-to-orange airbox flank, the red floor edge
+    { path: 'M2.93 0.13 L2.93 0.25 C2.5 0.32 2.0 0.39 1.6 0.42 C1.55 0.33 1.55 0.22 1.6 0.16 C2.1 0.15 2.5 0.14 2.93 0.13 Z', gradient: { from: [2.9, 0], to: [1.6, 0], stops: [[0, '#FFD21A'], [1, '#FFB100']] } },
+    { path: 'M0.12 0.66 L0.12 0.98 L-0.55 0.96 C-0.8 0.88 -1.0 0.76 -1.15 0.64 C-0.8 0.6 -0.4 0.6 0.12 0.66 Z', gradient: { from: [0.1, 0.85], to: [-1.1, 0.65], stops: [[0, RB_YELLOW], [0.6, '#F7A600'], [1, '#EF7D00']] } },
+    { color: RB_RED, path: 'M0.98 0.075 L-1.95 0.075 L-1.95 0.1 L0.98 0.1 Z' },
+    // the short red flashes beside BYBIT on the chassis
+    { color: RB_RED, path: 'M1.55 0.5 L1.75 0.47 L1.76 0.49 L1.56 0.52 Z' },
+    { color: RB_RED, path: 'M0.92 0.55 L1.0 0.54 L1.01 0.56 L0.93 0.57 Z' },
+  ],
+  decals: [
+    // the charging bull: big over the airbox and the engine cover, and along the nose (both charge forward)
+    { view: 'side', logo: 'redbull-bull', x: -0.6, y: 0.6, width: 0.56, mirror: true },
+    { view: 'side', logo: 'redbull-bull', x: 2.15, y: 0.28, width: 0.42, mirror: true },
+    { view: 'top', logo: 'redbull-bull', x: 2.2, y: 0, width: 0.4, mirror: true },
+    { view: 'top', logo: 'redbull-bull', x: -0.75, y: 0, width: 0.45, mirror: true },
+    // ORACLE on the sidepod, BYBIT on the chassis, the Honda HRC mark and Mobil 1 on the engine cover
+    { view: 'side', logo: 'oracle', x: 0.05, y: 0.33, height: 0.08 },
+    { view: 'side', logo: 'bybit', x: 1.25, y: 0.5, height: 0.05 },
+    { view: 'side', logo: 'hrc', x: -1.35, y: 0.55, height: 0.04 },
+    { view: 'side', logo: 'mobil1', x: -1.5, y: 0.44, height: 0.035 },
+    { view: 'side', logo: 'tag-heuer', x: 0.55, y: 0.6, height: 0.06 },
+    { view: 'side', logo: 'claro', x: 2.42, y: 0.2, height: 0.035 },
+    // on top: TAG Heuer and ORACLE before the cockpit, BYBIT on the rear wing and across the front wing flaps
+    { view: 'top', logo: 'tag-heuer', x: 1.38, y: 0, height: 0.09, rotate: 90 },
+    { view: 'top', logo: 'oracle', x: 1.12, y: 0, height: 0.03, rotate: 180 },
+    { view: 'top', logo: 'bybit', x: -2.26, y: 0, height: 0.085, orient: 'across-rear' },
+    { view: 'top', logo: 'bybit', x: 2.62, y: 0.5, height: 0.05, orient: 'across-front' },
+    { view: 'top', logo: 'bybit', x: 2.62, y: -0.5, height: 0.05, orient: 'across-front' },
   ],
   texts: [
-    sideText('ORACLE', -0.2, 0.36, 0.14, WHITE),
-    sideText('RED BULL', -0.75, 0.64, 0.05, WHITE),
-    sideText('BYBIT', 0.9, 0.5, 0.055, WHITE),
-    sideText('TAG HEUER', 0.5, 0.58, 0.038, '#FFD100'),
-    sideText('MOBIL 1', -1.5, 0.58, 0.05, WHITE),
-    sideText('TEZOS', 0.0, 0.62, 0.035, WHITE),
-    sideText('HRC', -1.2, 0.5, 0.04, WHITE),
-    sideText('CLARO', 2.4, 0.19, 0.032, WHITE),
-    topText('BYBIT', 1.0, 0, 0.06, WHITE),
-    wingText('BYBIT', -2.26, 0, 0.08, WHITE),
-    wingText('BYBIT', 2.75, 0.55, 0.07, WHITE, 'front'),
-    wingText('BYBIT', 2.75, -0.55, 0.07, WHITE, 'front'),
+    // the big red "Red Bull" across the front wing main plane, read from the front
+    { view: 'top', text: 'Red', x: 2.82, y: 0.48, height: 0.075, color: RB_RED, font: 'sans', weight: 900, orient: 'across-front' },
+    { view: 'top', text: 'Bull', x: 2.82, y: -0.48, height: 0.075, color: RB_RED, font: 'sans', weight: 900, orient: 'across-front' },
+    // the number, red on the nose
+    { view: 'top', text: '1', x: 1.58, y: 0, height: 0.12, color: RB_RED, font: 'sans', weight: 900, slant: 10, align: 'center' },
+    { view: 'side', text: '1', x: 1.62, y: 0.43, height: 0.08, color: RB_RED, font: 'sans', weight: 900, slant: 10, align: 'center' },
   ],
-  plateTexts: { front: [plateText('CLARO', 2.62, 0.22, 0.06, WHITE)], rear: [plateText('ESSO', -2.2, 0.76, 0.08, '#E4002B'), plateText('MOBIL 1', -2.2, 0.6, 0.05, WHITE)] },
+  plateDecals: {
+    front: [{ view: 'side', logo: 'mobil1', x: 2.62, y: 0.22, height: 0.045 }],
+    rear: [
+      { view: 'side', logo: 'esso', x: -2.2, y: 0.62, height: 0.06 },
+      { view: 'side', logo: 'mobil1', x: -2.2, y: 0.78, height: 0.04 },
+    ],
+  },
 };
 
 const ALPINE: Livery = {

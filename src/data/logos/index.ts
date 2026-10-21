@@ -2,13 +2,17 @@
 // (simplified, not copies of the official artwork files). They are trademarks of their owners, like the team and
 // sponsor names the app already uses: they would need clearing before any public release.
 
+import { FUEL_LOGOS } from './fuel';
+import { TEAM_MARKS } from './marks';
+import { SPONSOR_LOGOS } from './sponsors';
 import type { Logo } from './types';
+import { WORDMARK_LOGOS } from './wordmarks';
 
 export type { Logo, LogoColor, LogoPath, LogoShape, LogoText } from './types';
 export { isLogoText } from './types';
 
 /** Every logo, in the order the /dev/logos page shows them. */
-export const LOGOS: readonly Logo[] = [];
+export const LOGOS: readonly Logo[] = [...TEAM_MARKS, ...FUEL_LOGOS, ...SPONSOR_LOGOS, ...WORDMARK_LOGOS];
 
 let byId: Map<string, Logo> | null = null;
 

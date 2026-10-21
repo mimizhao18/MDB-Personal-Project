@@ -16,6 +16,8 @@ export interface LogoPath {
   /** Non-zero winding unless 'evenodd'. */
   rule?: 'nonzero' | 'evenodd';
   opacity?: number;
+  /** Drawn only when the decal gives this slot a color (an optional keyline round a logo, for example). */
+  when?: string;
 }
 
 /** Lettering inside a logo, in the Inter typeface (or the bold stroke font). */

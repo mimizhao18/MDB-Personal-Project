@@ -122,7 +122,7 @@ async function shoot(name: string, columns = 2): Promise<string[]> {
   return cells.map((c) => c.label);
 }
 
-type Params = { livery?: string; liveries?: string; view?: string; tile?: string; zoom?: string; sheet?: string; save?: string; yaw?: string; pitch?: string; bench?: string };
+type Params = { livery?: string; liveries?: string; view?: string; views?: string; shoot?: string; queue?: string; tile?: string; zoom?: string; sheet?: string; save?: string; yaw?: string; pitch?: string; bench?: string };
 
 /** The liveries a contact sheet covers: one generation's, or all of them. */
 function sheetLiveries(sheet: string) {
@@ -133,6 +133,8 @@ function sheetLiveries(sheet: string) {
  * Dev only: cars from fixed angles, for checking the models and liveries against reference photos.
  *   ?livery=<id>                    one car from five angles (default ferrari-2022)
  *   &view=side|front|rear|top|three-quarter   just that angle, big
+ *   &views=side,top,three-quarter    those angles, each big, one under the other
+ *   &shoot=<folder>&queue=b,c       saves the tiles as <folder>/<livery>, then moves on to the next livery in the queue
  *   &tile=<px>                       the height of each tile
  *   &zoom=<factor>                   camera distance, below 1 is closer (multiplies each angle's own zoom)
  *   &yaw=<radians>&pitch=<radians>   with &view=, any camera angle (yaw 0 looks at the nose, pi/2 at the right side)
@@ -152,12 +154,27 @@ export default function CarViewsScreen() {
     if (onWeb()) (window as unknown as { __shoot?: typeof shoot }).__shoot = shoot;
   }, []);
 
+  // unattended review: shoot this livery, then load the next one in the queue
+  useEffect(() => {
+    if (!params.shoot || !onWeb()) return;
+    const timer = setTimeout(async () => {
+      await shoot(`${params.shoot}/${params.livery ?? 'ferrari-2022'}`, 1);
+      const [next, ...rest] = (params.queue ?? '').split(',').filter(Boolean);
+      if (!next) return;
+      const url = new URL(window.location.href);
+      url.searchParams.set('livery', next);
+      url.searchParams.set('queue', rest.join(','));
+      window.location.replace(url.toString());
+    }, SETTLE_MS * 3);
+    return () => clearTimeout(timer);
+  }, [params.shoot, params.livery, params.queue]);
+
   if (params.bench) return <BenchScreen />;
   if (sheet) return <SheetScreen era={sheet} save={params.save} zoom={params.zoom ? Number(params.zoom) : 0.8} />;
 
   const columns = width >= WIDE ? 2 : 1;
   const only = params.view;
-  const tileHeight = params.tile ? Number(params.tile) : only ? Math.round(Math.min(width, 1400) * 0.55) : TILE_HEIGHT;
+  const tileHeight = params.tile ? Number(params.tile) : only || params.views ? Math.round(Math.min(width, 1400) * 0.55) : TILE_HEIGHT;
   const zoom = params.zoom ? Number(params.zoom) : 1;
 
   // several liveries on the same model, from one angle: the paint layer is generic if they all look right
@@ -184,8 +201,9 @@ export default function CarViewsScreen() {
 
   const liveryId = params.livery ?? 'ferrari-2022';
   // ?view=side shows just that angle, big, for a close comparison with a photo; ?yaw= and ?pitch= move that camera
-  const shown = VIEWS.filter((v) => !only || v.id === only).map((v) => (only && (params.yaw || params.pitch) ? { ...v, yaw: params.yaw ? Number(params.yaw) : v.yaw, pitch: params.pitch ? Number(params.pitch) : v.pitch } : v));
-  const tileWidth = only ? '100%' : columns === 1 ? '100%' : '49.5%';
+  const several = params.views?.split(',').filter(Boolean);
+  const shown = VIEWS.filter((v) => (several ? several.includes(v.id) : !only || v.id === only)).map((v) => (only && (params.yaw || params.pitch) ? { ...v, yaw: params.yaw ? Number(params.yaw) : v.yaw, pitch: params.pitch ? Number(params.pitch) : v.pitch } : v));
+  const tileWidth = only || several ? '100%' : columns === 1 ? '100%' : '49.5%';
 
   return (
     <ScrollView contentContainerStyle={styles.content}>
@@ -196,7 +214,7 @@ export default function CarViewsScreen() {
         {shown.map((view) => (
           <View key={view.id} style={[styles.tile, { width: tileWidth, height: tileHeight }]} testID={`car-view-${view.id}`}>
             <Text style={styles.label}>{view.label.toUpperCase()}</Text>
-            <Car3DView car={{ liveryId, number: 16 }} height={tileHeight} autoSpin={false} zoom={(only ? view.zoom * 0.84 : view.zoom) * zoom} fixedView={{ yaw: view.yaw, pitch: view.pitch }} capture />
+            <Car3DView car={{ liveryId, number: 16 }} height={tileHeight} autoSpin={false} zoom={(only || several ? view.zoom * 0.84 : view.zoom) * zoom} fixedView={{ yaw: view.yaw, pitch: view.pitch }} capture />
           </View>
         ))}
       </View>
