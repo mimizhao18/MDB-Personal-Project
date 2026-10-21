@@ -11,6 +11,7 @@ import json
 import os
 import re
 import sys
+import time
 import urllib.parse
 import urllib.request
 
@@ -75,6 +76,7 @@ def main():
                 name = re.sub(r'[^A-Za-z0-9]+', '-', r['title'].replace('File:', '')).strip('-')[:60]
                 ext = '.png' if r['thumb'].lower().endswith('.png') else '.jpg'
                 path = os.path.join(out_dir, f'{saved + 1:02d}-{name}{ext}')
+                time.sleep(2)  # Commons rate-limits bursts of downloads (HTTP 429)
                 try:
                     req = urllib.request.Request(r['thumb'], headers={'User-Agent': UA})
                     with urllib.request.urlopen(req, timeout=120) as resp, open(path, 'wb') as f:

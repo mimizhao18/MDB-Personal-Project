@@ -1,4 +1,4 @@
-import { BLACK, CARBON, WHITE, both, checker, ellipse, flank, noseCapShape, plateText, podBand, sideText, stripe, topText, wingText, layout } from '../liveryHelpers';
+import { BLACK, CARBON, WHITE, both, ellipse, flank, noseCapShape, plateText, podBand, sideText, stripe, topText, wingText, layout } from '../liveryHelpers';
 import type { Livery } from '../liveryTypes';
 
 // 2026: every team on the grid, drawn from the 2026 Chinese GP photos (reference/gen2026/liveries/). Shapes are in

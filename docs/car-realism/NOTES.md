@@ -134,3 +134,35 @@ pod with Revolut; Cadillac's black nose and chassis under the white upper body.
 
 One round: the second only checked a suspected end-plate defect (it was the flap lettering seen edge-on, not a bug).
 The dev page gained `?yaw=&pitch=` for free camera angles.
+
+## 2014 generation (checkpoint-2014)
+
+Decision: the brief names a W05-style (2014) car, but this generation's liveries are the 2018 ones (Force India with
+BWT, Williams Martini, Aston Martin Red Bull, McLaren papaya) and the model has a halo, so the 2018 Mercedes W09 is
+the reference (reference/gen2014/, ten Commons photos; dimensions.md). The real wheelbase (3.73 m) is kept at 3.6 so
+the comparison with the 2022 car stays honest.
+
+Model: open-spoke 13-inch wheels with tall sidewalls (they were covers), the 1.8 m front wing, a wider floor, the
+T-wing removed (banned in 2018) and a low shark fin, the rear wing shrunk into its 950 x 950 mm box on one pillar,
+the halo on the halo slot (bare carbon unless painted).
+
+| Round | Proportions | Silhouette | Materials | Lighting | Fixed next |
+|---|---|---|---|---|---|
+| 1 | 6 | 6.5 | 7 | 7.5 | Mercedes still black (livery), rear wing too tall and wide |
+| 2 | 6.5 | 6.5 | 7 | 7.5 | rear wing |
+| 3 (final) | 7 | 7 | 7 | 7.5 | |
+
+Still weak: the bargeboards are a stack of flat plates; the thumb nose is simpler than the real one; the flap vanes
+are one row of small boxes.
+
+Liveries (reference/gen2014/liveries/<id>/, three photos each, all seven redrawn from the 2018 cars):
+
+| Livery | Before | After | Notes |
+|---|---|---|---|
+| ferrari-2014 | 6 | 7 | red wings and halo, white number boxes, Shell roundel, 2018 sponsors |
+| mercedes-2014 | 4 | 7.5 | silver all over with the teal swooshes (it was black from the airbox back) |
+| mclaren-2014 | 5 | 7 | blue rear engine cover and rear wing, Kimoa box, blue end plates |
+| redbull-2014 | 6 | 7 | yellow nose and airbox with the bulls, Aston Martin lettering, Esso |
+| forceindia-2014 | 5 | 7 | silver-white cover and fin with BWT, white lower panel, pink halo |
+| renault-2014 | 5 | 7 | yellow nose top and cover edges, RCi roundel, yellow rear wing |
+| williams-2014 | 5 | 7.5 | diagonal Martini bands over the cover and fin, striped nose and rear wing |

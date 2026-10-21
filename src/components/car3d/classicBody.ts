@@ -285,16 +285,18 @@ function body2014(c: BodyContext) {
   car.add(ellipsoid(0.04, 0.09, 0.075, m.dark, 0.04, 0.88, 0));
 
   // the halo: a pillar up from the front of the cockpit and two arms back to the airbox
+  const haloMaterial = m.halo ?? m.carbon;
   const front = new THREE.CatmullRomCurve3([new THREE.Vector3(0.98, 0.68, 0), new THREE.Vector3(0.94, 0.8, 0), new THREE.Vector3(0.86, 0.9, 0)]);
-  car.add(new THREE.Mesh(new THREE.TubeGeometry(front, 16, 0.03, 8), m.carbon));
+  car.add(new THREE.Mesh(new THREE.TubeGeometry(front, 16, 0.032, 10), haloMaterial));
   for (const side of [1, -1] as const) {
     const arc = new THREE.CatmullRomCurve3([
       new THREE.Vector3(0.86, 0.9, 0),
-      new THREE.Vector3(0.5, 0.93, 0.16 * side),
-      new THREE.Vector3(0.15, 0.9, 0.24 * side),
-      new THREE.Vector3(-0.15, 0.82, 0.2 * side),
+      new THREE.Vector3(0.5, 0.93, 0.2 * side),
+      new THREE.Vector3(0.1, 0.9, 0.27 * side),
+      new THREE.Vector3(-0.2, 0.82, 0.22 * side),
+      new THREE.Vector3(-0.3, 0.76, 0.2 * side),
     ]);
-    car.add(new THREE.Mesh(new THREE.TubeGeometry(arc, 28, 0.028, 10), m.carbon));
+    car.add(new THREE.Mesh(new THREE.TubeGeometry(arc, 36, 0.03, 10), haloMaterial));
   }
 
   // wide sidepods: a huge oval mouth in the front, and a deep undercut from the inlet back

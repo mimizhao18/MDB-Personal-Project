@@ -1,15 +1,18 @@
 import { PAINT_BOX } from './spec';
 import type { CarSpec } from './spec';
 
-// The hybrid-era car (2014-2021), drawn as the 2018-2020 cars: 3.6 m wheelbase, 2.0 m wide, tall 13-inch wheels with
-// covers, a thumb-tip nose on pylons, a wide front wing with big end plates and cascades, bargeboards ahead of wide
-// sidepods, a tall finned engine cover with a shark fin and T-wing, a halo, and a DRS rear wing with a beam wing.
+// The hybrid-era car (2014-2021), drawn as the 2018 Mercedes W09 (reference/gen2014/): 3.6 m wheelbase (the real car's
+// 3.73 m is kept at 3.6 so the comparison with the 2022 car stays honest), 2.0 m wide, 13-inch open-spoke wheels with
+// tall sidewalls, a thumb-tip nose on pylons, a 1.8 m front wing with big end plates and cascades, tall bargeboards
+// ahead of undercut sidepods, a low shark fin on the engine cover (no T-wing: banned for 2018), a halo, and a DRS
+// rear wing with a beam wing.
 
 export const GEN2014: CarSpec = {
   id: 'gen2014',
-  notes: { label: '2014', frontWing: '4 elements, pylon nose', rearWing: 'Fixed, DRS flap, T-wing' },
+  notes: { label: '2014', frontWing: '4 elements, pylon nose', rearWing: 'Fixed, DRS flap, shark fin' },
   halo: true,
-  wheelLook: { style: 'cover', coverRatio: 0.52, grooves: 0, rimColor: '#2A2A2E' },
+  // a 13-inch rim on a 670 mm tyre: the rim is only half the wheel, the sidewall is tall
+  wheelLook: { style: 'spokes', coverRatio: 0.5, grooves: 0, rimColor: '#3A3A40' },
   centreX: 0.18,
   paint: PAINT_BOX,
 
@@ -47,7 +50,7 @@ export const GEN2014: CarSpec = {
 
   floor: {
     x: [1.45, 1.25, 0.95, 0.5, 0.0, -0.6, -1.0, -1.35, -1.6],
-    hw: [0.28, 0.42, 0.6, 0.72, 0.74, 0.7, 0.62, 0.56, 0.54],
+    hw: [0.28, 0.44, 0.64, 0.78, 0.8, 0.76, 0.66, 0.58, 0.55],
     y: 0.035,
     thickness: 0.03,
   },
@@ -61,8 +64,9 @@ export const GEN2014: CarSpec = {
     rear: { x: -1.8, radius: 0.34, width: 0.405, z: 0.8 },
   },
 
+  // 1.8 m wide (the 2017-21 rule), with big end plates and cascades
   frontWing: {
-    span: 1.0,
+    span: 0.9,
     sweep: 0.2,
     sweepPower: 1.4,
     concave: 0.05,
@@ -78,13 +82,14 @@ export const GEN2014: CarSpec = {
     pylons: true,
   },
 
+  // 950 mm wide and no higher than 950 mm (the 2017-21 rule), nearly flat, on a single swan-neck pillar
   rearWing: {
-    span: 0.5,
+    span: 0.475,
     elements: [
-      { x: -2.2, chord: 0.3, dChord: 0.05, y: 0.74, rise: 0.08, angle: 8, dAngle: 4, sweep: 0.08, camber: 0.06, flap: false },
-      { x: -2.34, chord: 0.26, dChord: 0.05, y: 0.86, rise: 0.1, angle: 20, dAngle: 6, sweep: 0.08, camber: 0.1, flap: true },
+      { x: -2.2, chord: 0.3, dChord: 0.04, y: 0.72, rise: 0.03, angle: 8, dAngle: 2, sweep: 0.04, camber: 0.06, flap: false },
+      { x: -2.34, chord: 0.26, dChord: 0.04, y: 0.83, rise: 0.04, angle: 20, dAngle: 3, sweep: 0.04, camber: 0.1, flap: true },
     ],
-    endplate: [[-2.1, 0.48], [-2.55, 0.5], [-2.62, 0.8], [-2.6, 1.0], [-2.3, 1.02], [-2.12, 0.95]],
+    endplate: [[-2.1, 0.5], [-2.55, 0.5], [-2.6, 0.75], [-2.58, 0.95], [-2.3, 0.96], [-2.12, 0.9]],
     supports: [{ outline: [[-1.9, 0.55], [-2.0, 0.55], [-2.3, 0.78], [-2.2, 0.8]], z: 0, thickness: 0.07, mirror: false }],
     beam: [{ x: -2.1, y: 0.5, chord: 0.2, angle: 10, camber: 0.05, span: 0.45 }],
     boxes: [
@@ -95,8 +100,8 @@ export const GEN2014: CarSpec = {
 
   extras: {
     plates: [
-      // the shark fin along the middle of the engine cover, in body paint
-      { outline: [[-2.2, 0.62], [-1.6, 0.66], [-1.0, 0.78], [-0.7, 0.9], [-0.62, 1.04], [-1.2, 1.03], [-1.8, 0.94], [-2.18, 0.8]], z: 0, thickness: 0.012, mirror: false, part: 'paint' },
+      // the low shark fin along the middle of the engine cover, in body paint
+      { outline: [[-2.2, 0.62], [-1.6, 0.66], [-1.0, 0.78], [-0.75, 0.88], [-0.7, 0.96], [-1.2, 0.95], [-1.8, 0.86], [-2.18, 0.76]], z: 0, thickness: 0.012, mirror: false, part: 'paint' },
       // bargeboards: a row of six tall curved vanes between the front wheel and the sidepod, each a different height
       { outline: [[1.38, 0.06], [1.34, 0.276], [1.18, 0.46], [0.96, 0.368], [0.88, 0.06]], z: 0.28, thickness: 0.008, mirror: true, part: 'carbon' },
       { outline: [[1.36, 0.06], [1.32, 0.252], [1.16, 0.42], [0.94, 0.336], [0.86, 0.06]], z: 0.35, thickness: 0.008, mirror: true, part: 'carbon' },
@@ -105,13 +110,11 @@ export const GEN2014: CarSpec = {
       { outline: [[1.3, 0.06], [1.26, 0.18], [1.1, 0.3], [0.88, 0.24], [0.8, 0.06]], z: 0.56, thickness: 0.008, mirror: true, part: 'carbon' },
       { outline: [[1.28, 0.06], [1.24, 0.156], [1.08, 0.26], [0.86, 0.208], [0.78, 0.06]], z: 0.63, thickness: 0.008, mirror: true, part: 'carbon' },
     ],
-    // the T-wing on top of the shark fin
+    // the cascade winglets on the front wing end plates
     wings: [
-      { x: 2.5, y: 0.42, chord: 0.13, angle: 12, camber: 0.05, span: 0.97, from: 0.7, part: 'carbon' },
-      { x: 2.4, y: 0.5, chord: 0.11, angle: 16, camber: 0.05, span: 0.97, from: 0.78, part: 'carbon' },
-      { x: 2.3, y: 0.56, chord: 0.09, angle: 20, camber: 0.05, span: 0.96, from: 0.84, part: 'carbon' },
-      { x: -1.88, y: 0.94, chord: 0.13, angle: 6, camber: 0.05, span: 0.27, from: 0, part: 'carbon' },
-      { x: -1.9, y: 1.02, chord: 0.1, angle: 10, camber: 0.05, span: 0.22, from: 0, part: 'carbon' },
+      { x: 2.5, y: 0.42, chord: 0.13, angle: 12, camber: 0.05, span: 0.88, from: 0.62, part: 'carbon' },
+      { x: 2.4, y: 0.5, chord: 0.11, angle: 16, camber: 0.05, span: 0.88, from: 0.7, part: 'carbon' },
+      { x: 2.3, y: 0.56, chord: 0.09, angle: 20, camber: 0.05, span: 0.87, from: 0.76, part: 'carbon' },
     ],
     rods: [],
     boxes: [{ size: [0.5, 0.2, 0.22], at: [-2.0, 0.33, 0], mirror: false, part: 'carbon' }],

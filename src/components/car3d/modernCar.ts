@@ -264,6 +264,8 @@ export function buildModernCar(spec: CarSpec, livery: Livery, options: CarOption
 
   if (options.body) {
     options.body({ car, spec, livery, paint, m });
+    // a generation's own body builder adds its meshes straight to the car: gather them into the body group
+    for (const child of [...car.children]) if (child instanceof THREE.Mesh) part('body').add(child);
   } else {
   // ---- bodywork: nose, cockpit, airbox and engine cover are one smooth surface ----
   part('body').add(new THREE.Mesh(loftGeometry(spec.spine, { rings: 110, sides: 36, squareness: 0.76 }), paint));
