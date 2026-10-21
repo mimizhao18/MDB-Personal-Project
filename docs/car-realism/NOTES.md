@@ -96,3 +96,19 @@ Alpine blue, AlphaTauri, Alfa Romeo and Haas white, Red Bull and Aston Martin in
 | williams-2022 | 5 | 6.5 | bright blue cover and nose, black lower body |
 
 Two rounds: the second only moved ALFA ROMEO clear of the rear wheel and ARAMCO clear of the halo.
+
+## 2026 model (checkpoint-2026-model)
+
+References: reference/gen2026/ (nine Commons photos of the Alpine A526 and Aston Martin AMR26 at the 2026 Chinese GP;
+a show car was discarded) and dimensions.md (wheelbase 3400, width 1900, tyres 25 / 30 mm narrower, floor 150 mm
+narrower, front wing 100 mm narrower, active wings, no beam wing). Redrawn: a long low nose onto a three-element
+front wing (top flap active, in sections) with small plain end plates; sidepods set back behind the front wheels
+with a deep undercut and a flat rear deck; a slimmer engine cover with a fin; a three-element rear wing on one
+central pillar; narrower floor without fences.
+
+| Round | Proportions | Silhouette | Materials | Lighting | Fixed next |
+|---|---|---|---|---|---|
+| 1 | 7 | 7 | 7 | 7.5 | lettering across the wings read mirrored (glyph tops now point to the rear on both wings) |
+| 2 (final) | 7.5 | 7.5 | 7 | 7.5 | |
+
+Still weak: the active flaps' section gaps are a little wide; the pod inlet is a plain dark ellipse.

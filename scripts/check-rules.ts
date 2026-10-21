@@ -439,6 +439,6 @@ assert.ok(f26.podWidth < f22.podWidth); // slimmer sidepods
 assert.ok(Math.max(...GEN2026.floor.hw) < Math.max(...GEN2022.floor.hw)); // narrower floor
 assert.equal(GEN2026.rearWing.beam.length, 0); // no beam wing on the 2026 car
 assert.ok(GEN2022.rearWing.beam.length > 0); // the 2022 car keeps its
-assert.equal(GEN2026.frontWing.elements.length, 2); // a two-element front wing
+assert.ok(GEN2026.frontWing.elements.length <= 3 && GEN2026.frontWing.elements.length < GEN2022.frontWing.elements.length); // a simpler front wing (three elements in the 2026 photos, four in 2022)
 assert.ok(GEN2026.frontWing.elements.some((e) => e.active) && GEN2026.rearWing.elements.every((e) => e.active)); // active wings front and rear
 assert.ok(GEN2022.frontWing.elements.every((e) => !e.active) && GEN2022.rearWing.elements.every((e) => !e.active)); // the 2022 wings are fixed

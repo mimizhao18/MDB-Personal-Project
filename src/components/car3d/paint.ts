@@ -191,8 +191,9 @@ function drawStrokeText(data: Uint8Array, width: number, height: number, toPixel
   const across = t.view === 'top' && t.orient && t.orient !== 'along';
   const fromRear = t.orient === 'across-rear';
   // where the run starts along its reading direction (metres)
-  // Across a wing, seen from behind the car, the reader's right is -z and the far edge (-x, the rear) is up.
-  const start = across ? (fromRear ? t.y + run / 2 : t.y - run / 2) : t.align === 'center' ? t.x - run / 2 : t.align === 'right' ? t.x - run : t.x;
+  // Across a wing the glyph tops point to the rear (-x): both wings rise toward the back, so that edge is the upper
+  // one whether the wing is seen from behind (reader's right +z) or from the front (reader's right -z).
+  const start = across ? (fromRear ? t.y - run / 2 : t.y + run / 2) : t.align === 'center' ? t.x - run / 2 : t.align === 'right' ? t.x - run : t.x;
   const rgb = hexToRgb(t.color);
   let offset = 0; // along the run, in metres
   for (let i = 0; i < text.length; i++) {
@@ -202,7 +203,7 @@ function drawStrokeText(data: Uint8Array, width: number, height: number, toPixel
     const map = (u: number, v: number): readonly [number, number] => {
       const gu = (mirror ? glyph.width - u : u) * unit; // along the reading direction, from the glyph's start
       const gv = (v - 50) * unit; // up from the middle of the cap height
-      if (across) return fromRear ? toPixel(t.x - gv, start - at - gu) : toPixel(t.x + gv, start + at + gu);
+      if (across) return fromRear ? toPixel(t.x - gv, start + at + gu) : toPixel(t.x - gv, start - at - gu);
       return t.view === 'top' ? toPixel(start + at + gu, t.y - gv) : toPixel(start + at + gu, t.y + gv);
     };
     for (const polygon of glyphPolygons(glyph, map)) fillPolygon(data, width, height, polygon, rgb);

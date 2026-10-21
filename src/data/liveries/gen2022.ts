@@ -7,7 +7,6 @@ import type { Livery } from '../liveryTypes';
 // engine cover top 0.9), z across (sidepods out to 0.75).
 
 const L = layout('gen2022');
-const mid = L.podMid; // a height halfway up the sidepod, for the big lettering (about 0.36)
 const parts = (wing: string, flap = wing, endplate = wing, halo?: string) => ({ wing, flap, endplate, floor: CARBON, ...(halo ? { halo } : {}) });
 const AIRBOX = [0.08, -1.3] as const; // along the car, where the airbox and engine cover hump stand
 const ABOX_Y = [0.62, 0.96] as const;
