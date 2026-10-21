@@ -1,5 +1,32 @@
 import type { CountryCode, Track, TrackId } from '../../models/types';
-import { CALENDAR_SHAPES } from './calendarShapes';
+import { AUSTRALIA_POINTS, AUSTRALIA_ROAD_WIDTH, AUSTRALIA_START_FINISH, AUSTRALIA_VIEWBOX } from './australiaShape';
+import { CHINA_POINTS, CHINA_ROAD_WIDTH, CHINA_START_FINISH, CHINA_VIEWBOX } from './chinaShape';
+import { JAPAN_POINTS, JAPAN_ROAD_WIDTH, JAPAN_START_FINISH, JAPAN_VIEWBOX } from './japanShape';
+import { BAHRAIN_POINTS, BAHRAIN_ROAD_WIDTH, BAHRAIN_START_FINISH, BAHRAIN_VIEWBOX } from './bahrainShape';
+import { MIAMI_POINTS, MIAMI_ROAD_WIDTH, MIAMI_START_FINISH, MIAMI_VIEWBOX } from './miamiShape';
+import { CANADA_POINTS, CANADA_ROAD_WIDTH, CANADA_START_FINISH, CANADA_VIEWBOX } from './canadaShape';
+import { BARCELONA_POINTS, BARCELONA_ROAD_WIDTH, BARCELONA_START_FINISH, BARCELONA_VIEWBOX } from './barcelonaShape';
+import { AUSTRIA_POINTS, AUSTRIA_ROAD_WIDTH, AUSTRIA_START_FINISH, AUSTRIA_VIEWBOX } from './austriaShape';
+import { HUNGARY_POINTS, HUNGARY_ROAD_WIDTH, HUNGARY_START_FINISH, HUNGARY_VIEWBOX } from './hungaryShape';
+import { NETHERLANDS_POINTS, NETHERLANDS_ROAD_WIDTH, NETHERLANDS_START_FINISH, NETHERLANDS_VIEWBOX } from './netherlandsShape';
+import { ITALY_POINTS, ITALY_ROAD_WIDTH, ITALY_START_FINISH, ITALY_VIEWBOX } from './italyShape';
+import { MADRID_POINTS, MADRID_ROAD_WIDTH, MADRID_START_FINISH, MADRID_VIEWBOX } from './madridShape';
+import { AZERBAIJAN_POINTS, AZERBAIJAN_ROAD_WIDTH, AZERBAIJAN_START_FINISH, AZERBAIJAN_VIEWBOX } from './azerbaijanShape';
+import { SINGAPORE_POINTS, SINGAPORE_ROAD_WIDTH, SINGAPORE_START_FINISH, SINGAPORE_VIEWBOX } from './singaporeShape';
+import { UNITED_STATES_POINTS, UNITED_STATES_ROAD_WIDTH, UNITED_STATES_START_FINISH, UNITED_STATES_VIEWBOX } from './unitedStatesShape';
+import { MEXICO_POINTS, MEXICO_ROAD_WIDTH, MEXICO_START_FINISH, MEXICO_VIEWBOX } from './mexicoShape';
+import { BRAZIL_POINTS, BRAZIL_ROAD_WIDTH, BRAZIL_START_FINISH, BRAZIL_VIEWBOX } from './brazilShape';
+import { LAS_VEGAS_POINTS, LAS_VEGAS_ROAD_WIDTH, LAS_VEGAS_START_FINISH, LAS_VEGAS_VIEWBOX } from './lasVegasShape';
+import { QATAR_POINTS, QATAR_ROAD_WIDTH, QATAR_START_FINISH, QATAR_VIEWBOX } from './qatarShape';
+import { ABU_DHABI_POINTS, ABU_DHABI_ROAD_WIDTH, ABU_DHABI_START_FINISH, ABU_DHABI_VIEWBOX } from './abuDhabiShape';
+
+/** What a traced outline gives: its box, road width, start/finish line and the 360 points of the lap. */
+interface Shape {
+  viewBox: Track['viewBox'];
+  roadWidth: number;
+  startFinish: Track['startFinish'];
+  points: Track['points'];
+}
 
 /** The facts about a circuit that the outline does not carry. */
 interface Facts {
@@ -14,7 +41,7 @@ interface Facts {
   lapTimeSeconds: number;
 }
 
-// The 2026 calendar, in race order, without the three circuits that are free and hand-traced (Silverstone, Spa, Monaco)
+// The 2026 calendar, in race order, without the three circuits that are free (Silverstone, Spa, Monaco)
 // and without Jeddah, which is left out for now.
 // Lap lengths and race laps are the published 2026 figures; lap records are the official ones (Madring is new, so its time is an estimate).
 const FACTS: readonly Facts[] = [
@@ -45,6 +72,30 @@ const FACTS: readonly Facts[] = [
  * to a level. (Level 2 is 50 XP, level 5 is 800 XP, level 10 is 4050 XP, level 12 is 6050 XP.)
  */
 const UNLOCK_LEVEL: readonly number[] = [2, 2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8, 8, 9, 9, 10, 10, 11, 12];
+
+// Each outline is traced from the official F1 circuit graphic with tools/trace_track.py, like Silverstone, Spa and Monaco.
+const CALENDAR_SHAPES: Record<string, Shape> = {
+  australia: { viewBox: AUSTRALIA_VIEWBOX, roadWidth: AUSTRALIA_ROAD_WIDTH, startFinish: AUSTRALIA_START_FINISH, points: AUSTRALIA_POINTS },
+  china: { viewBox: CHINA_VIEWBOX, roadWidth: CHINA_ROAD_WIDTH, startFinish: CHINA_START_FINISH, points: CHINA_POINTS },
+  japan: { viewBox: JAPAN_VIEWBOX, roadWidth: JAPAN_ROAD_WIDTH, startFinish: JAPAN_START_FINISH, points: JAPAN_POINTS },
+  bahrain: { viewBox: BAHRAIN_VIEWBOX, roadWidth: BAHRAIN_ROAD_WIDTH, startFinish: BAHRAIN_START_FINISH, points: BAHRAIN_POINTS },
+  miami: { viewBox: MIAMI_VIEWBOX, roadWidth: MIAMI_ROAD_WIDTH, startFinish: MIAMI_START_FINISH, points: MIAMI_POINTS },
+  canada: { viewBox: CANADA_VIEWBOX, roadWidth: CANADA_ROAD_WIDTH, startFinish: CANADA_START_FINISH, points: CANADA_POINTS },
+  barcelona: { viewBox: BARCELONA_VIEWBOX, roadWidth: BARCELONA_ROAD_WIDTH, startFinish: BARCELONA_START_FINISH, points: BARCELONA_POINTS },
+  austria: { viewBox: AUSTRIA_VIEWBOX, roadWidth: AUSTRIA_ROAD_WIDTH, startFinish: AUSTRIA_START_FINISH, points: AUSTRIA_POINTS },
+  hungary: { viewBox: HUNGARY_VIEWBOX, roadWidth: HUNGARY_ROAD_WIDTH, startFinish: HUNGARY_START_FINISH, points: HUNGARY_POINTS },
+  netherlands: { viewBox: NETHERLANDS_VIEWBOX, roadWidth: NETHERLANDS_ROAD_WIDTH, startFinish: NETHERLANDS_START_FINISH, points: NETHERLANDS_POINTS },
+  italy: { viewBox: ITALY_VIEWBOX, roadWidth: ITALY_ROAD_WIDTH, startFinish: ITALY_START_FINISH, points: ITALY_POINTS },
+  madrid: { viewBox: MADRID_VIEWBOX, roadWidth: MADRID_ROAD_WIDTH, startFinish: MADRID_START_FINISH, points: MADRID_POINTS },
+  azerbaijan: { viewBox: AZERBAIJAN_VIEWBOX, roadWidth: AZERBAIJAN_ROAD_WIDTH, startFinish: AZERBAIJAN_START_FINISH, points: AZERBAIJAN_POINTS },
+  singapore: { viewBox: SINGAPORE_VIEWBOX, roadWidth: SINGAPORE_ROAD_WIDTH, startFinish: SINGAPORE_START_FINISH, points: SINGAPORE_POINTS },
+  'united-states': { viewBox: UNITED_STATES_VIEWBOX, roadWidth: UNITED_STATES_ROAD_WIDTH, startFinish: UNITED_STATES_START_FINISH, points: UNITED_STATES_POINTS },
+  mexico: { viewBox: MEXICO_VIEWBOX, roadWidth: MEXICO_ROAD_WIDTH, startFinish: MEXICO_START_FINISH, points: MEXICO_POINTS },
+  brazil: { viewBox: BRAZIL_VIEWBOX, roadWidth: BRAZIL_ROAD_WIDTH, startFinish: BRAZIL_START_FINISH, points: BRAZIL_POINTS },
+  'las-vegas': { viewBox: LAS_VEGAS_VIEWBOX, roadWidth: LAS_VEGAS_ROAD_WIDTH, startFinish: LAS_VEGAS_START_FINISH, points: LAS_VEGAS_POINTS },
+  qatar: { viewBox: QATAR_VIEWBOX, roadWidth: QATAR_ROAD_WIDTH, startFinish: QATAR_START_FINISH, points: QATAR_POINTS },
+  'abu-dhabi': { viewBox: ABU_DHABI_VIEWBOX, roadWidth: ABU_DHABI_ROAD_WIDTH, startFinish: ABU_DHABI_START_FINISH, points: ABU_DHABI_POINTS },
+};
 
 const pathFromPoints = (points: readonly (readonly [number, number])[]) => `M${points.map(([x, y]) => `${x} ${y}`).join(' L')}`;
 
