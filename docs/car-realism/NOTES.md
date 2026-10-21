@@ -72,3 +72,27 @@ keeps the old one); the livery pictures went from 1536 to 2048 pixels wide.
 
 Still weak: the front wing elements read as stacked dark slabs from the front; the airbox "ears" and the engine
 cover ridge are simpler than the real car's; no sidewall lettering on the tyres beyond the dashes.
+
+## 2022 liveries (checkpoint-2022-liveries)
+
+References: reference/gen2022/liveries/<id>/ (three Commons photos each, fetched with tools/fetch_refs.py, licences
+in sources.txt). All ten liveries redrawn against the photos and the new geometry. Biggest corrections: the
+Mercedes W13 was silver, not black; Alfa Romeo's sidepods and airbox are white with the red kept to the nose and the
+tail; McLaren's engine cover flanks are black; Red Bull's nose is yellow with the bulls on it and the engine cover
+carries the Red Bull badge instead of an orange panel; painted halos where the team painted them (McLaren papaya,
+Alpine blue, AlphaTauri, Alfa Romeo and Haas white, Red Bull and Aston Martin in their body color).
+
+| Livery | Before | After | Notes |
+|---|---|---|---|
+| ferrari-2022 | 6 | 7.5 | Shell roundel, Ceva, Ray-Ban, Santander placed as on the F1-75; red front flaps; carbon halo |
+| mercedes-2022 | 3 | 7.5 | silver body, teal swoosh, INEOS on the airbox, black tail |
+| mclaren-2022 | 5 | 7 | black engine cover flanks with android, blue swoosh, DeWalt box, papaya halo |
+| redbull-2022 | 5 | 7 | yellow nose with the bulls, ORACLE on the pod, Red Bull badge on the cover, red floor edge |
+| alpine-2022 | 5 | 7 | brighter blue, pink BWT panel, MAPFRE box, Castrol badge, blue halo |
+| astonmartin-2022 | 6 | 7 | lime line, aramco on the cover, JCB, lime rear wing edge |
+| alphatauri-2022 | 6 | 7 | white upper body with the bull splash, white halo, FASHION MEETS FUNCTION on the rear wing |
+| alfaromeo-2022 | 4 | 7 | white pods and airbox, red nose and tail, white halo |
+| haas-2022 | 6 | 7 | red HAAS, red floor band and nose stripe, 1&1 box, white halo |
+| williams-2022 | 5 | 6.5 | bright blue cover and nose, black lower body |
+
+Two rounds: the second only moved ALFA ROMEO clear of the rear wheel and ARAMCO clear of the halo.

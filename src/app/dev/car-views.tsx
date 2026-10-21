@@ -21,7 +21,7 @@ const viewById = (id: string | undefined) => VIEWS.find((v) => v.id === id) ?? V
 
 /** The angles a livery is judged from on the contact sheet. */
 const SHEET_VIEWS: readonly ViewId[] = ['three-quarter', 'side', 'top'];
-const SHEET_TILE = { width: 520, height: 300 };
+const SHEET_TILE = { width: 520, height: 320 };
 const SETTLE_MS = 1100; // time for a freshly built car and its textures to be drawn before its canvas is read
 
 /** Where captured pictures go: the dev sink server (tools/shot-sink.mjs) saves them under docs/car-realism/. */
@@ -149,7 +149,7 @@ export default function CarViewsScreen() {
     if (onWeb()) (window as unknown as { __shoot?: typeof shoot }).__shoot = shoot;
   }, []);
 
-  if (sheet) return <SheetScreen era={sheet} save={params.save} />;
+  if (sheet) return <SheetScreen era={sheet} save={params.save} zoom={params.zoom ? Number(params.zoom) : 0.8} />;
 
   const columns = width >= WIDE ? 2 : 1;
   const only = params.view;
@@ -204,7 +204,7 @@ export default function CarViewsScreen() {
  * The contact sheet: renders the liveries of a generation one after another on a small stage (three angles), keeps a
  * picture of each, and shows them all in a column. With `save`, the whole sheet is also posted to the sink server.
  */
-function SheetScreen({ era, save }: { era: string; save?: string }) {
+function SheetScreen({ era, save, zoom }: { era: string; save?: string; zoom: number }) {
   const styles = useStyles();
   const liveries = sheetLiveries(era);
   const [index, setIndex] = useState(0);
@@ -251,7 +251,7 @@ function SheetScreen({ era, save }: { era: string; save?: string }) {
             return (
               <View key={id} style={[styles.tile, SHEET_TILE]} testID={`sheet-${id}`}>
                 <Text style={styles.label}>{`${current.name} ${view.label}`.toUpperCase()}</Text>
-                <Car3DView car={{ liveryId: current.id, number: 16 }} height={SHEET_TILE.height} autoSpin={false} zoom={view.zoom} fixedView={{ yaw: view.yaw, pitch: view.pitch }} capture />
+                <Car3DView car={{ liveryId: current.id, number: 16 }} height={SHEET_TILE.height} autoSpin={false} zoom={view.zoom * zoom} fixedView={{ yaw: view.yaw, pitch: view.pitch }} capture />
               </View>
             );
           })}
