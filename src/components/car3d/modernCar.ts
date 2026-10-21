@@ -258,9 +258,10 @@ export function buildModernCar(spec: CarSpec, livery: Livery, options: CarOption
   // end plates: plain, or with their lettering when the livery has some
   const plateTextures: THREE.Texture[] = [];
   const plateMaterial = (kind: 'front' | 'rear', outline: typeof spec.frontWing.endplate, side: 1 | -1): THREE.Material => {
-    const texts = livery.plateTexts?.[kind];
-    if (!texts || texts.length === 0) return kind === 'front' ? m.frontEndplate : m.endplate;
-    const texture = buildPlateTexture(outline, (kind === 'front' ? livery.frontParts ?? livery.parts : livery.parts).endplate, texts, side < 0);
+    const texts = livery.plateTexts?.[kind] ?? [];
+    const decals = livery.plateDecals?.[kind] ?? [];
+    if (texts.length === 0 && decals.length === 0) return kind === 'front' ? m.frontEndplate : m.endplate;
+    const texture = buildPlateTexture(outline, (kind === 'front' ? livery.frontParts ?? livery.parts : livery.parts).endplate, texts, side < 0, decals);
     plateTextures.push(texture);
     return new THREE.MeshPhysicalMaterial({ map: texture, metalness: 0.1, roughness: matte ? 0.55 : 0.32, clearcoat: matte ? 0.1 : 0.9, clearcoatRoughness: matte ? 0.5 : 0.12, side: THREE.DoubleSide });
   };

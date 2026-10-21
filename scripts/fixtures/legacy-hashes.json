@@ -1,0 +1,387 @@
+{
+ "ferrari-1980s": [
+  "79c325a871a69301",
+  "4d217a4d6ea0706e",
+  "107696be0c58753c",
+  "2877c5d3b33786c2",
+  "5b915aad8ddf92ba",
+  "4873de1efbc1a2af",
+  "137b67dd7307eeb7"
+ ],
+ "mclaren-1980s": [
+  "717d8a0175a71591",
+  "169735fcb4b5bb34",
+  "38edfa50ed8fc117",
+  "e041a3ac5d4bd3a6",
+  "2d7c86f05f514c6d",
+  "126cea2652b6ffda",
+  "62cc96f9b376618b"
+ ],
+ "lotus-1980s": [
+  "d79237b20b68fcdc",
+  "1b558f4abddd7c7e",
+  "a6c9c68a5346aa46",
+  "61941cd0ad293800",
+  "1fa604dc1c7456e7",
+  "dee821adcb46c9c2",
+  "5d2d8d13f82f9e12"
+ ],
+ "williams-1980s": [
+  "f240ae4e95dd6dfb",
+  "7ec779c10a997691",
+  "1bfee44215e11469",
+  "6c657ccfcfca8d65",
+  "7b60f6e5ff448be8",
+  "2b50fdd9f32caa58",
+  "518c4f9a0afc4914"
+ ],
+ "benetton-1980s": [
+  "36b823d17a8a4c21",
+  "a99701c67193f327",
+  "d0143af66fc2dc0d",
+  "5c8b2f3f5c8ebc55",
+  "10220ba1dd171e3e",
+  "7634bb5395c0339d",
+  "1b3205b5ce4c6e25"
+ ],
+ "lotuscamel-1980s": [
+  "79ef403b6ed71894",
+  "839386c00eb062b1",
+  "0a625eb010727715",
+  "f35389d187abe272",
+  "eed113fdb3b5de9d",
+  "41369863ab65f5ce",
+  "3a3c563fc79c6142"
+ ],
+ "brabham-1980s": [
+  "2cd89327b5560aad",
+  "b96a42ca3cf50b5b",
+  "661cc0c74872c9ed",
+  "86749accd596cae2",
+  "db1480f3cab022e9",
+  "9718240513e92bfa",
+  "1cd11cbcd6ddf561"
+ ],
+ "ferrari-2004": [
+  "5048a5f105a33190",
+  "5f6c1b7261bddc2f",
+  "1f0b73a52e72b841",
+  "9a7ae17d119f443d",
+  "6f7bcdd3ebcc95a3",
+  "0ba5d1b1c4da5b59",
+  "ec17e7041a79b070"
+ ],
+ "mclaren-2004": [
+  "e4a71eae5f93c849",
+  "bca4a8278a69d8d8",
+  "5cd7b24c9e358815",
+  "66da5ba8ff4fe479",
+  "a619609a3360e433",
+  "beea9a76c88eb7d8",
+  "08bf4e474d7d53bf"
+ ],
+ "williams-2004": [
+  "cce0a556080ff3cb",
+  "b65b28ecb2f12f33",
+  "0eddeadc553fa146",
+  "a82c1804077e3aef",
+  "f448cb768ba2d75c",
+  "0800ed3f36b5e805",
+  "855a3d318b0edf95"
+ ],
+ "renault-2004": [
+  "abb63319e11105b1",
+  "9a5adfd1781567a3",
+  "94c2823f6b9d24a7",
+  "f48fec9fe9759b3c",
+  "a0a243afbfba394c",
+  "19336af500f79325",
+  "21f6b2d27c8746ce"
+ ],
+ "bar-2004": [
+  "426db31add94a43c",
+  "24d90a96e599c34d",
+  "10c5e9238dff10df",
+  "5fac5c41f6f5e29b",
+  "cabcfaebf3fdc790",
+  "7148cc9456b13500",
+  "ad5045c5d22e0ca3"
+ ],
+ "jaguar-2004": [
+  "218fffdf762eca6b",
+  "08730715d010e045",
+  "77b624d0279a2d87",
+  "9b99b1ae56f2bfce",
+  "15b7b7fcb1ac8fc1",
+  "b8b50c1a0cd1973d",
+  "5ce75e948e26a72c"
+ ],
+ "toyota-2004": [
+  "dba1e05aca40c670",
+  "0eda3d8ded7ed8ee",
+  "9c4e3e68ea8faa86",
+  "accc601e3e243438",
+  "cac6a1a5d72913e2",
+  "48a7deb3e2376715",
+  "d1077fef73256d30"
+ ],
+ "ferrari-2014": [
+  "26eb24ae575681b5",
+  "70ca79361045ffca",
+  "2f9a7e76fdc2b0f4",
+  "671ad1b5175e03a3",
+  "bb61a39289594054",
+  "2107c1a3c18f1ded",
+  "799ef4659a7de65e"
+ ],
+ "mercedes-2014": [
+  "c12ad3ee360fefff",
+  "28794d5ef4234aa2",
+  "7c0d17b38bbed0c9",
+  "4e01abe4e52d5188",
+  "d9598f510f89d5dd",
+  "3d7e18c0c14952d8",
+  "bbb3292d09f6a09f"
+ ],
+ "mclaren-2014": [
+  "9326492ab42376b1",
+  "086a6f0898c294b0",
+  "375e5540e0177490",
+  "671ad1b5175e03a3",
+  "bb61a39289594054",
+  "ed4f67ee417a37cb",
+  "5c0c4321e13152a6"
+ ],
+ "redbull-2014": [
+  "56fe496e548e58e6",
+  "3e23fb8310232bba",
+  "c0302e5f8537e560",
+  "b7f3b6449c258b14",
+  "6b4de705bc2876cb",
+  "1131d281bb17fb4d",
+  "60915f7586463b8f"
+ ],
+ "forceindia-2014": [
+  "652e9f62f4ffeaae",
+  "65d2f6c974563254",
+  "343e89560f278e05",
+  "e36fcc79e6053d91",
+  "1a949b105129c592",
+  "2b1ef428b399aa79",
+  "bde208e9c9a0cb52"
+ ],
+ "renault-2014": [
+  "9af8d6324edebb99",
+  "e605c907c3547fbf",
+  "e02213ecafc20f01",
+  "eeac85fb3bdc3438",
+  "216e3e8b12e4e3db",
+  "f5f1e7de8147b277",
+  "6954add900dff823"
+ ],
+ "williams-2014": [
+  "f7ca7a923822704e",
+  "f5d14844f72ea6f2",
+  "a71b6d00b85c7da2",
+  "e45e83499f8a7ec4",
+  "e05d43787b8eaebd",
+  "496777e350d4d6a7",
+  "bc82391d5b6538a1"
+ ],
+ "ferrari-2022": [
+  "a0d2983de117e9bf",
+  "d2ee3f89d44460aa",
+  "a9d050ff988b5acc",
+  "d20b3f014d793547",
+  "cdd033d9d873da55",
+  "f4090f68602e28cb",
+  "286967aa34aadbe6"
+ ],
+ "mercedes-2022": [
+  "bb08b85a93e0500d",
+  "34c5863aa5bfc817",
+  "a5aa5bf803e849b9",
+  "7efa52cd6a799296",
+  "d1a8d7961d271103",
+  "b695db78f4245ae3",
+  "1aa41d46eb328a55"
+ ],
+ "mclaren-2022": [
+  "cd82ecb964050b28",
+  "f2090af7f9cfe0f9",
+  "268174451fb5732b",
+  "dc10b838476d15e1",
+  "0649fe943b535b5e",
+  "2875e5a1f13bdb6e",
+  "b572846459f86c24"
+ ],
+ "redbull-2022": [
+  "c72b114e1c8e8265",
+  "02e0a1c0cfa837f1",
+  "8c5f1be3eca882bf",
+  "de86aeadc01e0cfa",
+  "3acb8cef7578bf33",
+  "e9c09adb461dc8eb",
+  "c4b28b71be7ea2c6"
+ ],
+ "alpine-2022": [
+  "a3cef6d53cebea47",
+  "a76fc025d09904e3",
+  "496df5ce0756e56d",
+  "4e066433c6c6bbd4",
+  "9d1d11b7152294ac",
+  "9dc2e770f7cab856",
+  "e0f6007373eab202"
+ ],
+ "astonmartin-2022": [
+  "3576860abcd84308",
+  "c6a1fd1e940239f0",
+  "7e00f3e3ba996278",
+  "546c05d911f58bb3",
+  "cec7bb0c43c26910",
+  "49a4371ed0361831",
+  "75575bd8a4c83fb0"
+ ],
+ "alphatauri-2022": [
+  "ca0107a1b9cb12db",
+  "b3efec98b915b3af",
+  "a78943d487e96518",
+  "5a83246e5ded742c",
+  "c8eb5b15454f5398",
+  "a162c7dbb35466ee",
+  "80ffe1848e15bcd4"
+ ],
+ "alfaromeo-2022": [
+  "c5cf668ea8887fd3",
+  "8c53c1ca55d22505",
+  "3fb78cb2b749add6",
+  "d8aca468f8bad7df",
+  "ba38a0da6f1229bd",
+  "cf1bd18899ccf9b1",
+  "aa4575babcb8665e"
+ ],
+ "haas-2022": [
+  "591ed31df28975e1",
+  "ab581fba3f18e49b",
+  "38c1d4279dfd6fb3",
+  "94298fdcff8765c7",
+  "d5db185cdc2c6b91",
+  "660660874db911fb",
+  "9d572134c5523c97"
+ ],
+ "williams-2022": [
+  "e55169f170fcaefd",
+  "1233961a61e689da",
+  "0e45fd4944fd5321",
+  "76a2f30ab3b57bde",
+  "28e1bfc9dff10b32",
+  "0219f616f09edd27",
+  "6792e6da5227d6be"
+ ],
+ "ferrari-2026": [
+  "4b4b7f03a030051e",
+  "894dff0466ba11b1",
+  "0796214b52bba3b6",
+  "c3ca370f85afea3f",
+  "5a9e515dbb107245",
+  "3c52421b5a800aeb",
+  "5212e976da08d358"
+ ],
+ "mercedes-2026": [
+  "6439feceb70f1d56",
+  "4c036449dc77e53f",
+  "2d6f60323da01109",
+  "50dace8611bdf9b3",
+  "6613f899bc42675e",
+  "794c0382515ad9c9",
+  "83799c4527699e5b"
+ ],
+ "mclaren-2026": [
+  "ae71d19dae8c7066",
+  "fb8038d137274e20",
+  "c269305b434d0594",
+  "262e68566ee85481",
+  "df8a35d00f87ea5e",
+  "b480851c6b8c0854",
+  "4703334a6999e4d7"
+ ],
+ "redbull-2026": [
+  "e593f1f2ce24c9c0",
+  "8c6da721859f8c50",
+  "774756d2689766fb",
+  "c95e25b6433867cb",
+  "7d37e5e94158d504",
+  "095d85abd1934c31",
+  "85c07e38a4463d20"
+ ],
+ "racingbulls-2026": [
+  "2e7dde855491248b",
+  "6656c382cecade1b",
+  "3a57f347097e12a1",
+  "465a643f9cb3b653",
+  "197f641f6e7eac14",
+  "8ff83b6e153cbcc7",
+  "971ac1641b791260"
+ ],
+ "alpine-2026": [
+  "0c24c8d433745e67",
+  "ad0c40e33b3084bc",
+  "f0d479c51138da67",
+  "a00b55a042379017",
+  "7f22e193f89e481f",
+  "e26d1ea57a3b990d",
+  "a48f5d205f4c9632"
+ ],
+ "astonmartin-2026": [
+  "4b01fce821a66534",
+  "47fb070ad4689283",
+  "e710f0bb5d74369b",
+  "a820c9acd3d1448c",
+  "cb92fdb01979c60e",
+  "b25e6f004733aad5",
+  "d6ec0e82de39411a"
+ ],
+ "williams-2026": [
+  "0ec63691f9eb8930",
+  "a814f5175076506a",
+  "69488a9ef7a937c9",
+  "c4fa927d7815191e",
+  "6cc55935a58c5032",
+  "594ba5ddac8c6523",
+  "422036f624d04089"
+ ],
+ "haas-2026": [
+  "75a680479bc6088d",
+  "4a2225563aa93873",
+  "5956e75284bd84de",
+  "6de47a162a62daa8",
+  "7ae2a282b7b526ed",
+  "8775be6a61189910",
+  "53d8be4a8595ae0b"
+ ],
+ "audi-2026": [
+  "79da0c803102768a",
+  "0ffb50bbabd70b6d",
+  "28be48a908070e92",
+  "004112502a7535d2",
+  "0cb661125322b4f1",
+  "c11e358754f7f7ce",
+  "96f9855521d1500c"
+ ],
+ "cadillac-2026": [
+  "baf35ca006eeea4e",
+  "b1f907ba3820f0e6",
+  "e98b0b57f9c3c80d",
+  "67a4d9fa7a702705",
+  "f4c0d830dda138e3",
+  "f8168f2db234f05a",
+  "af497ae37cf847d8"
+ ],
+ "legacy-pixel": [
+  "788047c44188d94b",
+  "8bf6f72d5acf37e4",
+  "421c2bad949a7d00",
+  "998c00f20d34041c",
+  "3ac69363f6e8f4ef"
+ ]
+}

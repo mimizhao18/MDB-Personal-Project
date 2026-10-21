@@ -1,215 +1,17 @@
 import * as THREE from 'three';
 
-import { specFor } from '../../data/cars';
-import { PAINT_BOX, frontWingSection, rearWingSection } from '../../data/cars/spec';
+import { PAINT_BOX } from '../../data/cars/spec';
 import type { Outline } from '../../data/cars/spec';
-import type { Livery, LiveryLayer, LiveryText } from '../../data/liveries';
-import { GLYPH_HEIGHT, GLYPH_WIDTH, glyphRows } from './font';
-import { LETTER_GAP, glyphPolygons, strokeGlyph, strokeTextWidth } from './strokeFont';
+import type { Livery, LiveryDecal, LiveryText } from '../../data/liveryTypes';
+import type { LiveryPixels } from './liveryRaster';
+import { paintLivery, paintPlate } from './liveryRaster';
 
 // A livery is a pair of flat pictures: one of the car seen from above, one seen from the side. The paint material looks
 // each surface point up in them by its position on the car (top picture for surfaces facing up, side picture for the
-// rest), so one set of flat shapes colors the whole body no matter how it is curved.
+// rest), so one set of flat shapes colors the whole body no matter how it is curved. The pictures are painted on the
+// CPU by liveryRaster.ts; this file makes them into textures and patches the materials' shaders.
 
 const { xMin, xMax, zHalf, yMax } = PAINT_BOX;
-const TOP_W = 2048;
-const TOP_H = 768;
-const SIDE_W = 2048;
-const SIDE_H = 448;
-const SUBSAMPLES = 4;
-
-type Rgb = [number, number, number];
-
-function hexToRgb(hex: string): Rgb {
-  const n = parseInt(hex.slice(1), 16);
-  return [(n >> 16) & 255, (n >> 8) & 255, n & 255];
-}
-
-/** Fills a polygon (in pixel coordinates) with a color, with soft edges from a few samples per pixel row. */
-function fillPolygon(data: Uint8Array, width: number, height: number, points: readonly (readonly [number, number])[], rgb: Rgb): void {
-  if (points.length < 3) return;
-  let minY = Infinity;
-  let maxY = -Infinity;
-  let minX = Infinity;
-  let maxX = -Infinity;
-  for (const [x, y] of points) {
-    minY = Math.min(minY, y);
-    maxY = Math.max(maxY, y);
-    minX = Math.min(minX, x);
-    maxX = Math.max(maxX, x);
-  }
-  const first = Math.max(0, Math.floor(minY));
-  const last = Math.min(height - 1, Math.ceil(maxY));
-  // only the columns the polygon can touch are scanned (lettering is thousands of small polygons)
-  const colFirst = Math.max(0, Math.floor(minX));
-  const colLast = Math.min(width - 1, Math.ceil(maxX));
-  if (colLast < colFirst || last < first) return;
-  const coverage = new Float32Array(colLast - colFirst + 1);
-
-  for (let py = first; py <= last; py++) {
-    coverage.fill(0);
-    let touched = false;
-    for (let k = 0; k < SUBSAMPLES; k++) {
-      const sy = py + (k + 0.5) / SUBSAMPLES;
-      const crossings: number[] = [];
-      for (let i = 0; i < points.length; i++) {
-        const [x0, y0] = points[i];
-        const [x1, y1] = points[(i + 1) % points.length];
-        if ((y0 <= sy && y1 > sy) || (y1 <= sy && y0 > sy)) crossings.push(x0 + ((sy - y0) / (y1 - y0)) * (x1 - x0));
-      }
-      crossings.sort((a, b) => a - b);
-      for (let c = 0; c + 1 < crossings.length; c += 2) {
-        const xa = Math.max(0, crossings[c]);
-        const xb = Math.min(width, crossings[c + 1]);
-        if (xb <= xa) continue;
-        touched = true;
-        for (let px = Math.max(colFirst, Math.floor(xa)); px < Math.min(colLast + 1, Math.ceil(xb)); px++) {
-          coverage[px - colFirst] += (Math.min(px + 1, xb) - Math.max(px, xa)) / SUBSAMPLES;
-        }
-      }
-    }
-    if (!touched) continue;
-    for (let px = colFirst; px <= colLast; px++) {
-      const a = Math.min(1, coverage[px - colFirst]);
-      if (a <= 0) continue;
-      const o = (py * width + px) * 4;
-      data[o] += (rgb[0] - data[o]) * a;
-      data[o + 1] += (rgb[1] - data[o + 1]) * a;
-      data[o + 2] += (rgb[2] - data[o + 2]) * a;
-    }
-  }
-}
-
-type ToPixel = (a: number, b: number) => [number, number];
-
-/** The flat shapes of the wing elements seen from above, in their paint colors, so the wings are painted (and can carry lettering) too. */
-function wingLayers(livery: Livery): LiveryLayer[] {
-  const spec = specFor(livery.era);
-  const layers: LiveryLayer[] = [];
-  const fw = spec.frontWing;
-  const front = livery.frontParts ?? livery.parts;
-  for (const e of fw.elements) {
-    const color = e.flap ? front.flap : front.wing;
-    const z0 = Math.max(e.from, 0.12); // leave the middle to the nose, which runs into the wing
-    const zs = Array.from({ length: 24 }, (_, i) => z0 + ((fw.span - 0.01 - z0) * i) / 23);
-    for (const side of [1, -1]) {
-      const le = zs.map((z) => [frontWingSection(spec, e, z).x, z * side] as const);
-      const te = zs.map((z) => {
-        const sec = frontWingSection(spec, e, z);
-        return [sec.x - sec.chord, z * side] as const;
-      });
-      layers.push({ color, points: [...le, ...te.reverse()] });
-    }
-  }
-  const rw = spec.rearWing;
-  for (const e of rw.elements) {
-    const color = e.flap ? livery.parts.flap : livery.parts.wing;
-    const half = rw.span - 0.01;
-    const zs = Array.from({ length: 30 }, (_, i) => -half + (2 * half * i) / 29);
-    const le = zs.map((z) => [rearWingSection(spec, e, z).x, z] as const);
-    const te = zs.map((z) => {
-      const sec = rearWingSection(spec, e, z);
-      return [sec.x - sec.chord, z] as const;
-    });
-    layers.push({ color, points: [...le, ...te.reverse()] });
-  }
-  return layers;
-}
-
-/** A flat picture: the base color with the livery's shapes filled in (no lettering yet). */
-function paintShapes(width: number, height: number, base: Rgb, layers: readonly LiveryLayer[], toPixel: ToPixel): Uint8Array {
-  const data = new Uint8Array(width * height * 4);
-  for (let i = 0; i < width * height; i++) {
-    data[i * 4] = base[0];
-    data[i * 4 + 1] = base[1];
-    data[i * 4 + 2] = base[2];
-    data[i * 4 + 3] = 255;
-  }
-  for (const layer of layers) {
-    fillPolygon(data, width, height, layer.points.map(([a, b]) => toPixel(a, b)), hexToRgb(layer.color));
-  }
-  return data;
-}
-
-/**
- * Letters one piece of text onto a picture. `view` says which way is up for the letters: in the top picture the car's
- * right side is down; in the side picture up is up. `mirror` draws it back to front, for the picture seen from the
- * other side of the car, so the letters read the right way round from both sides.
- */
-function drawText(data: Uint8Array, width: number, height: number, toPixel: ToPixel, t: LiveryText, mirror: boolean): void {
-  if (t.font !== 'pixel') return drawStrokeText(data, width, height, toPixel, t, mirror);
-  const text = t.text;
-  const p = t.height / GLYPH_HEIGHT; // the size of one font pixel, in metres
-  const advance = (GLYPH_WIDTH + 1) * p + (t.spacing ?? 0);
-  const length = text.length * advance - p;
-  const start = t.align === 'center' ? t.x - length / 2 : t.align === 'right' ? t.x - length : t.x;
-  const rgb = hexToRgb(t.color);
-  if (t.view === 'top' && t.orient && t.orient !== 'along') {
-    // across the wing: the letters advance along z, with their tops toward the front (read from the rear) or the rear
-    const fromRear = t.orient === 'across-rear';
-    const zStart = fromRear ? t.y - length / 2 : t.y + length / 2;
-    for (let i = 0; i < text.length; i++) {
-      const rows = glyphRows(text[i]);
-      for (let r = 0; r < GLYPH_HEIGHT; r++) {
-        for (let c = 0; c < GLYPH_WIDTH; c++) {
-          if (!((rows[r] >> (GLYPH_WIDTH - 1 - c)) & 1)) continue;
-          const off = i * advance + c * p;
-          const z0 = fromRear ? zStart + off : zStart - off - p;
-          const x0 = fromRear ? t.x + t.height / 2 - (r + 1) * p : t.x - t.height / 2 + r * p;
-          fillPolygon(data, width, height, [toPixel(x0, z0), toPixel(x0 + p, z0), toPixel(x0 + p, z0 + p), toPixel(x0, z0 + p)], rgb);
-        }
-      }
-    }
-    return;
-  }
-  for (let i = 0; i < text.length; i++) {
-    const slot = mirror ? text.length - 1 - i : i;
-    const rows = glyphRows(text[i]);
-    for (let r = 0; r < GLYPH_HEIGHT; r++) {
-      for (let c = 0; c < GLYPH_WIDTH; c++) {
-        const col = mirror ? GLYPH_WIDTH - 1 - c : c;
-        if (!((rows[r] >> (GLYPH_WIDTH - 1 - col)) & 1)) continue;
-        const x0 = start + slot * advance + c * p;
-        // top view: the glyph's top row is toward -z; side view: toward +y
-        const lo = t.view === 'top' ? t.y - t.height / 2 + r * p : t.y + t.height / 2 - (r + 1) * p;
-        fillPolygon(data, width, height, [toPixel(x0, lo), toPixel(x0 + p, lo), toPixel(x0 + p, lo + p), toPixel(x0, lo + p)], rgb);
-      }
-    }
-  }
-}
-
-/**
- * Letters one piece of text in the bold stroke font. Each glyph is laid out in its own units (100 tall, x to the
- * right, y up) and mapped into the picture by `view` and `orient` like the pixel font: along the car (side view: y up;
- * top view: the glyph's top toward -z), or across a wing. `mirror` reverses the run and each glyph for the far side.
- */
-function drawStrokeText(data: Uint8Array, width: number, height: number, toPixel: ToPixel, t: LiveryText, mirror: boolean): void {
-  const text = t.text;
-  const unit = t.height / 100; // metres per glyph unit
-  const extraGap = (t.spacing ?? 0) / unit;
-  const run = strokeTextWidth(text, extraGap) * unit; // the whole run, in metres
-  const across = t.view === 'top' && t.orient && t.orient !== 'along';
-  const fromRear = t.orient === 'across-rear';
-  // where the run starts along its reading direction (metres)
-  // Across a wing the glyph tops point to the rear (-x): both wings rise toward the back, so that edge is the upper
-  // one whether the wing is seen from behind (reader's right +z) or from the front (reader's right -z).
-  const start = across ? (fromRear ? t.y - run / 2 : t.y + run / 2) : t.align === 'center' ? t.x - run / 2 : t.align === 'right' ? t.x - run : t.x;
-  const rgb = hexToRgb(t.color);
-  let offset = 0; // along the run, in metres
-  for (let i = 0; i < text.length; i++) {
-    const glyph = strokeGlyph(text[mirror ? text.length - 1 - i : i]);
-    const w = glyph.width * unit;
-    const at = offset;
-    const map = (u: number, v: number): readonly [number, number] => {
-      const gu = (mirror ? glyph.width - u : u) * unit; // along the reading direction, from the glyph's start
-      const gv = (v - 50) * unit; // up from the middle of the cap height
-      if (across) return fromRear ? toPixel(t.x - gv, start + at + gu) : toPixel(t.x - gv, start - at - gu);
-      return t.view === 'top' ? toPixel(start + at + gu, t.y - gv) : toPixel(start + at + gu, t.y + gv);
-    };
-    for (const polygon of glyphPolygons(glyph, map)) fillPolygon(data, width, height, polygon, rgb);
-    offset += w + (LETTER_GAP + extraGap) * unit;
-  }
-}
 
 function toTexture(data: Uint8Array, width: number, height: number): THREE.DataTexture {
   const texture = new THREE.DataTexture(data, width, height, THREE.RGBAFormat);
@@ -230,42 +32,38 @@ export interface LiveryPictures {
   sideLeft: THREE.DataTexture;
 }
 
-/** Draws the livery's pictures. Free them with `disposePictures` when the car is no longer needed. */
-export function buildLiveryPictures(livery: Livery): LiveryPictures {
-  const base = hexToRgb(livery.primary);
-  const topPixel: ToPixel = (x, z) => [((x - xMin) / (xMax - xMin)) * TOP_W, ((z + zHalf) / (2 * zHalf)) * TOP_H];
-  const sidePixel: ToPixel = (x, y) => [((x - xMin) / (xMax - xMin)) * SIDE_W, (y / yMax) * SIDE_H];
-  const topData = paintShapes(TOP_W, TOP_H, base, [...livery.top, ...wingLayers(livery), ...(livery.wingTop ?? [])], topPixel);
-  const sideData = paintShapes(SIDE_W, SIDE_H, base, livery.side, sidePixel);
-  const sideLeftData = sideData.slice();
-  for (const t of livery.texts ?? []) {
-    if (t.view === 'top') drawText(topData, TOP_W, TOP_H, topPixel, t, false);
-    else {
-      drawText(sideData, SIDE_W, SIDE_H, sidePixel, t, false);
-      drawText(sideLeftData, SIDE_W, SIDE_H, sidePixel, t, true);
-    }
+// The painted pixels of the last few liveries, so going back and forth between cars (Garage, Store) does not paint
+// them again. The pixels are kept, not the textures: a texture is freed with its car, the pixels are only read.
+const CACHE_SIZE = 3;
+const cache = new Map<Livery, LiveryPixels>();
+
+/** The livery's pixels, painted or from the cache. */
+export function liveryPixels(livery: Livery): LiveryPixels {
+  const hit = cache.get(livery);
+  if (hit) {
+    cache.delete(livery);
+    cache.set(livery, hit);
+    return hit;
   }
-  return { top: toTexture(topData, TOP_W, TOP_H), side: toTexture(sideData, SIDE_W, SIDE_H), sideLeft: toTexture(sideLeftData, SIDE_W, SIDE_H) };
+  const pixels = paintLivery(livery);
+  cache.set(livery, pixels);
+  while (cache.size > CACHE_SIZE) cache.delete(cache.keys().next().value as Livery);
+  return pixels;
 }
 
-/** A picture for a wing end plate: its color with its lettering, sized to the plate outline and mapped by position. */
-export function buildPlateTexture(outline: Outline, base: string, texts: readonly LiveryText[], mirror: boolean): THREE.DataTexture {
-  const xs = outline.map(([x]) => x);
-  const ys = outline.map(([, y]) => y);
-  const x0 = Math.min(...xs);
-  const y0 = Math.min(...ys);
-  const w = Math.max(...xs) - x0;
-  const h = Math.max(...ys) - y0;
-  const PPM = 420; // pixels per metre
-  const width = Math.max(8, Math.ceil(w * PPM));
-  const height = Math.max(8, Math.ceil(h * PPM));
-  const toPixel: ToPixel = (x, y) => [(x - x0) * PPM, (y - y0) * PPM];
-  const data = paintShapes(width, height, hexToRgb(base), [], toPixel);
-  for (const t of texts) drawText(data, width, height, toPixel, { ...t, view: 'side' }, mirror);
-  const texture = toTexture(data, width, height);
+/** Draws the livery's pictures. Free them with `disposePictures` when the car is no longer needed. */
+export function buildLiveryPictures(livery: Livery): LiveryPictures {
+  const { top, side, sideLeft } = liveryPixels(livery);
+  return { top: toTexture(top.data, top.width, top.height), side: toTexture(side.data, side.width, side.height), sideLeft: toTexture(sideLeft.data, sideLeft.width, sideLeft.height) };
+}
+
+/** A picture for a wing end plate: its color with its logos and lettering, sized to the plate outline and mapped by position. */
+export function buildPlateTexture(outline: Outline, base: string, texts: readonly LiveryText[], mirror: boolean, decals: readonly LiveryDecal[] = []): THREE.DataTexture {
+  const pic = paintPlate(outline, base, texts, decals, mirror);
+  const texture = toTexture(pic.data, pic.width, pic.height);
   // the end plate faces are mapped by their own x and y in metres, so scale and shift to the picture
-  texture.repeat.set(1 / w, 1 / h);
-  texture.offset.set(-x0 / w, -y0 / h);
+  texture.repeat.set(1 / pic.w, 1 / pic.h);
+  texture.offset.set(-pic.x0 / pic.w, -pic.y0 / pic.h);
   return texture;
 }
 

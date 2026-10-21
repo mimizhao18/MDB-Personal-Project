@@ -83,11 +83,12 @@ export function strokeTextWidth(text: string, extraGap = 0): number {
 
 /**
  * The filled shapes of a glyph: one polygon per stroke segment (a thick line with round ends) and per dot, in glyph
- * units. `map` turns a glyph-unit point into the picture's own coordinates.
+ * units. `map` turns a glyph-unit point into the picture's own coordinates. `extra` thickens every stroke by that many
+ * glyph units on each side (for outlined lettering).
  */
-export function glyphPolygons(glyph: StrokeGlyph, map: (u: number, v: number) => readonly [number, number]): (readonly [number, number])[][] {
+export function glyphPolygons(glyph: StrokeGlyph, map: (u: number, v: number) => readonly [number, number], extra = 0): (readonly [number, number])[][] {
   const polygons: (readonly [number, number])[][] = [];
-  const r = STROKE_WIDTH / 2;
+  const r = STROKE_WIDTH / 2 + extra;
   const disc = (cx: number, cy: number, radius: number) => Array.from({ length: 10 }, (_, k) => map(cx + radius * Math.cos((k / 10) * Math.PI * 2), cy + radius * Math.sin((k / 10) * Math.PI * 2)));
   for (const stroke of glyph.strokes) {
     for (let i = 0; i + 1 < stroke.length; i++) {
@@ -103,6 +104,6 @@ export function glyphPolygons(glyph: StrokeGlyph, map: (u: number, v: number) =>
     }
     if (stroke.length > 0) polygons.push(disc(stroke[0][0], stroke[0][1], r));
   }
-  for (const [cx, cy, radius] of glyph.dots ?? []) polygons.push(disc(cx, cy, radius));
+  for (const [cx, cy, radius] of glyph.dots ?? []) polygons.push(disc(cx, cy, radius + extra));
   return polygons;
 }

@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import { Image, ScrollView, Text, View, useWindowDimensions } from 'react-native';
 
 import { Car3DView, renderNow } from '../../components/car3d/Car3DView';
+import { paintLivery } from '../../components/car3d/liveryRaster';
 import type { EraId } from '../../data/eras';
 import { ERAS } from '../../data/eras';
 import { LIVERIES, getLivery } from '../../data/liveries';
@@ -121,7 +122,7 @@ async function shoot(name: string, columns = 2): Promise<string[]> {
   return cells.map((c) => c.label);
 }
 
-type Params = { livery?: string; liveries?: string; view?: string; tile?: string; zoom?: string; sheet?: string; save?: string; yaw?: string; pitch?: string };
+type Params = { livery?: string; liveries?: string; view?: string; tile?: string; zoom?: string; sheet?: string; save?: string; yaw?: string; pitch?: string; bench?: string };
 
 /** The liveries a contact sheet covers: one generation's, or all of them. */
 function sheetLiveries(sheet: string) {
@@ -137,7 +138,8 @@ function sheetLiveries(sheet: string) {
  *   &yaw=<radians>&pitch=<radians>   with &view=, any camera angle (yaw 0 looks at the nose, pi/2 at the right side)
  *   ?liveries=a,b,c,d&view=side      several liveries side by side on the same model, one angle each
  *   ?sheet=gen2022|all&save=<name>   a contact sheet of every livery of a generation (three angles each);
- *                                    with `save`, it is posted to the sink server as docs/car-realism/<name>.jpg
+ *                                    with `save`, it is posted to the sink server (tools/shot-sink.mjs) as <name>.jpg
+ *   ?bench=1                         paints every livery's pictures (no cache) and lists the time each took
  * In the browser console, `__shoot('<name>')` saves the tiles on the page the same way.
  */
 export default function CarViewsScreen() {
@@ -150,6 +152,7 @@ export default function CarViewsScreen() {
     if (onWeb()) (window as unknown as { __shoot?: typeof shoot }).__shoot = shoot;
   }, []);
 
+  if (params.bench) return <BenchScreen />;
   if (sheet) return <SheetScreen era={sheet} save={params.save} zoom={params.zoom ? Number(params.zoom) : 0.8} />;
 
   const columns = width >= WIDE ? 2 : 1;
@@ -231,7 +234,7 @@ function SheetScreen({ era, save, zoom }: { era: string; save?: string; zoom: nu
       if (save) {
         try {
           await post(save, await compose(rows, 1));
-          setStatus(`saved docs/car-realism/${save}.jpg`);
+          setStatus(`saved ${save}.jpg`);
         } catch (e) {
           setStatus(`not saved: ${(e as Error).message}`);
         }
@@ -263,6 +266,39 @@ function SheetScreen({ era, save, zoom }: { era: string; save?: string; zoom: nu
           <Text style={styles.intro}>{row.label}</Text>
           <Image source={{ uri: row.dataUrl }} style={[styles.sheetImage, { aspectRatio: row.width / row.height }]} resizeMode="contain" />
         </View>
+      ))}
+    </ScrollView>
+  );
+}
+
+/** Times the painting of every livery's pictures (the CPU part of building a car), one after another, uncached. */
+function BenchScreen() {
+  const styles = useStyles();
+  const [lines, setLines] = useState<string[]>([]);
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      const out: string[] = [];
+      paintLivery(LIVERIES[0]); // warm up the code paths first
+      let total = 0;
+      for (const l of LIVERIES) {
+        const t0 = performance.now();
+        paintLivery(l);
+        const ms = performance.now() - t0;
+        total += ms;
+        out.push(`${l.id} ${ms.toFixed(0)} ms`);
+      }
+      out.unshift(`average ${(total / LIVERIES.length).toFixed(0)} ms, max ${Math.max(...out.map((o) => Number(o.split(' ')[1]))).toFixed(0)} ms`);
+      setLines(out);
+    }, 300);
+    return () => clearTimeout(timer);
+  }, []);
+  return (
+    <ScrollView contentContainerStyle={styles.content}>
+      <Text style={styles.intro}>{lines.length ? 'Paint time per livery:' : 'Painting every livery...'}</Text>
+      {lines.map((l) => (
+        <Text key={l} style={styles.intro} testID="bench-line">
+          {l}
+        </Text>
       ))}
     </ScrollView>
   );

@@ -182,9 +182,18 @@ export function CarShape({ car, detail = 'simple', showNumber = false }: ShapePr
       <Path d={pods[1]} fill={livery.primary} />
       <Path d={airbox} fill={livery.primary} />
       <G clipPath={`url(#${BODY_CLIP_ID})`}>
-        {livery.top.map((layer, i) => (
-          <Polygon key={i} points={layer.points.map(([x, z]) => `${fmt(ix(x))},${fmt(iy(z))}`).join(' ')} fill={layer.color} />
-        ))}
+        {livery.top.flatMap((layer, i) => {
+          // the icon is small: a gradient is shown as its first color, outlines are left out
+          const fill = layer.color ?? layer.gradient?.stops[0]?.[1];
+          if (!fill) return [];
+          const sides = layer.symmetric ? [1, -1] : [1];
+          const points = layer.points;
+          if (points && !layer.path) return sides.map((side) => <Polygon key={`${i}${side}`} points={points.map(([x, z]) => `${fmt(ix(x))},${fmt(iy(z * side))}`).join(' ')} fill={fill} fillOpacity={layer.opacity ?? 1} />);
+          // a path is in the car's metres: scale and shift it into the icon (mirrored too when it is symmetric)
+          return sides.map((side) => (
+            <Path key={`${i}${side}`} d={layer.path ?? ''} transform={`matrix(${SCALE} 0 0 ${SCALE * side} ${fmt(ix(0))} 0)`} fill={fill} fillOpacity={layer.opacity ?? 1} fillRule={layer.rule === 'evenodd' ? 'evenodd' : 'nonzero'} />
+          ));
+        })}
       </G>
       <Path d={spine} fill="none" stroke={edge} strokeWidth={0.4} />
       <Path d={pods[0]} fill="none" stroke={edge} strokeWidth={0.4} />
