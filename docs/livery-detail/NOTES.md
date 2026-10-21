@@ -142,3 +142,19 @@ Pictures: docs/livery-detail/gen2004/before.jpg, after.jpg, <id>.jpg. Two rounds
 | toyota-2004 (TF104) | 7 | 7.5 | the red brush strokes with rough edges over the pod and along the nose, Panasonic, the three-ellipse emblem, Denso, Esso |
 
 Average after: 7.6.
+
+## 1980s, all seven (checkpoint-livery-1980s)
+
+Pictures: docs/livery-detail/gen1980s/before.jpg, after.jpg, <id>.jpg. Two rounds each.
+
+| Livery | Before | After | What changed |
+|---|---|---|---|
+| ferrari-1980s (F1/87) | 7 | 7.5 | Agip's six-legged dog, the white Fiat panel on the cover, the shield, EniChem, Longines, Goodyear with the winged foot; mostly plain red, as the car was |
+| mclaren-1980s (MP4/4) | 8 | 8 | the Marlboro chevron in red over the cowl and down the side, red rear body, cover louvres, Shell pecten, Honda H, "Shell" across the front wing, 12 on the red end plates |
+| lotus-1980s (98T) | 7 | 8 | gold pinstripes along the nose, the pods and the floor as outlines, the DeLonghi box drawn as a gold pinstripe, John Player Special, JPS monograms |
+| williams-1980s (FW11) | 7.5 | 7.5 | navy nose, yellow cowl, the ICI roundel, Canon in red, Honda H, Mobil 1, Tactel |
+| benetton-1980s (B186) | 7 | 7.5 | turquoise front, white rear with the colored paint strokes, benetton, Sisley, Riello boxes, BMW roundel |
+| lotuscamel-1980s (99T) | 7.5 | 7.5 | CAMEL and the camel, DeLonghi in its rounded box, LOTUS on the cover, elf |
+| brabham-1980s (BT52) | 7 | 7.5 | white arrow-head top with the red centre line, parmalat lower case, Fila F, BMW roundel and M stripes, the big 5 |
+
+Average after: 7.6.
