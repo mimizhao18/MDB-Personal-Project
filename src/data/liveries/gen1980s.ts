@@ -1,4 +1,4 @@
-import { BLACK, CARBON, WHITE, both, ellipse, flank, noseCapShape, plateText, podBand, sideText, stripe, topText, wingText, layout } from '../liveryHelpers';
+import { BLACK, CARBON, WHITE, ellipse, flank, noseCapShape, plateText, podBand, sideText, stripe, topText, wingText, layout } from '../liveryHelpers';
 import type { Livery } from '../liveryTypes';
 
 // 1980s (turbo era): the most famous liveries, drawn from the photos in reference/gen1980s/liveries/. Shapes are in
