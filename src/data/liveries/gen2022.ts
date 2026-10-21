@@ -81,27 +81,33 @@ const FERRARI: Livery = {
 
 const MERC_TEAL = '#00A19C';
 const MERC_RED = '#A3192A';
+/** The W13's silver: a mid grey that the clearcoat and the studio lights brighten (a light grey reads as white). */
+const MERC_SILVER = '#8A8E95';
 const MERCEDES: Livery = {
   id: 'mercedes-2022',
   name: 'Mercedes',
   era: 'gen2022',
   team: 'Mercedes-AMG Petronas',
   price: 60,
-  primary: '#C4C7CB',
+  primary: MERC_SILVER,
   secondary: '#00D2BE',
   glow: '#00D2BE',
   sidepod: 'slim',
   finish: 'gloss',
   helmet: '#FFD500',
   parts: parts(BLACK),
-  frontParts: { wing: '#C4C7CB', flap: BLACK, endplate: MERC_RED },
+  frontParts: { wing: MERC_SILVER, flap: BLACK, endplate: MERC_RED },
   top: [
+    // metallic silver, a touch darker toward the tail
+    { path: 'M3.1 1.1 L-2.8 1.1 L-2.8 -1.1 L3.1 -1.1 Z', gradient: { from: [1.5, 0], to: [-1.6, 0], stops: [[0, '#959AA1'], [1, '#7A7E85']] } },
     // silver all over with a black tail; teal lines along the edges of the narrow sidepods; the red airbox top
     { color: BLACK, path: 'M-1.6 0.17 C-1.9 0.17 -2.2 0.15 -2.3 0.1 L-2.3 -0.1 C-2.2 -0.15 -1.9 -0.17 -1.6 -0.17 Z' },
     { color: MERC_TEAL, symmetric: true, path: 'M0.98 0.3 C0.6 0.43 0.0 0.48 -0.7 0.4 C-1.0 0.36 -1.2 0.31 -1.3 0.28 L-1.3 0.255 C-1.0 0.33 -0.6 0.37 0.0 0.44 C0.5 0.41 0.8 0.33 0.98 0.27 Z' },
     { color: MERC_RED, path: 'M0.12 0.13 C0.0 0.15 -0.3 0.14 -0.45 0.1 L-0.45 -0.1 C-0.3 -0.14 0.0 -0.15 0.12 -0.13 Z' },
   ],
   side: [
+    // metallic silver: brighter high up where the light catches it, darker low down
+    { path: 'M3.1 0 L3.1 1.2 L-2.8 1.2 L-2.8 0 Z', gradient: { from: [0, 0.85], to: [0, 0.2], stops: [[0, '#999DA4'], [1, '#72767D']] } },
     // the black floor edge, the teal stripe sweeping along the bottom of the sidepod, the black rear of the cover
     { color: BLACK, path: 'M1.0 0.06 L1.0 0.2 C0.5 0.2 -0.4 0.17 -1.95 0.2 L-1.95 0.06 Z' },
     { color: MERC_TEAL, path: 'M0.98 0.29 C0.6 0.26 0.2 0.24 -0.3 0.24 C-0.9 0.24 -1.5 0.28 -1.95 0.32 L-1.95 0.285 C-1.5 0.245 -0.9 0.205 -0.3 0.205 C0.2 0.205 0.6 0.22 0.98 0.25 Z' },

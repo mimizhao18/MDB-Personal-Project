@@ -1,12 +1,12 @@
 import { router } from 'expo-router';
 import { useState } from 'react';
-import { Pressable, ScrollView, Text, View } from 'react-native';
+import { ScrollView, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { glowHexFor } from '../components/car3d/glow';
 import { LiveryCard } from '../components/LiveryCard';
 import { LiveryPreview } from '../components/LiveryPreview';
-import { AmbientGlow, Button, Chip, Divider, SectionLabel, SegmentedProgress } from '../components/ui';
+import { AmbientGlow, Button, Chip, SectionLabel, SegmentedProgress } from '../components/ui';
 import { ERAS } from '../data/eras';
 import type { EraId } from '../data/eras';
 import { LIVERIES, getLivery } from '../data/liveries';
@@ -25,17 +25,13 @@ const useStyles = makeStyles((t) => ({
   grid: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between', rowGap: t.spacing.sm },
   empty: { alignItems: 'center', gap: t.spacing.md, paddingVertical: t.spacing.lg },
   emptyText: { ...t.typography.body, color: t.colors.textMuted, textAlign: 'center' },
-  numberRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
-  stepperRow: { flexDirection: 'row', alignItems: 'center', gap: t.spacing.md },
-  stepper: { width: t.size.touch, height: t.size.touch, borderRadius: t.radius.control, borderWidth: t.border.hairline, borderColor: t.glass.divider, alignItems: 'center', justifyContent: 'center' },
-  stepperText: { ...t.typography.stat, color: t.colors.text },
-  number: { ...t.typography.statLarge, color: t.colors.text, minWidth: t.size.control, textAlign: 'center' },
 }));
 
 /** Your liveries: the car you are looking at big at the top, then what you own, grouped newest generation first. */
 export default function GarageScreen() {
   const styles = useStyles();
-  const { profile, equip, buy, changeNumber } = useGarage();
+  // The race number control is hidden for now (the number stays in the profile and on the race icon).
+  const { profile, equip, buy } = useGarage();
   // The livery shown on the big car. Tapping a card previews it; the button under the car equips it.
   const [previewId, setPreviewId] = useState<string | null>(null);
   const [filter, setFilter] = useState<EraFilter>('all');
@@ -100,20 +96,6 @@ export default function GarageScreen() {
             ))}
           </View>
         )}
-
-        <Divider />
-        <View style={styles.numberRow}>
-          <SectionLabel>Race number</SectionLabel>
-          <View style={styles.stepperRow}>
-            <Pressable style={styles.stepper} onPress={() => changeNumber(-1)} accessibilityRole="button" accessibilityLabel="Lower race number">
-              <Text style={styles.stepperText}>−</Text>
-            </Pressable>
-            <Text style={styles.number}>{profile.car.number}</Text>
-            <Pressable style={styles.stepper} onPress={() => changeNumber(1)} accessibilityRole="button" accessibilityLabel="Raise race number">
-              <Text style={styles.stepperText}>+</Text>
-            </Pressable>
-          </View>
-        </View>
       </ScrollView>
     </SafeAreaView>
   );
