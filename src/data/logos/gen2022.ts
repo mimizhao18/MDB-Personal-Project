@@ -101,14 +101,8 @@ const ONE_AND_ONE: Logo = {
   shapes: [{ d: rrect(0, 0, 200, 120, 10), fill: 'box' }, text('1&1', 100, 95, 72, 'main', { weight: 900, align: 'center' })],
 };
 
-/** Haas Automation's "haas" logo with the tooling line. */
-const HAAS_TOOLING: Logo = {
-  id: 'haas-tooling',
-  name: 'Haas Tooling',
-  size: [300, 60],
-  slots: { main: '#E10600' },
-  shapes: [text('HAAS TOOLING', 150, 60, 60, 'main', { weight: 900, align: 'center', tracking: 3 })],
-};
+/** Haas Automation's tooling line, red capitals. */
+const HAAS_TOOLING = wordmark('haas-tooling', 'Haas Tooling', 'HAAS TOOLING', '#E10600', { weight: 900, tracking: 5 });
 
 // ---- Williams ----
 

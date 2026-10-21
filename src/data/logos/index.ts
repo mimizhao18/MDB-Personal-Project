@@ -4,6 +4,8 @@
 
 import { FUEL_LOGOS } from './fuel';
 import { LOGOS_2022 } from './gen2022';
+import { LOGOS_2014 } from './gen2014';
+import { LOGOS_2026 } from './gen2026';
 import { TEAM_MARKS } from './marks';
 import { SPONSOR_LOGOS } from './sponsors';
 import type { Logo } from './types';
@@ -13,7 +15,7 @@ export type { Logo, LogoColor, LogoPath, LogoShape, LogoText } from './types';
 export { isLogoText } from './types';
 
 /** Every logo, in the order the /dev/logos page shows them. */
-export const LOGOS: readonly Logo[] = [...TEAM_MARKS, ...FUEL_LOGOS, ...SPONSOR_LOGOS, ...WORDMARK_LOGOS, ...LOGOS_2022];
+export const LOGOS: readonly Logo[] = [...TEAM_MARKS, ...FUEL_LOGOS, ...SPONSOR_LOGOS, ...WORDMARK_LOGOS, ...LOGOS_2022, ...LOGOS_2026, ...LOGOS_2014];
 
 let byId: Map<string, Logo> | null = null;
 

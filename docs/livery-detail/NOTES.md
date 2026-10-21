@@ -88,3 +88,25 @@ Bottas 77, Schumacher 47, Latifi 6).
 
 Paint time (Node, best of 3, `scripts/bench-paint.ts`): the rebuilt 2022 liveries paint in about the same time as
 before (0.98x): logos replaced thousands of stroke-font polygons.
+
+## 2026, all eleven (checkpoint-livery-2026)
+
+Pictures: docs/livery-detail/gen2026/before.jpg, after.jpg, <id>.jpg. Two rounds each (positions, then colors and
+sizes); a third for the Cadillac (TWG straddled the sidepod crease).
+
+| Livery | Before | After | What changed |
+|---|---|---|---|
+| ferrari-2026 | 7.5 | 7.5 | the white airbox and cover sweep with the blue HP disc, IBM in blue, pecten, Ceva, Puma, UniCredit mark |
+| mercedes-2026 | 7 | 8 | teal and silver speed lines over black, the star fade on the cover, Petronas in white, Microsoft squares |
+| mclaren-2026 | 7 | 7.5 | the anthracite rear behind a diagonal with the papaya slash, Gemini with its spark, all win, Dropbox, Etihad |
+| redbull-2026 | 7 | 7.5 | the full Red Bull logo (bulls, sun, name) on the cover, yellow airbox gradient, ORACLE, Ford oval |
+| racingbulls-2026 | 7 | 7.5 | white body over a navy lower body glowing blue, VISA, Red Bull logo, Cash App square, HUGO |
+| alpine-2026 | 7 | 7.5 | a deep blue darkening toward the tail, pink BWT letters, eni with the six-legged dog, MSC, pink halo |
+| astonmartin-2026 | 7 | 7.5 | green to dark gradient, lime lines, aramco, Maaden, the wings, Honda, Valvoline |
+| williams-2026 | 7 | 8 | white Komatsu panel, Atlassian sail, Barclays eagle, Gulf roundel |
+| haas-2026 | 7 | 7.5 | the big GR with its red slash, slanted HAAS, red airbox and chassis line |
+| audi-2026 | 7 | 7.5 | titanium shading darker low down, the red rear slash, red ring round the airbox mouth, four rings, Revolut |
+| cadillac-2026 | 7 | 7.5 | black nose and diagonal over the white body, the grey checks fading as dots, TWG, the crest |
+
+Average after: 7.6. Numbers are the drivers in the reference photos or the 2026 race numbers (Leclerc 16, Russell 63,
+Piastri 81, Verstappen 3, Lawson 30, Colapinto 43, Alonso 14, Albon 23, Bearman 87, Hulkenberg 27, Bottas 77).
