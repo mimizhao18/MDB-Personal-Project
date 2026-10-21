@@ -39,8 +39,32 @@ const MAX_PITCH = 0.62;
 /** `background="transparent"` lets whatever is behind the car (a gauge, a panel) show through the 3D view. */
 const seeThrough = (background: string) => background === 'transparent';
 
-function Scene({ livery, orbit, background, autoSpin }: { livery: Livery; orbit: React.MutableRefObject<Orbit>; background: string; autoSpin: boolean }) {
+/**
+ * Dev only: every capturing view (see the `capture` prop) registers a function here that draws one frame right away.
+ * The /dev/car-views page calls them before reading the canvases, because the browser stops the normal animation loop
+ * while its pane is hidden.
+ */
+export const renderNow: Set<() => void> = new Set();
+
+function Scene({ livery, orbit, background, autoSpin, capture }: { livery: Livery; orbit: React.MutableRefObject<Orbit>; background: string; autoSpin: boolean; capture: boolean }) {
   const { camera, gl, scene } = useThree();
+  const advance = useThree((s) => s.advance);
+  const setSize = useThree((s) => s.setSize);
+  const get = useThree((s) => s.get);
+  useEffect(() => {
+    if (!capture) return;
+    const draw = () => {
+      // a hidden pane also stops the resize observer, so size the view from its box here before drawing
+      const box = gl.domElement.parentElement?.getBoundingClientRect();
+      const { width, height } = get().size;
+      if (box && box.width > 0 && box.height > 0 && (Math.round(box.width) !== Math.round(width) || Math.round(box.height) !== Math.round(height))) setSize(box.width, box.height);
+      advance(performance.now(), true);
+    };
+    renderNow.add(draw);
+    return () => {
+      renderNow.delete(draw);
+    };
+  }, [advance, capture, get, gl, setSize]);
   const car = useMemo(() => buildCar(livery), [livery]);
   // The floor glow and the rim lights take the car's color (the accent color for very dark paint).
   const glowHex = livery.glow ?? glowHexFor(livery.primary, livery.secondary);
@@ -122,6 +146,7 @@ export function Car3DView({
   autoSpin = true,
   zoom = 1,
   fixedView,
+  capture = false,
 }: {
   car: CarSettings;
   height?: number;
@@ -132,6 +157,8 @@ export function Car3DView({
   autoSpin?: boolean;
   /** Holds the camera at one angle: no dragging and no spinning (the /dev/car-views page uses this to compare angles). */
   fixedView?: { yaw: number; pitch: number };
+  /** Keeps the drawn frame readable from the canvas (the /dev/car-views page saves pictures of it). Costs a little, so off by default. */
+  capture?: boolean;
 }) {
   const livery = getLivery(car.liveryId);
   const [focused, setFocused] = useState(true);
@@ -182,8 +209,8 @@ export function Car3DView({
       accessibilityLabel={`3D view of the ${livery.name} car. Drag to rotate.`}
     >
       <View style={[StyleSheet.absoluteFill, { pointerEvents: 'none' }]}>
-        <Canvas camera={{ fov: 30, position: [6, 2, 6], near: 0.1, far: 60 }} gl={{ antialias: true, alpha: seeThrough(background) }} dpr={[1, 2]} frameloop={focused ? 'always' : 'never'}>
-          <Scene livery={livery} orbit={orbit} background={background} autoSpin={autoSpin && !fixedView} />
+        <Canvas camera={{ fov: 30, position: [6, 2, 6], near: 0.1, far: 60 }} gl={{ antialias: true, alpha: seeThrough(background), preserveDrawingBuffer: capture }} dpr={[1, 2]} frameloop={focused ? 'always' : 'never'}>
+          <Scene livery={livery} orbit={orbit} background={background} autoSpin={autoSpin && !fixedView} capture={capture} />
         </Canvas>
       </View>
     </View>
