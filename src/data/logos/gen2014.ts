@@ -43,7 +43,7 @@ function blackberry(): Logo {
 const JOHNNIE_WALKER: Logo = {
   id: 'johnnie-walker',
   name: 'Johnnie Walker',
-  size: [330, 150],
+  size: [70 + measure('WALKER', { weight: 900, tracking: 10, size: 58 }), 150],
   slots: { main: W },
   shapes: [
     // the striding man in his top hat, walking right
@@ -132,7 +132,7 @@ const ROYAL_CHALLENGE: Logo = {
   name: 'Royal Challenge',
   size: [300, 200],
   slots: { main: W },
-  shapes: [text('ROYAL', 150, 88, 80, 'main', { weight: 800, align: 'center', tracking: 4 }), text('CHALLENGE', 150, 192, 80, 'main', { weight: 800, align: 'center', condense: 0.82 })],
+  shapes: [text('ROYAL', 150, 88, 80, 'main', { weight: 800, align: 'center', tracking: 4 }), text('CHALLENGE', 150, 192, 80, 'main', { weight: 800, align: 'center', fitWidth: 296 })],
 };
 
 /** PDVSA: the white sunburst disc and the name on a red box. */

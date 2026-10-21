@@ -13,7 +13,7 @@ const MARLBORO: Logo = {
   slots: { main: '#E10600', roof: '#E10600' },
   shapes: [
     { d: 'M0 50L150 0L300 50V62L150 14L0 62Z', fill: 'roof' },
-    text('Marlboro', 150, 130, 62, 'main', { weight: 800, align: 'center', tracking: 2 }),
+    text('Marlboro', 150, 130, 62, 'main', { weight: 800, align: 'center', fitWidth: 290 }),
   ],
 };
 
@@ -86,7 +86,7 @@ const CAMEL_SILHOUETTE = 'M2 96L8 60C10 50 14 44 22 40C26 34 28 26 34 24C40 22 4
 const CAMEL: Logo = {
   id: 'camel',
   name: 'Camel (name)',
-  size: [330, 100],
+  size: [measure('CAMEL', { weight: 900, condense: 1.15, tracking: 4 }), 100],
   slots: { main: '#0033A0' },
   shapes: [text('CAMEL', 0, 100, 100, 'main', { weight: 900, condense: 1.15, tracking: 4 })],
 };

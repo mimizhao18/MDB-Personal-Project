@@ -158,3 +158,12 @@ Pictures: docs/livery-detail/gen1980s/before.jpg, after.jpg, <id>.jpg. Two round
 | brabham-1980s (BT52) | 7 | 7.5 | white arrow-head top with the red centre line, parmalat lower case, Fila F, BMW roundel and M stripes, the big 5 |
 
 Average after: 7.6.
+
+## Final checks (checkpoint-livery-final)
+
+- Logo sheet: docs/livery-detail/logos.jpg (292 logos, light and dark). Four logos were clipped by their box
+  (Johnnie Walker, Royal Challenge, CAMEL, Marlboro) and were resized to their text. Scores in LOGO-SCORES.md.
+- Paint time on web (`/dev/car-views?bench=1`): 248 ms average, 376 ms at most (310 / 363 before). In Node
+  (`scripts/bench-paint.ts`): 69 ms average against 72 ms for the same liveries before (0.96x).
+- Garage, Store and Livery screens render on web with the new liveries (3D car and 2D icons). The 2D icon now draws
+  pinstripe-only shapes as lines (the 1980s Lotus would otherwise lose its gold stripes in the icon).
