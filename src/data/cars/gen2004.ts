@@ -1,23 +1,24 @@
 import { PAINT_BOX } from './spec';
 import type { CarSpec } from './spec';
 
-// The V10-era car (2004): a shorter 3.1 m wheelbase and 1.8 m wide, grooved tires on 13-inch spoked wheels, a high nose
-// carrying a narrow front wing on two pylons, a tall periscope airbox over the driver, rounded sidepods with turning
+// The V10-era car (2004), drawn as the Ferrari F2004 (reference/gen2004/): a 3.05 m wheelbase and 1.8 m wide, 959 mm
+// high, four-groove tyres on 13-inch spoked wheels, a drooping nose carrying a narrow front wing on two pylons, a
+// periscope airbox over the driver with a winglet on top, rounded sidepods with turning
 // vanes ahead of them, a tall rear wing with a small "monkey seat" wing below it, and an open cockpit (no halo).
 
 export const GEN2004: CarSpec = {
   id: 'gen2004',
   notes: { label: '2004', frontWing: '3 elements, high nose', rearWing: 'Tall, two elements, small beam wing' },
   halo: false,
-  wheelLook: { style: 'spokes', coverRatio: 0.5, grooves: 3, rimColor: '#B8B8BE' },
+  wheelLook: { style: 'spokes', coverRatio: 0.5, grooves: 4, rimColor: '#B8B8BE' },
   centreX: 0.17,
   paint: PAINT_BOX,
 
   spine: {
     x: [2.3, 2.1, 1.85, 1.55, 1.25, 0.95, 0.65, 0.35, 0.05, -0.25, -0.5, -0.95, -1.4, -1.75, -1.95],
     hw: [0.045, 0.07, 0.1, 0.13, 0.165, 0.2, 0.22, 0.23, 0.23, 0.22, 0.21, 0.17, 0.12, 0.08, 0.06],
-    bottom: [0.34, 0.34, 0.31, 0.27, 0.22, 0.17, 0.12, 0.1, 0.1, 0.1, 0.1, 0.11, 0.14, 0.19, 0.24],
-    top: [0.44, 0.46, 0.5, 0.56, 0.63, 0.7, 0.77, 0.81, 0.82, 0.82, 0.8, 0.72, 0.62, 0.54, 0.48],
+    bottom: [0.22, 0.24, 0.26, 0.25, 0.21, 0.16, 0.12, 0.1, 0.1, 0.1, 0.1, 0.11, 0.14, 0.19, 0.24],
+    top: [0.34, 0.38, 0.44, 0.52, 0.6, 0.68, 0.75, 0.8, 0.82, 0.82, 0.8, 0.72, 0.62, 0.54, 0.48],
     squareness: [0.9, 0.85, 0.8, 0.78, 0.76, 0.74, 0.72, 0.7, 0.7, 0.78, 0.78, 0.78, 0.78, 0.78, 0.78],
   },
   shoulder: {
@@ -30,9 +31,9 @@ export const GEN2004: CarSpec = {
   // the tall periscope intake above the driver's head
   airbox: {
     x: [0.05, -0.05, -0.3, -0.65, -1.05, -1.4],
-    hw: [0.12, 0.14, 0.145, 0.13, 0.09, 0.04],
+    hw: [0.11, 0.13, 0.135, 0.12, 0.085, 0.04],
     bottom: [0.8, 0.76, 0.72, 0.68, 0.64, 0.62],
-    top: [1.02, 1.15, 1.17, 1.1, 0.96, 0.8],
+    top: [0.9, 0.97, 0.98, 0.93, 0.84, 0.72],
     squareness: [0.5, 0.5, 0.5, 0.55, 0.6, 0.7],
   },
 
@@ -58,8 +59,8 @@ export const GEN2004: CarSpec = {
 
   // 13-inch wheels, grooved tires: 280 mm front, 380 mm rear, on a 1.8 m wide car
   wheels: {
-    front: { x: 1.55, radius: 0.33, width: 0.28, z: 0.75 },
-    rear: { x: -1.55, radius: 0.335, width: 0.38, z: 0.71 },
+    front: { x: 1.55, radius: 0.33, width: 0.27, z: 0.75 },
+    rear: { x: -1.55, radius: 0.33, width: 0.35, z: 0.71 },
   },
 
   // a narrow wing (1.44 m), narrower than the tires, hung low from a high nose

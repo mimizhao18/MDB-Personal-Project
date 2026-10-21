@@ -166,3 +166,30 @@ Liveries (reference/gen2014/liveries/<id>/, three photos each, all seven redrawn
 | forceindia-2014 | 5 | 7 | silver-white cover and fin with BWT, white lower panel, pink halo |
 | renault-2014 | 5 | 7 | yellow nose top and cover edges, RCi roundel, yellow rear wing |
 | williams-2014 | 5 | 7.5 | diagonal Martini bands over the cover and fin, striped nose and rear wing |
+
+## 2004 generation (checkpoint-2004)
+
+References: reference/gen2004/ (ten Commons photos of the F2004; several downloads were refused by Commons' rate
+limit and skipped) and dimensions.md (wheelbase 3050, width 1796, height 959, 13-inch grooved tyres 270 / 350).
+
+Model: the nose lowered to the F2004's drooping line (its bottom was 0.34 m up, now 0.22), the periscope airbox
+brought down from 1.17 m to the real 0.98 with a winglet on top, tyres narrowed to 270 / 350 with four grooves.
+
+| Round | Proportions | Silhouette | Materials | Lighting | Fixed next |
+|---|---|---|---|---|---|
+| 1 (final) | 7 | 7 | 7 | 7.5 | two sponsor names moved |
+
+Still weak: the sidepod inlets are plain dark ellipses; no bargeboards; the front wing's raised middle section is
+missing (the F2004's main plane rises under the nose).
+
+Liveries (reference/gen2004/liveries/<id>/, two or three photos each, all seven redrawn):
+
+| Livery | Before | After | Notes |
+|---|---|---|---|
+| ferrari-2004 | 6 | 7.5 | red wings with white end plates, white barcode on the cover, Vodafone roundel, Shell scallop, white lower pod panel |
+| mclaren-2004 | 5 | 7 | lighter silver, black rear cover and pod tops, red-orange flash, West on the rear wing |
+| williams-2004 | 5 | 7.5 | navy sidepods under a white body, navy nose band and roundel, white rear wing with HP invent |
+| renault-2004 | 5 | 7.5 | yellow front half with light blue behind, navy nose tip, wings and floor edge; Mild Seven, Hanjin, elf |
+| bar-2004 | 5 | 7 | red airbox, white Honda band and black rear cover; Lucky Strike roundel and red lower band |
+| jaguar-2004 | 5 | 7 | British racing green over silver sidepods with a red lower stripe; AT&T, HSBC, Becks |
+| toyota-2004 | 5 | 7 | the red brush over the sidepod fronts and nose, red end plates; Panasonic, Denso, Esso |

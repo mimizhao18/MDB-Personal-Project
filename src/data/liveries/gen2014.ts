@@ -1,4 +1,4 @@
-import { BLACK, CARBON, WHITE, both, ellipse, flank, noseCapShape, plateText, podBand, sideText, stripe, topText, wingText, layout } from '../liveryHelpers';
+import { BLACK, CARBON, WHITE, both, ellipse, flank, noseCapShape, plateText, sideText, stripe, topText, wingText, layout } from '../liveryHelpers';
 import type { Livery } from '../liveryTypes';
 
 // 2014 (hybrid era, drawn as the 2018 cars): the best-known liveries, drawn from the 2018 photos in
@@ -12,8 +12,6 @@ const AIRBOX = [0.06, -1.4] as const;
 const ABOX_Y = [0.62, 1.05] as const;
 /** The black lower sidepod and floor edge most teams run (bare carbon). */
 const lowerPod = (top = 0.2, color = BLACK) => ({ color, points: flank(L.podFront, L.podRear, 0.06, top) });
-/** The upper flank of the engine cover and the shark fin, from the airbox back to the tail. */
-const coverFlank = (color: string, y0 = 0.6) => ({ color, points: [[0.1, y0], [0.1, 1.0], [-0.7, 0.98], [-1.2, 0.95], [-2.2, 0.8], [-2.3, 0.5], [-1.3, y0]] as const });
 
 const FERRARI: Livery = {
   id: 'ferrari-2014',
