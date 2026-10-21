@@ -225,6 +225,26 @@ assert.deepEqual(FREE_LIVERY_IDS, [DEFAULT_LIVERY_ID]); // everyone starts with 
 assert.equal(getLivery('ferrari-2022').id, 'ferrari-2022');
 assert.equal(getLivery('no-such-livery').id, DEFAULT_LIVERY_ID); // unknown ids still draw something
 
+// every livery is still there: players' saves refer to these ids, so none may disappear or be renamed, and the
+// count per generation only changes on purpose (add the new id here when adding a livery)
+const LIVERY_IDS_BY_ERA = {
+  gen1980s: ['ferrari-1980s', 'mclaren-1980s', 'lotus-1980s', 'williams-1980s', 'benetton-1980s', 'lotuscamel-1980s', 'brabham-1980s'],
+  gen2004: ['ferrari-2004', 'mclaren-2004', 'williams-2004', 'renault-2004', 'bar-2004', 'jaguar-2004', 'toyota-2004'],
+  gen2014: ['ferrari-2014', 'mercedes-2014', 'mclaren-2014', 'redbull-2014', 'forceindia-2014', 'renault-2014', 'williams-2014'],
+  gen2022: ['ferrari-2022', 'mercedes-2022', 'mclaren-2022', 'redbull-2022', 'alpine-2022', 'astonmartin-2022', 'alphatauri-2022', 'alfaromeo-2022', 'haas-2022', 'williams-2022'],
+  gen2026: ['ferrari-2026', 'mercedes-2026', 'mclaren-2026', 'redbull-2026', 'racingbulls-2026', 'alpine-2026', 'astonmartin-2026', 'williams-2026', 'haas-2026', 'audi-2026', 'cadillac-2026'],
+};
+for (const [era, ids] of Object.entries(LIVERY_IDS_BY_ERA)) {
+  const have = LIVERIES.filter((l) => l.era === era).map((l) => l.id);
+  assert.equal(have.length, ids.length, `${era} has ${ids.length} liveries`);
+  assert.deepEqual([...have].sort(), [...ids].sort(), `${era} livery ids`);
+}
+assert.equal(Object.values(LIVERY_IDS_BY_ERA).flat().length, 42);
+for (const l of LIVERIES) {
+  assert.ok(!l.parts.halo || /^#[0-9A-Fa-f]{6}$/.test(l.parts.halo), `${l.id} halo color`);
+  for (const t of l.texts ?? []) assert.ok(t.height > 0 && t.text.length > 0, `${l.id} text`);
+}
+
 // profile migration: old saves keep progress and get a livery
 const catalog = { knownIds: LIVERIES.map((l) => l.id), freeIds: FREE_LIVERY_IDS, defaultId: DEFAULT_LIVERY_ID, renamed: RENAMED_LIVERY_IDS };
 const oldSave = { totalXp: 120, credits: 40, currentStreak: 3, longestStreak: 5, lastSessionDay: '2026-10-01', unlockedColors: ['red', 'white', 'blue'], car: { primaryColor: '#1E41FF', secondaryColor: '#FFFFFF', number: 44 } };
@@ -410,7 +430,7 @@ const close = (a, b) => Math.abs(a - b) < 0.0005;
 assert.ok(close(f22.wheelbase, 3.6) && close(f26.wheelbase, 3.4)); // 3600 mm vs 3400 mm
 assert.ok(close(f22.width, 2.0, ) || Math.abs(f22.width - 2.005) < 0.006); // about 2000 mm
 assert.ok(Math.abs(f26.width - 1.9) < 0.006); // about 1900 mm
-assert.ok(close(f22.frontWingWidth - f26.frontWingWidth, 0.24)); // the 2026 front wing is narrower, about as wide as the front tires
+assert.ok(close(f22.frontWingWidth - f26.frontWingWidth, 0.1)); // the 2026 front wing is 100 mm narrower
 assert.ok(close(f22.frontTire - f26.frontTire, 0.025)); // front tires 25 mm narrower
 assert.ok(close(f22.rearTire - f26.rearTire, 0.03)); // rear tires 30 mm narrower
 assert.equal(GEN2022.wheels.front.radius, GEN2026.wheels.front.radius); // both on 18-inch wheels

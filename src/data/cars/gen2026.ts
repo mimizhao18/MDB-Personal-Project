@@ -71,7 +71,7 @@ export const GEN2026: CarSpec = {
   },
 
   // Two elements: a fixed main plane and an active flap in three sections. A less swept, flatter, narrower wing
-  // (1.76 m instead of 2.0, about as wide as the front tires' outer edges, its tips swept back and curved up) with
+  // (100 mm narrower than the 2022 wing, about as wide as the front tires' outer edges, its tips swept back and curved up) with
   // small plain end plates.
   frontWing: {
     span: 0.88,
