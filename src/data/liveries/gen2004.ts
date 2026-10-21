@@ -8,8 +8,6 @@ import type { Livery } from '../liveryTypes';
 const L = layout('gen2004');
 const solidParts = (c: string, flap = c, endplate = c) => ({ wing: c, flap, endplate, floor: CARBON });
 const AIRBOX = [0.05, -1.4] as const;
-/** The upper flank of the engine cover behind the airbox, down to the tail. */
-const coverFlank = (color: string, y0 = 0.62) => ({ color, points: [[-0.2, y0], [-0.2, 0.96], [-0.7, 0.92], [-1.2, 0.76], [-1.95, 0.5], [-1.95, 0.42], [-1.2, y0]] as const });
 
 const FERRARI: Livery = {
   id: 'ferrari-2004',

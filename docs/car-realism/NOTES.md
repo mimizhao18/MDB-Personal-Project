@@ -193,3 +193,32 @@ Liveries (reference/gen2004/liveries/<id>/, two or three photos each, all seven 
 | bar-2004 | 5 | 7 | red airbox, white Honda band and black rear cover; Lucky Strike roundel and red lower band |
 | jaguar-2004 | 5 | 7 | British racing green over silver sidepods with a red lower stripe; AT&T, HSBC, Becks |
 | toyota-2004 | 5 | 7 | the red brush over the sidepod fronts and nose, red end plates; Panasonic, Denso, Esso |
+
+## 1980s generation (checkpoint-1980s)
+
+References: reference/gen1980s/ (ten Commons photos of the MP4/4) and dimensions.md (wheelbase 2875, width 2134,
+height 940, tracks 1824 / 1670, tyres 255 / 355 on 13-inch rims).
+
+Model: a wider flat wedge nose instead of the needle, the roll hoop lowered from 1.03 m to the real 0.94, louvres on
+the engine cover, big flat rectangular end plates front and rear, the rear wing lowered into its 0.94 box, the rear
+tyres much wider than the fronts on the real tracks.
+
+| Round | Proportions | Silhouette | Materials | Lighting | Fixed next |
+|---|---|---|---|---|---|
+| 1 | 6 | 6.5 | 7 | 7.5 | nose, roll hoop, end plates, tyres |
+| 2 (final) | 7 | 7 | 7 | 7.5 | |
+
+Still weak: the sidepods are plain boxes with no radiator detail; the MP4/4's reclined driver position is not shown
+(the helmet sits as high as on the other cars); the front wing has no raised middle section.
+
+Liveries (reference/gen1980s/liveries/<id>/, two or three photos each, all seven redrawn):
+
+| Livery | Before | After | Notes |
+|---|---|---|---|
+| ferrari-1980s | 5 | 7 | 1987 F1/87: Enichem and 28 on the nose, Agip, Fiat label, carbon wings |
+| mclaren-1980s | 6 | 8 | the MP4/4 red chevron cowl and sweep, red lower rear body, red rear wing with 12, Shell on the pod and front wing |
+| lotus-1980s | 6 | 7 | gold pinstripes, John Player Special, DeLonghi, 12, elf on the end plates |
+| williams-1980s | 6 | 7.5 | navy nose, yellow Tactel cowl with the ICI roundel, Canon in red, Mobil 1 and 5 on the nose |
+| benetton-1980s | 3 | 7 | it was blue: now the turquoise B186 with the white rear and coloured streaks, Sisley, Riello, black wings |
+| lotuscamel-1980s | 6 | 7.5 | Camel in blue on the pods, DeLonghi box, Honda, 12, elf on the rear wing |
+| brabham-1980s | 3 | 7 | it was white with a navy nose: now the navy BT52 with the white upper nose and cockpit, parmalat, Santal front wing |

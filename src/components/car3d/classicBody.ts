@@ -93,9 +93,9 @@ function body1980s(c: BodyContext) {
     loft(
       {
         x: [2.45, 2.32, 2.05, 1.75, 1.4, 1.05, 0.78, 0.48, 0.18, -0.12],
-        hw: [0.04, 0.075, 0.105, 0.13, 0.155, 0.19, 0.22, 0.24, 0.25, 0.23],
+        hw: [0.07, 0.09, 0.115, 0.14, 0.16, 0.19, 0.22, 0.24, 0.25, 0.23],
         bottom: [0.13, 0.13, 0.13, 0.12, 0.12, 0.11, 0.1, 0.1, 0.1, 0.1],
-        top: [0.17, 0.2, 0.25, 0.31, 0.38, 0.47, 0.58, 0.68, 0.72, 0.72],
+        top: [0.19, 0.22, 0.27, 0.33, 0.4, 0.48, 0.58, 0.68, 0.72, 0.72],
         squareness: [0.7, 0.5, 0.38, 0.32, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3],
       },
       paint,
@@ -126,8 +126,10 @@ function body1980s(c: BodyContext) {
     ),
   );
   // the roll hoop: a tall, thin blade standing well above the engine cover, with the engine intake in its front face
-  car.add(new THREE.Mesh(plateGeometry([[0.04, 0.66], [0.02, 0.96], [-0.1, 1.03], [-0.3, 1.02], [-0.55, 0.84], [-0.8, 0.68]], 0, 0.12), paint));
-  car.add(box(0.03, 0.14, 0.1, m.dark, 0.035, 0.84, 0));
+  car.add(new THREE.Mesh(plateGeometry([[0.04, 0.66], [0.02, 0.88], [-0.1, 0.94], [-0.3, 0.93], [-0.55, 0.8], [-0.8, 0.68]], 0, 0.11), paint));
+  car.add(box(0.03, 0.12, 0.09, m.dark, 0.035, 0.8, 0));
+  // the louvred engine cover behind the roll hoop
+  for (let i = 0; i < 6; i++) car.add(box(0.012, 0.004, 0.32, m.dark, -0.35 - i * 0.06, 0.712 - i * 0.006, 0));
 
   // the box radiator pods beside the cockpit: flat sided and flat topped, with a tall upright inlet in the front of each
   const sp = addPods(c, 0.3);
