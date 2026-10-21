@@ -31,19 +31,22 @@ const useStyles = makeStyles((t) => ({
 export default function CarViewsScreen() {
   const styles = useStyles();
   const { width } = useWindowDimensions();
-  const { livery } = useLocalSearchParams<{ livery?: string }>();
+  const { livery, view: only } = useLocalSearchParams<{ livery?: string; view?: string }>();
   const liveryId = livery ?? 'ferrari-2022';
   const columns = width >= WIDE ? 2 : 1;
-  const tileWidth = columns === 1 ? '100%' : '49.5%';
+  // ?view=side shows just that angle, big, for a close comparison with a photo
+  const shown = VIEWS.filter((v) => !only || v.id === only);
+  const tileWidth = only ? '100%' : columns === 1 ? '100%' : '49.5%';
+  const tileHeight = only ? Math.round(Math.min(width, 1400) * 0.55) : TILE_HEIGHT;
 
   return (
     <ScrollView contentContainerStyle={styles.content}>
-      <Text style={styles.intro}>{liveryId}. Fixed cameras, no spinning. Change the car with ?livery=id.</Text>
+      <Text style={styles.intro}>{liveryId}. Fixed cameras, no spinning. Change the car with ?livery=id, show one angle with ?view=side|front|rear|top|three-quarter.</Text>
       <View style={styles.grid}>
-        {VIEWS.map((view) => (
-          <View key={view.id} style={[styles.tile, { width: tileWidth, height: TILE_HEIGHT }]} testID={`car-view-${view.id}`}>
+        {shown.map((view) => (
+          <View key={view.id} style={[styles.tile, { width: tileWidth, height: tileHeight }]} testID={`car-view-${view.id}`}>
             <Text style={styles.label}>{view.label.toUpperCase()}</Text>
-            <Car3DView car={{ liveryId, number: 16 }} height={TILE_HEIGHT} autoSpin={false} zoom={view.zoom} fixedView={{ yaw: view.yaw, pitch: view.pitch }} />
+            <Car3DView car={{ liveryId, number: 16 }} height={tileHeight} autoSpin={false} zoom={only ? view.zoom * 0.84 : view.zoom} fixedView={{ yaw: view.yaw, pitch: view.pitch }} />
           </View>
         ))}
       </View>
