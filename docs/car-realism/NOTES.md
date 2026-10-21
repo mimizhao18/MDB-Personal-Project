@@ -112,3 +112,25 @@ central pillar; narrower floor without fences.
 | 2 (final) | 7.5 | 7.5 | 7 | 7.5 | |
 
 Still weak: the active flaps' section gaps are a little wide; the pod inlet is a plain dark ellipse.
+
+## 2026 liveries (checkpoint-2026-liveries)
+
+References: reference/gen2026/liveries/<id>/ (three Commons photos each from the 2026 Chinese GP). All eleven
+redrawn. Biggest corrections: Ferrari's white engine cover with the blue HP and carbon wings with red; Mercedes'
+teal and silver swooshes and the silver stars on the engine cover; McLaren's anthracite engine cover with Gemini and
+the black lower body with its diagonal cut; Red Bull's yellow airbox with the bull across the cover; Racing Bulls'
+yellow airbox and navy sweep; Alpine's pink airbox, halo and end plates; Williams' white lower panel with Komatsu and
+the black cover top; Haas' black HAAS lettering and red airbox; Audi's red ring around the airbox and the red rear
+pod with Revolut; Cadillac's black nose and chassis under the white upper body.
+
+| Livery | Before | After | Livery | Before | After |
+|---|---|---|---|---|---|
+| ferrari-2026 | 6 | 7.5 | alpine-2026 | 5 | 7 |
+| mercedes-2026 | 5 | 7 | astonmartin-2026 | 6 | 7 |
+| mclaren-2026 | 5 | 7 | williams-2026 | 5 | 7 |
+| redbull-2026 | 5 | 7 | haas-2026 | 5 | 7 |
+| racingbulls-2026 | 5 | 7 | audi-2026 | 4 | 7 |
+| cadillac-2026 | 4 | 7 | | | |
+
+One round: the second only checked a suspected end-plate defect (it was the flap lettering seen edge-on, not a bug).
+The dev page gained `?yaw=&pitch=` for free camera angles.

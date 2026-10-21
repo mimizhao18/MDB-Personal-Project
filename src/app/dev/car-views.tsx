@@ -121,7 +121,7 @@ async function shoot(name: string, columns = 2): Promise<string[]> {
   return cells.map((c) => c.label);
 }
 
-type Params = { livery?: string; liveries?: string; view?: string; tile?: string; zoom?: string; sheet?: string; save?: string };
+type Params = { livery?: string; liveries?: string; view?: string; tile?: string; zoom?: string; sheet?: string; save?: string; yaw?: string; pitch?: string };
 
 /** The liveries a contact sheet covers: one generation's, or all of them. */
 function sheetLiveries(sheet: string) {
@@ -134,6 +134,7 @@ function sheetLiveries(sheet: string) {
  *   &view=side|front|rear|top|three-quarter   just that angle, big
  *   &tile=<px>                       the height of each tile
  *   &zoom=<factor>                   camera distance, below 1 is closer (multiplies each angle's own zoom)
+ *   &yaw=<radians>&pitch=<radians>   with &view=, any camera angle (yaw 0 looks at the nose, pi/2 at the right side)
  *   ?liveries=a,b,c,d&view=side      several liveries side by side on the same model, one angle each
  *   ?sheet=gen2022|all&save=<name>   a contact sheet of every livery of a generation (three angles each);
  *                                    with `save`, it is posted to the sink server as docs/car-realism/<name>.jpg
@@ -179,8 +180,8 @@ export default function CarViewsScreen() {
   }
 
   const liveryId = params.livery ?? 'ferrari-2022';
-  // ?view=side shows just that angle, big, for a close comparison with a photo
-  const shown = VIEWS.filter((v) => !only || v.id === only);
+  // ?view=side shows just that angle, big, for a close comparison with a photo; ?yaw= and ?pitch= move that camera
+  const shown = VIEWS.filter((v) => !only || v.id === only).map((v) => (only && (params.yaw || params.pitch) ? { ...v, yaw: params.yaw ? Number(params.yaw) : v.yaw, pitch: params.pitch ? Number(params.pitch) : v.pitch } : v));
   const tileWidth = only ? '100%' : columns === 1 ? '100%' : '49.5%';
 
   return (
