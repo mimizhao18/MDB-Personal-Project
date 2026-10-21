@@ -216,7 +216,7 @@ assert.equal(new Set(LIVERIES.map((l) => l.id)).size, LIVERIES.length); // ids a
 assert.ok(LIVERIES.every((l) => /^#[0-9A-Fa-f]{6}$/.test(l.primary) && /^#[0-9A-Fa-f]{6}$/.test(l.secondary))); // the car shades #RRGGBB colors
 assert.ok(LIVERIES.every((l) => ERAS.some((e) => e.id === l.era && e.available))); // every livery belongs to a built generation
 assert.ok(LIVERIES.every((l) => l.top.length > 0 && l.side.length > 0)); // and has paint shapes to draw
-assert.ok(LIVERIES.every((l) => [...l.top, ...l.side].every((layer) => /^#[0-9A-Fa-f]{6}$/.test(layer.color) && layer.points.length >= 3)));
+assert.ok(LIVERIES.every((l) => [...l.top, ...l.side].every((layer) => (layer.color === undefined || /^#[0-9A-Fa-f]{6}$/.test(layer.color)) && (layer.path !== undefined || layer.points.length >= 3)))); // shapes are polygons or paths (paths are parsed in check-paint.ts)
 assert.ok(LIVERIES.every((l) => l.sidepod in specFor(l.era).pods)); // each team's sidepod design exists on its generation's car
 assert.ok(LIVERIES.every((l) => Object.values(l.parts).every((c) => /^#[0-9A-Fa-f]{6}$/.test(c))));
 assert.ok(LIVERIES.every((l) => l.price >= 0 && Number.isInteger(l.price)));
