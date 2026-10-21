@@ -45,3 +45,30 @@ no sidewall shading, no soft shadow under the car (only a radial blur), and the 
   layout passes, so the normal loop never draws there.
 - `/dev/car-views`: `__shoot('<name>')` in the console saves every tile and a composite; `?sheet=gen2022&save=<name>`
   renders every livery of a generation (three angles each) and saves one contact sheet.
+
+## 2022 model (checkpoint-2022-model)
+
+Geometry from reference/gen2022/dimensions.md and the F1-75 photos: rear wing shrunk into its 2022 box (end plates
+0.28 m shorter and 0.14 m lower), floor narrowed to the reference volume (0.685 m half width), tyres widened to their
+measured inflated widths (350 / 450 mm) on 18-inch rims with a 0.68 cover, nose tip widened and rounded onto the
+second wing element, roll hoop lowered under 0.97 m, three pod designs redrawn, a bathtub wall on the scooped
+(Ferrari) pods, the flap vanes removed (banned in 2022), the engine cover tail closed, a taller halo in bare carbon
+(liveries may paint it with `parts.halo`).
+
+Materials and light: clearcoat paint, satin carbon with the weave, sheen on the tyres, glossy wheel covers; a warm
+key light that throws a soft shadow on the ground, a cool rim light, a 512 x 256 studio map with strip lights.
+Every mesh is in a named group (body, sidepods, floor, frontWing, rearWing, cockpit, halo, wheels, extras) and the
+materials hang on `car.userData.materials`.
+
+Lettering: a new bold stroke font (strokeFont.ts) replaces the 5 x 7 pixel font as the default (`font: 'pixel'`
+keeps the old one); the livery pictures went from 1536 to 2048 pixels wide.
+
+| Round | Proportions | Silhouette | Materials | Lighting | Fixed next |
+|---|---|---|---|---|---|
+| 1 | 6.5 | 6.5 | 6 | 7 | flap vanes, open tail, bright carbon |
+| 2 | 7 | 7 | 6.5 | 7.5 | stray inlet-lip line, carbon reflections, thinner flaps |
+| 3 | 7 | 7 | 7 | 7.5 | lettering across the rear wing read rotated from behind; top view yaw; wheel covers |
+| 4 (final) | 7.5 | 7.5 | 7 | 7.5 | |
+
+Still weak: the front wing elements read as stacked dark slabs from the front; the airbox "ears" and the engine
+cover ridge are simpler than the real car's; no sidewall lettering on the tyres beyond the dashes.

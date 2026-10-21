@@ -14,7 +14,7 @@ const VIEWS = [
   { id: 'side', label: 'Side', yaw: Math.PI / 2, pitch: 0.02, zoom: 1 },
   { id: 'front', label: 'Front', yaw: 0, pitch: 0.06, zoom: 0.62 },
   { id: 'rear', label: 'Rear', yaw: Math.PI, pitch: 0.06, zoom: 0.62 },
-  { id: 'top', label: 'Top', yaw: -Math.PI / 2, pitch: 1.5, zoom: 1 },
+  { id: 'top', label: 'Top', yaw: Math.PI / 2, pitch: 1.5, zoom: 1 }, // nose to the right, so lettering along the car reads left to right
 ] as const;
 type ViewId = (typeof VIEWS)[number]['id'];
 const viewById = (id: string | undefined) => VIEWS.find((v) => v.id === id) ?? VIEWS[0];

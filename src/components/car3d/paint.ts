@@ -5,16 +5,17 @@ import { PAINT_BOX, frontWingSection, rearWingSection } from '../../data/cars/sp
 import type { Outline } from '../../data/cars/spec';
 import type { Livery, LiveryLayer, LiveryText } from '../../data/liveries';
 import { GLYPH_HEIGHT, GLYPH_WIDTH, glyphRows } from './font';
+import { LETTER_GAP, glyphPolygons, strokeGlyph, strokeTextWidth } from './strokeFont';
 
 // A livery is a pair of flat pictures: one of the car seen from above, one seen from the side. The paint material looks
 // each surface point up in them by its position on the car (top picture for surfaces facing up, side picture for the
 // rest), so one set of flat shapes colors the whole body no matter how it is curved.
 
 const { xMin, xMax, zHalf, yMax } = PAINT_BOX;
-const TOP_W = 1536;
-const TOP_H = 576;
-const SIDE_W = 1536;
-const SIDE_H = 336;
+const TOP_W = 2048;
+const TOP_H = 768;
+const SIDE_W = 2048;
+const SIDE_H = 448;
 const SUBSAMPLES = 4;
 
 type Rgb = [number, number, number];
@@ -29,13 +30,21 @@ function fillPolygon(data: Uint8Array, width: number, height: number, points: re
   if (points.length < 3) return;
   let minY = Infinity;
   let maxY = -Infinity;
-  for (const [, y] of points) {
+  let minX = Infinity;
+  let maxX = -Infinity;
+  for (const [x, y] of points) {
     minY = Math.min(minY, y);
     maxY = Math.max(maxY, y);
+    minX = Math.min(minX, x);
+    maxX = Math.max(maxX, x);
   }
   const first = Math.max(0, Math.floor(minY));
   const last = Math.min(height - 1, Math.ceil(maxY));
-  const coverage = new Float32Array(width);
+  // only the columns the polygon can touch are scanned (lettering is thousands of small polygons)
+  const colFirst = Math.max(0, Math.floor(minX));
+  const colLast = Math.min(width - 1, Math.ceil(maxX));
+  if (colLast < colFirst || last < first) return;
+  const coverage = new Float32Array(colLast - colFirst + 1);
 
   for (let py = first; py <= last; py++) {
     coverage.fill(0);
@@ -54,14 +63,14 @@ function fillPolygon(data: Uint8Array, width: number, height: number, points: re
         const xb = Math.min(width, crossings[c + 1]);
         if (xb <= xa) continue;
         touched = true;
-        for (let px = Math.floor(xa); px < Math.ceil(xb); px++) {
-          coverage[px] += (Math.min(px + 1, xb) - Math.max(px, xa)) / SUBSAMPLES;
+        for (let px = Math.max(colFirst, Math.floor(xa)); px < Math.min(colLast + 1, Math.ceil(xb)); px++) {
+          coverage[px - colFirst] += (Math.min(px + 1, xb) - Math.max(px, xa)) / SUBSAMPLES;
         }
       }
     }
     if (!touched) continue;
-    for (let px = 0; px < width; px++) {
-      const a = Math.min(1, coverage[px]);
+    for (let px = colFirst; px <= colLast; px++) {
+      const a = Math.min(1, coverage[px - colFirst]);
       if (a <= 0) continue;
       const o = (py * width + px) * 4;
       data[o] += (rgb[0] - data[o]) * a;
@@ -128,6 +137,7 @@ function paintShapes(width: number, height: number, base: Rgb, layers: readonly 
  * other side of the car, so the letters read the right way round from both sides.
  */
 function drawText(data: Uint8Array, width: number, height: number, toPixel: ToPixel, t: LiveryText, mirror: boolean): void {
+  if (t.font !== 'pixel') return drawStrokeText(data, width, height, toPixel, t, mirror);
   const text = t.text;
   const p = t.height / GLYPH_HEIGHT; // the size of one font pixel, in metres
   const advance = (GLYPH_WIDTH + 1) * p + (t.spacing ?? 0);
@@ -165,6 +175,38 @@ function drawText(data: Uint8Array, width: number, height: number, toPixel: ToPi
         fillPolygon(data, width, height, [toPixel(x0, lo), toPixel(x0 + p, lo), toPixel(x0 + p, lo + p), toPixel(x0, lo + p)], rgb);
       }
     }
+  }
+}
+
+/**
+ * Letters one piece of text in the bold stroke font. Each glyph is laid out in its own units (100 tall, x to the
+ * right, y up) and mapped into the picture by `view` and `orient` like the pixel font: along the car (side view: y up;
+ * top view: the glyph's top toward -z), or across a wing. `mirror` reverses the run and each glyph for the far side.
+ */
+function drawStrokeText(data: Uint8Array, width: number, height: number, toPixel: ToPixel, t: LiveryText, mirror: boolean): void {
+  const text = t.text;
+  const unit = t.height / 100; // metres per glyph unit
+  const extraGap = (t.spacing ?? 0) / unit;
+  const run = strokeTextWidth(text, extraGap) * unit; // the whole run, in metres
+  const across = t.view === 'top' && t.orient && t.orient !== 'along';
+  const fromRear = t.orient === 'across-rear';
+  // where the run starts along its reading direction (metres)
+  // Across a wing, seen from behind the car, the reader's right is -z and the far edge (-x, the rear) is up.
+  const start = across ? (fromRear ? t.y + run / 2 : t.y - run / 2) : t.align === 'center' ? t.x - run / 2 : t.align === 'right' ? t.x - run : t.x;
+  const rgb = hexToRgb(t.color);
+  let offset = 0; // along the run, in metres
+  for (let i = 0; i < text.length; i++) {
+    const glyph = strokeGlyph(text[mirror ? text.length - 1 - i : i]);
+    const w = glyph.width * unit;
+    const at = offset;
+    const map = (u: number, v: number): readonly [number, number] => {
+      const gu = (mirror ? glyph.width - u : u) * unit; // along the reading direction, from the glyph's start
+      const gv = (v - 50) * unit; // up from the middle of the cap height
+      if (across) return fromRear ? toPixel(t.x - gv, start - at - gu) : toPixel(t.x + gv, start + at + gu);
+      return t.view === 'top' ? toPixel(start + at + gu, t.y - gv) : toPixel(start + at + gu, t.y + gv);
+    };
+    for (const polygon of glyphPolygons(glyph, map)) fillPolygon(data, width, height, polygon, rgb);
+    offset += w + (LETTER_GAP + extraGap) * unit;
   }
 }
 

@@ -207,6 +207,8 @@ function tireGeometry(radius: number, width: number, innerRatio: number, grooves
 export interface WheelMaterials {
   rubber: THREE.Material;
   carbon: THREE.Material;
+  /** The smooth wheel cover (glossy, for the covered wheels of recent cars); carbon when not given. */
+  cover?: THREE.Material;
   metal: THREE.Material;
   band: THREE.Material;
   rim: THREE.Material;
@@ -246,8 +248,8 @@ export function buildWheel(radius: number, width: number, side: 1 | -1, m: Wheel
   };
 
   if (look.style === 'cover') {
-    disc(rimR, m.carbon, 0.004);
-    faceRing(rimR * 0.97, rimR * 1.05, m.metal, 0.004);
+    disc(rimR, m.cover ?? m.carbon, 0.004);
+    faceRing(rimR * 0.97, rimR * 1.04, m.metal, 0.004);
   } else if (look.style === 'spokes') {
     // open spokes with the dark brake disc showing between them
     disc(rimR, m.dark, 0.006);

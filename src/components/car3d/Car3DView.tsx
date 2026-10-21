@@ -33,6 +33,7 @@ const FIT_WIDTH = 14.8; // camera distance times the view's width/height ratio n
 const TARGET = new THREE.Vector3(0.15, 0.45, 0);
 const AUTO_SPIN_RADIANS_PER_SECOND = 0.32;
 const IDLE_BEFORE_SPIN_MS = 1800;
+const SHADOW_MAP = 1024; // the key light's shadow map: enough for a soft outline under the car, cheap on a phone
 const MIN_PITCH = 0.04;
 const MAX_PITCH = 0.62;
 
@@ -70,10 +71,19 @@ function Scene({ livery, orbit, background, autoSpin, capture }: { livery: Liver
   const glowHex = livery.glow ?? glowHexFor(livery.primary, livery.secondary);
   const glow = useMemo(() => radialTexture(hexToRgb255(glowHex), 0.9, 1.3), [glowHex]);
   const groundTint = useMemo(() => new THREE.Color(glowHex).multiplyScalar(0.3), [glowHex]);
-  const shadow = useMemo(() => radialTexture([0, 0, 0], 0.85, 1.4), []);
+  const shadow = useMemo(() => radialTexture([0, 0, 0], 0.6, 1.6), []);
   const glowPlane = useRef<THREE.Mesh>(null);
 
   useEffect(() => () => disposeCar(car), [car]);
+  // every part throws a shadow on the ground (and on the parts below it); the wheels are the biggest casters
+  useEffect(() => {
+    car.traverse((object) => {
+      if (object instanceof THREE.Mesh) {
+        object.castShadow = true;
+        object.receiveShadow = true;
+      }
+    });
+  }, [car]);
   useEffect(
     () => () => {
       glow.dispose();
@@ -86,7 +96,7 @@ function Scene({ livery, orbit, background, autoSpin, capture }: { livery: Liver
   useEffect(() => {
     const environment = buildStudioEnvironment(gl as unknown as THREE.WebGLRenderer);
     scene.environment = environment;
-    scene.environmentIntensity = 0.9;
+    scene.environmentIntensity = 1.0;
     return () => {
       environment?.dispose();
       scene.environment = null;
@@ -110,20 +120,40 @@ function Scene({ livery, orbit, background, autoSpin, capture }: { livery: Liver
   return (
     <>
       {!seeThrough(background) && <color attach="background" args={[background]} />}
-      <ambientLight intensity={0.35} />
-      <hemisphereLight args={['#aab4d0', groundTint, 0.6]} />
-      <directionalLight position={[5, 7, 4]} intensity={2.2} />
-      <pointLight position={[-4, 1.6, -3]} intensity={30} color={glowHex} />
-      <pointLight position={[3, 0.4, 3.5]} intensity={6} color="#ffe6dc" />
+      {/* studio lighting: a warm key light high in front (it throws the shadow), a cool rim light from behind, soft fill */}
+      <ambientLight intensity={0.18} />
+      <hemisphereLight args={['#b9c4d8', groundTint, 0.5]} />
+      <directionalLight
+        position={[4.5, 7, 3.5]}
+        intensity={2.6}
+        color="#fff3e4"
+        castShadow
+        shadow-mapSize={[SHADOW_MAP, SHADOW_MAP]}
+        shadow-bias={-0.0004}
+        shadow-normalBias={0.025}
+        shadow-camera-near={2}
+        shadow-camera-far={20}
+        shadow-camera-left={-3.6}
+        shadow-camera-right={3.6}
+        shadow-camera-top={3.6}
+        shadow-camera-bottom={-3.6}
+      />
+      <directionalLight position={[-5, 3, -4]} intensity={1.5} color="#d6e4ff" />
+      <pointLight position={[-4, 1.6, -3]} intensity={16} color={glowHex} />
+      <pointLight position={[3, 0.5, 3.5]} intensity={5} color="#ffe6dc" />
       {/* bounce from the glowing floor, so the underside is not pitch black */}
-      <pointLight position={[0, 0.12, 0]} intensity={5} distance={5} color={glowHex} />
+      <pointLight position={[0, 0.12, 0]} intensity={4} distance={5} color={glowHex} />
 
-      {/* a soft glow in the car's color and a contact shadow on the floor */}
+      {/* the floor: a soft glow in the car's color, the key light's shadow, and a contact shadow under the car */}
       <mesh ref={glowPlane} rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.003, 0]} renderOrder={1}>
         <planeGeometry args={[GLOW_PLANE_SIZE, GLOW_PLANE_SIZE]} />
         <meshBasicMaterial map={glow} transparent depthWrite={false} />
       </mesh>
-      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.005, 0]} renderOrder={2}>
+      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.004, 0]} renderOrder={2} receiveShadow>
+        <planeGeometry args={[12, 12]} />
+        <shadowMaterial transparent opacity={0.55} depthWrite={false} />
+      </mesh>
+      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.005, 0]} renderOrder={3}>
         <planeGeometry args={[5.6, 2.8]} />
         <meshBasicMaterial map={shadow} transparent depthWrite={false} />
       </mesh>
@@ -209,7 +239,7 @@ export function Car3DView({
       accessibilityLabel={`3D view of the ${livery.name} car. Drag to rotate.`}
     >
       <View style={[StyleSheet.absoluteFill, { pointerEvents: 'none' }]}>
-        <Canvas camera={{ fov: 30, position: [6, 2, 6], near: 0.1, far: 60 }} gl={{ antialias: true, alpha: seeThrough(background), preserveDrawingBuffer: capture }} dpr={[1, 2]} frameloop={focused ? 'always' : 'never'}>
+        <Canvas camera={{ fov: 30, position: [6, 2, 6], near: 0.1, far: 60 }} gl={{ antialias: true, alpha: seeThrough(background), preserveDrawingBuffer: capture }} shadows="soft" dpr={[1, 2]} frameloop={focused ? 'always' : 'never'}>
           <Scene livery={livery} orbit={orbit} background={background} autoSpin={autoSpin && !fixedView} capture={capture} />
         </Canvas>
       </View>

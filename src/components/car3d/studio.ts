@@ -1,44 +1,49 @@
 import * as THREE from 'three';
 
 // Fake studio surroundings used only to give the paint something to reflect: a dark room with a few bright
-// soft boxes, like a car photo shoot. Drawn as a small float image and turned into a reflection map.
+// soft boxes and strip lights, like a car photo shoot. Drawn as a small float image and turned into a reflection map.
 
-const W = 256;
-const H = 128;
+const W = 512;
+const H = 256;
 
 interface Box {
   u: [number, number]; // around the room, 0 to 1
   v: [number, number]; // from the ceiling (0) down to the floor (1)
   color: [number, number, number]; // brightness above 1 is fine
+  /** how soft the edges are, as a fraction of the picture */
+  soft?: number;
 }
 
+// A car photo studio: a big soft box overhead and in front (the key), two long strip lights along the walls at
+// bonnet height (they draw the long highlights along the flanks), a cool window behind, and a warm accent.
 const SOFT_BOXES: Box[] = [
-  { u: [0.52, 0.7], v: [0.08, 0.34], color: [9, 9, 9.5] }, // big key light, front left
-  { u: [0.04, 0.12], v: [0.22, 0.5], color: [4.5, 5, 6] }, // cool strip, behind right
-  { u: [0.3, 0.37], v: [0.28, 0.56], color: [3.4, 0.35, 0.28] }, // red accent strip
-  { u: [0.82, 0.95], v: [0.12, 0.26], color: [3.5, 3.5, 3.8] }, // top rear fill
+  { u: [0.4, 0.66], v: [0.04, 0.26], color: [7, 6.8, 6.4], soft: 0.03 }, // key soft box, high in front
+  { u: [0.08, 0.36], v: [0.3, 0.37], color: [3.2, 3.3, 3.6], soft: 0.012 }, // strip light, left wall
+  { u: [0.66, 0.94], v: [0.31, 0.38], color: [2.6, 2.7, 3.0], soft: 0.012 }, // strip light, right wall
+  { u: [0.0, 0.06], v: [0.14, 0.42], color: [2.2, 2.8, 3.8], soft: 0.02 }, // cool window behind the car
+  { u: [0.96, 1.0], v: [0.14, 0.42], color: [2.2, 2.8, 3.8], soft: 0.02 }, // (the same window, wrapped round)
+  { u: [0.3, 0.37], v: [0.42, 0.52], color: [1.8, 0.5, 0.3], soft: 0.015 }, // warm accent low on the left
 ];
 
 function studioPixels(): Float32Array {
   const data = new Float32Array(W * H * 4);
   for (let y = 0; y < H; y++) {
     const v = y / (H - 1);
-    // dark ceiling, slightly lighter near the horizon, nearly black floor
-    const base = v < 0.55 ? 0.05 + 0.1 * smooth(v / 0.55) : 0.15 * (1 - smooth((v - 0.55) / 0.45)) + 0.01;
+    // a dark grey ceiling brightening toward a pale horizon band, then a nearly black floor
+    const base = v < 0.5 ? 0.06 + 0.22 * smooth(v / 0.5) : 0.28 * (1 - smooth(Math.min(1, (v - 0.5) / 0.2))) + 0.015;
     for (let x = 0; x < W; x++) {
       const u = x / (W - 1);
       let r = base;
-      let g = base;
-      let b = base * 1.05;
+      let g = base * 1.01;
+      let b = base * 1.06;
       for (const box of SOFT_BOXES) {
-        if (u >= box.u[0] && u <= box.u[1] && v >= box.v[0] && v <= box.v[1]) {
-          // soft edges
-          const edge = Math.min(u - box.u[0], box.u[1] - u, v - box.v[0], box.v[1] - v);
-          const k = Math.min(1, edge / 0.015);
-          r += box.color[0] * k;
-          g += box.color[1] * k;
-          b += box.color[2] * k;
-        }
+        const soft = box.soft ?? 0.015;
+        const inside = Math.min(u - box.u[0] + soft, box.u[1] - u + soft, v - box.v[0] + soft, box.v[1] - v + soft);
+        if (inside <= 0) continue;
+        const k = smooth(Math.min(1, inside / (2 * soft)));
+        r += box.color[0] * k;
+        g += box.color[1] * k;
+        b += box.color[2] * k;
       }
       const o = (y * W + x) * 4;
       data[o] = r;

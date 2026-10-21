@@ -64,10 +64,10 @@ export const GEN2026: CarSpec = {
   diffuser: { xStart: -1.5, xEnd: -2.15, hw: 0.44, rise: 0.22, strakes: [0.18] },
   fences: [],
 
-  // 18-inch wheels like the 2022 car (same diameter), but narrower tires and a narrower track
+  // 18-inch wheels like the 2022 car (same diameter), but tyres 25 / 30 mm narrower (measured inflated, like the 2022 car's) and a narrower track
   wheels: {
-    front: { x: 1.7, radius: 0.36, width: 0.28, z: 0.78 },
-    rear: { x: -1.7, radius: 0.365, width: 0.375, z: 0.7625 },
+    front: { x: 1.7, radius: 0.36, width: 0.325, z: 0.7875 },
+    rear: { x: -1.7, radius: 0.36, width: 0.42, z: 0.74 },
   },
 
   // Two elements: a fixed main plane and an active flap in three sections. A less swept, flatter, narrower wing

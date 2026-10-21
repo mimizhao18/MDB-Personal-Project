@@ -24,6 +24,8 @@ export interface LiveryText {
   spacing?: number;
   /** Top view only: along the car (the default), or across it for the wings, reading from the rear or from the front. */
   orient?: 'along' | 'across-rear' | 'across-front';
+  /** The smooth bold lettering (the default) or the old 5 x 7 pixel font. */
+  font?: 'bold' | 'pixel';
 }
 
 export interface Livery {
@@ -47,8 +49,8 @@ export interface Livery {
   helmet?: string;
   /** Matte paint (a few teams run it) or glossy. */
   finish: 'gloss' | 'matte';
-  /** Solid colors for the wings and floor. */
-  parts: { wing: string; flap: string; endplate: string; floor: string };
+  /** Solid colors for the wings and floor, and the halo when the team paints it (otherwise it is bare carbon). */
+  parts: { wing: string; flap: string; endplate: string; floor: string; halo?: string };
   /** The front wing's colors, when it differs from the rear wing's (the 1980s McLarens ran a white front wing and a red rear one). */
   frontParts?: { wing: string; flap: string; endplate: string };
   /** Shapes laid over the base paint seen from above: [x, z] in the car's own measurements (see src/data/cars). */
