@@ -92,23 +92,24 @@ export const GEN2022: CarSpec = {
     rear: { x: -1.8, radius: 0.36, width: 0.45, z: 0.775 },
   },
 
-  // A wide arrow-shaped wing (profiles to 0.9 m from the middle, end plates just beyond) whose tips rise toward the
-  // front tyres. The nose runs into the second element.
+  // A wide arrow-shaped wing (profiles to 0.9 m from the middle, end plates just beyond): a flat main plane whose
+  // tips curl up to the end plates, and three flaps stacked behind it with open slot gaps, each sweeping up at its
+  // inner end to meet the side of the nose and curling up again at the tip. The nose runs into the second element.
   frontWing: {
     span: 0.93,
     sweep: 0.3,
     sweepPower: 1.5,
-    concave: 0.06,
+    concave: 0.08,
     elements: [
-      { x: 3.0, chord: 0.34, y: 0.08, rise: 0.05, angle: 3, dAngle: 3, camber: 0.03, from: 0, flap: false },
-      { x: 2.84, chord: 0.26, y: 0.13, rise: 0.08, angle: 10, dAngle: 7, camber: 0.06, from: 0.12, flap: true },
-      { x: 2.72, chord: 0.22, y: 0.185, rise: 0.1, angle: 18, dAngle: 7, camber: 0.07, from: 0.16, flap: true },
-      { x: 2.62, chord: 0.18, y: 0.24, rise: 0.1, angle: 26, dAngle: 5, camber: 0.07, from: 0.2, flap: true },
+      { x: 3.0, chord: 0.32, y: 0.07, rise: 0.06, angle: 3, dAngle: 3, camber: 0.03, from: 0, flap: false, lift: 0, risePower: 2.2 },
+      { x: 2.8, chord: 0.22, y: 0.135, rise: 0.09, angle: 11, dAngle: 7, camber: 0.08, from: 0.12, flap: true, lift: 0.08, liftSpan: 0.36, risePower: 1.4 },
+      { x: 2.7, chord: 0.18, y: 0.2, rise: 0.1, angle: 19, dAngle: 7, camber: 0.09, from: 0.15, flap: true, lift: 0.11, liftSpan: 0.33, risePower: 1.4 },
+      { x: 2.62, chord: 0.15, y: 0.265, rise: 0.1, angle: 27, dAngle: 5, camber: 0.1, from: 0.18, flap: true, lift: 0.13, liftSpan: 0.3, risePower: 1.4 },
     ],
     // low and rounded at the front, rising to a tall rear corner
     endplate: [[2.98, 0.06], [3.0, 0.14], [2.92, 0.26], [2.7, 0.36], [2.45, 0.42], [2.28, 0.43], [2.24, 0.36], [2.3, 0.2], [2.5, 0.1], [2.75, 0.06]],
     footplate: { x: 2.6, length: 0.5 },
-    vanes: false, // the little vanes along the flaps were banned for 2022
+    vanes: true, // small vortex vanes along the top flap
     pylons: false, // the nose runs all the way into the wing
   },
 

@@ -52,8 +52,10 @@ all ten liveries: [gen2022/liveries-final.jpg](gen2022/liveries-final.jpg); the 
 The geometry was corrected against the FIA 2022 reference volumes (reference/gen2022/dimensions.md, written by the
 previous session and used here): the rear wing was 0.28 m too long and 0.14 m too tall, the floor 0.1 m too wide per
 side, the tyres too narrow, the roll hoop too tall; the nose was a needle. Three sidepod designs (downwash, scoop with
-a bathtub wall, slim) are kept. Still weak: the front wing elements read as stacked dark slabs from dead ahead; the
-airbox ears and engine-cover ridge are simpler than the real car's.
+a bathtub wall, slim) are kept. The front wing was reworked in the morning against a reference photo: a flat main
+plane with curled tips and three separately shaped flaps with open slot gaps, each sweeping up to the nose and curling
+at the tip, with vortex vanes on the top flap (the 2026 wing got the same with two flaps). Still weak: the airbox
+ears and engine-cover ridge are simpler than the real car's.
 
 ### 2026 (reference: the 2026 Chinese GP cars, Alpine A526 and Aston Martin AMR26)
 
@@ -164,6 +166,9 @@ Every livery keeps its id, name, team, era and price.
 - **No new packages** were installed. Expo's documentation for SDK 57 (expo-gl) was checked before touching the GL
   side; nothing beyond what the project already used was needed.
 - **Pod inlet lip lines were removed** from the 2022/2026 cars (they drew a stray dark streak across the pods).
+- **Front wing elements are shaped individually** (`lift`, `liftSpan`, `risePower` on each element) after the
+  morning review; the front wing also has its own paint materials now, so a red front flap no longer gets the rear
+  wing's carbon weave.
 - **Lettering across the wings** now reads correctly from behind (rear wing) and from the front (front wing); it was
   mirrored on one side before this pass, which the stroke font made obvious.
 

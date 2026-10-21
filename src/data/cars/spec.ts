@@ -52,6 +52,13 @@ export interface FrontWingElement {
   /** Where the element starts out from the middle line (the nose passes between the upper flaps). */
   from: number;
   flap: boolean;
+  /** How much the element curls up toward the nose at its inner end, and over what distance from the middle (metres).
+   *  The 2022-style flaps sweep up to meet the nose side; a flap without these gets a small default curl. */
+  lift?: number;
+  liftSpan?: number;
+  /** How the tip rise is spread along the span: 1.6 (the default) keeps the middle flat and curls the tip; lower
+   *  values make a gentler, more even curve. */
+  risePower?: number;
   /** An active element moves: in the straight (low-drag) mode it flattens to `straightAngle` degrees. */
   active?: boolean;
   straightAngle?: number;
@@ -174,11 +181,12 @@ export function frontWingSection(spec: CarSpec, e: FrontWingElement, z: number, 
   const { span, sweep, sweepPower } = spec.frontWing;
   const a = Math.abs(z);
   const t = a / span;
-  const centreLift = e.flap ? 0.04 * Math.exp(-((a / 0.4) ** 2)) : 0;
+  const lift = e.lift ?? (e.flap ? 0.04 : 0);
+  const centreLift = lift * Math.exp(-((a / (e.liftSpan ?? 0.4)) ** 2));
   const flat = mode === 'straight' && e.active;
   return {
     x: e.x - sweep * t ** sweepPower - spec.frontWing.concave * (e.flap ? 1 : 0.5) * Math.sin(Math.PI * t),
-    y: e.y + e.rise * t ** 1.6 + centreLift,
+    y: e.y + e.rise * t ** (e.risePower ?? 1.6) + centreLift,
     chord: e.chord * (1 - 0.06 * t),
     angleDeg: flat ? (e.straightAngle ?? 3) : e.angle + e.dAngle * t,
   };

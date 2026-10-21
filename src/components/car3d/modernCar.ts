@@ -198,6 +198,9 @@ export function buildModernCar(spec: CarSpec, livery: Livery, options: CarOption
     return material;
   };
   const wingMaterials = { wing: wingPaint(lightness(livery.parts.wing) < 0.12), flap: wingPaint(lightness(livery.parts.flap) < 0.12) };
+  // the front wing has its own colors when the livery gives them (frontParts), so its own weave flags too
+  const frontColors = livery.frontParts ?? livery.parts;
+  const frontWingMaterials = { wing: wingPaint(lightness(frontColors.wing) < 0.12), flap: wingPaint(lightness(frontColors.flap) < 0.12) };
 
   // painted parts: a solid color under a clearcoat (matte teams get a dull coat)
   const solid = (hex: string) =>
@@ -390,19 +393,18 @@ export function buildModernCar(spec: CarSpec, livery: Livery, options: CarOption
             return { x: s.x, y: s.y, chord: s.chord, angle: s.angleDeg * DEG };
           },
           e.camber,
-          e.flap ? 0.036 : 0.045,
+          e.flap ? 0.03 : 0.045,
         );
-        part('frontWing').add(new THREE.Mesh(geometry, e.flap ? wingMaterials.flap : wingMaterials.wing));
+        part('frontWing').add(new THREE.Mesh(geometry, e.flap ? frontWingMaterials.flap : frontWingMaterials.wing));
       }
     }
     if (fw.vanes) {
-      // small vertical vanes along the flaps
-      for (const e of fw.elements.filter((el) => el.flap)) {
-        for (const z of [0.3, 0.5, 0.7, 0.85]) {
-          const s = frontWingSection(spec, e, z, aero);
-          const top = s.y + 0.45 * s.chord * Math.sin(s.angleDeg * DEG) + e.camber * s.chord + 0.012;
-          part('frontWing').add(box(0.05, 0.04, 0.006, m.carbon, s.x - s.chord * 0.45, top + 0.02, z * side));
-        }
+      // a row of small vortex vanes standing on the top flap
+      const top = fw.elements[fw.elements.length - 1];
+      for (const z of [0.3, 0.42, 0.54, 0.66, 0.78, 0.88]) {
+        const s = frontWingSection(spec, top, z, aero);
+        const y = s.y + 0.35 * s.chord * Math.sin(s.angleDeg * DEG) + top.camber * s.chord + 0.008;
+        part('frontWing').add(box(0.04, 0.028, 0.005, m.carbon, s.x - s.chord * 0.35, y + 0.012, z * side));
       }
     }
     part('frontWing').add(new THREE.Mesh(plateGeometry(fw.endplate, fw.span * side, 0.014), plateMaterial('front', fw.endplate, side)));
@@ -517,6 +519,8 @@ export function buildModernCar(spec: CarSpec, livery: Livery, options: CarOption
     paint.dispose();
     wingMaterials.wing.dispose();
     wingMaterials.flap.dispose();
+    frontWingMaterials.wing.dispose();
+    frontWingMaterials.flap.dispose();
     plateTextures.forEach((t) => t.dispose());
     Object.values(m).forEach((material) => material.dispose());
   };

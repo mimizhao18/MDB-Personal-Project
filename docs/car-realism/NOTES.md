@@ -251,3 +251,17 @@ now draws the Renault-engined Lotus E22 (Lotus F1 Team), since Renault had no wo
 | forceindia-2014 | Force India VJM07 | 7 | silver-white nose, saffron sidepods with Sahara, green band, black rear |
 | renault-2014 | Lotus E22 | 7 | black with gold pinstripes, red airbox, EMC, burn, red PDVSA rear wing end plates |
 | williams-2014 | Williams FW36 | 7.5 | white with the Martini stripes down the middle, Martini on the pods, striped rear wing |
+
+## 2022 and 2026 front wings (checkpoint-front-wings)
+
+Asked for in the morning: the 2022 and 2026 front wings read as stacked slabs next to the older cars. Against a
+reference photo of a 2022 wing, each element is now shaped on its own: `FrontWingElement` gained `lift` and
+`liftSpan` (how far the flap's inner end sweeps up to meet the side of the nose) and `risePower` (how the tip curl is
+spread along the span). The 2022 wing is a flat main plane with its tips curled to the end plates and three thinner,
+more cambered flaps behind it with open slot gaps, each sweeping up toward the nose and curling at the tip; the 2026
+wing does the same with two flaps. Six small vortex vanes stand on the top flap. The front wing now has its own paint
+materials (it reused the rear wing's, which put the carbon weave on Ferrari's red front flaps).
+
+Pictures: gen2022/wing-round1-front.jpg and wing-round2-front.jpg (before the material fix, after), the
+final-model.jpg of both generations re-taken. Front-wing detail is the one thing that moved: the 2022 car's
+proportions score goes from 7.5 to 8 by my reckoning; the overall scores stay 7.5.

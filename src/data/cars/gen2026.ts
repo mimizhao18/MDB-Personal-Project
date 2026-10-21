@@ -83,13 +83,13 @@ export const GEN2026: CarSpec = {
     sweepPower: 1.8,
     concave: 0.04,
     elements: [
-      { x: 2.9, chord: 0.32, y: 0.08, rise: 0.04, angle: 3, dAngle: 2, camber: 0.03, from: 0, flap: false },
-      { x: 2.74, chord: 0.22, y: 0.14, rise: 0.06, angle: 12, dAngle: 4, camber: 0.06, from: 0.1, flap: true },
-      { x: 2.62, chord: 0.2, y: 0.2, rise: 0.07, angle: 24, dAngle: 4, camber: 0.08, from: 0.14, flap: true, active: true, straightAngle: 3, sections: 3 },
+      { x: 2.9, chord: 0.3, y: 0.07, rise: 0.05, angle: 3, dAngle: 2, camber: 0.03, from: 0, flap: false, lift: 0, risePower: 2.2 },
+      { x: 2.72, chord: 0.2, y: 0.14, rise: 0.07, angle: 12, dAngle: 4, camber: 0.08, from: 0.1, flap: true, lift: 0.08, liftSpan: 0.34, risePower: 1.4 },
+      { x: 2.62, chord: 0.17, y: 0.21, rise: 0.08, angle: 24, dAngle: 4, camber: 0.1, from: 0.14, flap: true, lift: 0.11, liftSpan: 0.3, risePower: 1.4, active: true, straightAngle: 3, sections: 3 },
     ],
     endplate: [[2.86, 0.06], [2.88, 0.14], [2.78, 0.24], [2.6, 0.3], [2.42, 0.32], [2.36, 0.26], [2.4, 0.12], [2.6, 0.06]],
     footplate: null,
-    vanes: false,
+    vanes: true, // small vortex vanes along the top flap
     pylons: false, // the low nose reaches the wing
   },
 
