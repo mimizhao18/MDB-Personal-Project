@@ -43,7 +43,7 @@ export default function RootLayout() {
   return (
     <ThemeProvider value={appTheme}>
       <View style={styles.page}>
-        <View style={styles.app} {...swipe}>
+        <View style={[styles.app, pathname.startsWith('/dev/') && styles.appFull]} {...swipe}>
           <StatusBar style="light" />
           <Stack
             screenOptions={{
@@ -65,6 +65,7 @@ export default function RootLayout() {
             <Stack.Screen name="settings" options={tabScreen('Settings', topLevel)} />
             <Stack.Screen name="livery" options={{ title: 'Livery' }} />
             <Stack.Screen name="dev/design-system" options={{ title: 'Design system' }} />
+            <Stack.Screen name="dev/car-views" options={{ title: 'Car views' }} />
             <Stack.Screen name="compare" options={{ title: 'Compare generations' }} />
             {/* Swipe-back is off here because dragging the race-length slider to the right looks like a back swipe. */}
             <Stack.Screen name="create-session" options={{ title: 'New Race', gestureEnabled: false }} />
@@ -83,4 +84,6 @@ export default function RootLayout() {
 const styles = StyleSheet.create({
   page: { flex: 1, alignItems: 'center', backgroundColor: Platform.OS === 'web' ? colors.backdrop : colors.background },
   app: { flex: 1, width: '100%', maxWidth: Platform.OS === 'web' ? 460 : undefined, backgroundColor: colors.background },
+  // the dev pages (design system, car views) use the whole browser window
+  appFull: { maxWidth: '100%' },
 });

@@ -121,6 +121,7 @@ export function Car3DView({
   background = colors.background,
   autoSpin = true,
   zoom = 1,
+  fixedView,
 }: {
   car: CarSettings;
   height?: number;
@@ -129,6 +130,8 @@ export function Car3DView({
   zoom?: number;
   /** Turn slowly by itself when left alone. Off on Home, where the car holds still until you drag it. */
   autoSpin?: boolean;
+  /** Holds the camera at one angle: no dragging and no spinning (the /dev/car-views page uses this to compare angles). */
+  fixedView?: { yaw: number; pitch: number };
 }) {
   const livery = getLivery(car.liveryId);
   const [focused, setFocused] = useState(true);
@@ -138,19 +141,21 @@ export function Car3DView({
       return () => setFocused(false);
     }, []),
   );
-  const orbit = useRef<Orbit>({ yaw: 0.75, pitch: 0.2, zoom, dragging: false, lastTouchAt: 0, lastX: 0, lastY: 0 });
+  const orbit = useRef<Orbit>({ yaw: fixedView?.yaw ?? 0.75, pitch: fixedView?.pitch ?? 0.2, zoom, dragging: false, lastTouchAt: 0, lastX: 0, lastY: 0 });
   // Development only: lets the camera be set from the browser console when reviewing the model from different angles.
   useEffect(() => {
-    if (__DEV__ && typeof window !== 'undefined') (window as unknown as { __carOrbit?: Orbit }).__carOrbit = orbit.current;
-  }, []);
+    if (__DEV__ && !fixedView && typeof window !== 'undefined') (window as unknown as { __carOrbit?: Orbit }).__carOrbit = orbit.current;
+  }, [fixedView]);
 
   const grant = (e: GestureResponderEvent) => {
+    if (fixedView) return;
     const o = orbit.current;
     o.dragging = true;
     o.lastX = e.nativeEvent.pageX;
     o.lastY = e.nativeEvent.pageY;
   };
   const move = (e: GestureResponderEvent) => {
+    if (fixedView) return;
     const o = orbit.current;
     const { pageX, pageY } = e.nativeEvent;
     o.yaw -= (pageX - o.lastX) * 0.012;
@@ -178,7 +183,7 @@ export function Car3DView({
     >
       <View style={[StyleSheet.absoluteFill, { pointerEvents: 'none' }]}>
         <Canvas camera={{ fov: 30, position: [6, 2, 6], near: 0.1, far: 60 }} gl={{ antialias: true, alpha: seeThrough(background) }} dpr={[1, 2]} frameloop={focused ? 'always' : 'never'}>
-          <Scene livery={livery} orbit={orbit} background={background} autoSpin={autoSpin} />
+          <Scene livery={livery} orbit={orbit} background={background} autoSpin={autoSpin && !fixedView} />
         </Canvas>
       </View>
     </View>
